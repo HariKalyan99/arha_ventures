@@ -19,15 +19,15 @@ export function AtelierTeaser({ index }: { index: string }) {
         <div className="lg:col-span-5">
           <SectionLabel index={index} label="The Atelier" />
           <h2 id="atelier-title" className="display mt-8 text-display-xl text-cream">
-            <Lines lines={['Compose', <>a room <em>in real time.</em></>]} />
+            <Lines lines={['Learn', <>how materials <em>belong together.</em></>]} />
           </h2>
           <p data-reveal="fade" className="mt-8 max-w-md text-cream/75">
-            Step inside a living room rendered live in your browser. Change the stone underfoot, the panelling, the upholstery and the metalwork — then watch
-            the same space move from daylight to firelight.
+            Step inside a living room rendered live in your browser. Change a finish, see what pairs with it, and watch the same space move from daylight to
+            firelight — a quiet education in how rooms hold together.
           </p>
           <div data-reveal="fade" className="mt-10">
             <ArrowLink to="/atelier" variant="outline">
-              Enter the atelier
+              Enter the study
             </ArrowLink>
           </div>
         </div>
