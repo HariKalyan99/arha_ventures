@@ -1,0 +1,326 @@
+@import '@fontsource-variable/cormorant-garamond/wght.css';
+@import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+@import '@fontsource-variable/manrope/wght.css';
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------
+   Design tokens — Dark Opulent Luxury
+   ------------------------------------------------------------------ */
+@theme {
+  --color-obsidian: #171716;
+  --color-ink: #10100f;
+  --color-espresso: #302722;
+  --color-walnut: #604b3b;
+  --color-gold: #b49a73;
+  --color-gold-soft: #cbb592;
+  --color-cream: #e8dfd0;
+  --color-mist: #a9a196;
+  --color-stone: #8a8176;
+  --color-line: rgb(232 223 208 / 0.14);
+  --color-danger: #d89a8a;
+
+  --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+
+  /* Fluid editorial type scale */
+  --text-display-xxl: clamp(3.4rem, 1rem + 10.5vw, 13.5rem);
+  --text-display-xxl--line-height: 0.88;
+  --text-display-xl: clamp(2.9rem, 1.2rem + 6.6vw, 9rem);
+  --text-display-xl--line-height: 0.92;
+  --text-display-lg: clamp(2.4rem, 1.3rem + 4.2vw, 6.25rem);
+  --text-display-lg--line-height: 0.98;
+  --text-display-md: clamp(1.9rem, 1.25rem + 2.4vw, 4rem);
+  --text-display-md--line-height: 1.04;
+  --text-display-sm: clamp(1.5rem, 1.15rem + 1.2vw, 2.4rem);
+  --text-display-sm--line-height: 1.12;
+  --text-lead: clamp(1.05rem, 0.95rem + 0.35vw, 1.3rem);
+  --text-lead--line-height: 1.65;
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.4;
+
+  --tracking-eyebrow: 0.28em;
+  --tracking-wordmark: 0.42em;
+
+  --ease-luxe: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --breakpoint-3xl: 120rem;
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --gutter: clamp(1.25rem, 0.6rem + 3.2vw, 4.5rem);
+    --section-y: clamp(6rem, 4rem + 9vw, 13rem);
+    --header-h: clamp(4.25rem, 3.8rem + 1.2vw, 5.5rem);
+    color-scheme: dark;
+  }
+
+  html {
+    background: var(--color-obsidian);
+    color: var(--color-cream);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-x: clip;
+    min-height: 100svh;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-obsidian);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-gold);
+    outline-offset: 4px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Components & utilities
+   ------------------------------------------------------------------ */
+@utility shell {
+  width: 100%;
+  max-width: 112rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility section-y {
+  padding-block: var(--section-y);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@utility hairline {
+  height: 1px;
+  background: var(--color-line);
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility text-pretty {
+  text-wrap: pretty;
+}
+
+@layer components {
+  /* Film grain over the whole experience — purely decorative */
+  .grain::after {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.055;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.015em;
+  }
+
+  .display em,
+  .display i {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--color-gold-soft);
+  }
+
+  /* Underline-on-hover links */
+  .link-line {
+    position: relative;
+    display: inline-block;
+  }
+  .link-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.2em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.7s var(--ease-luxe);
+  }
+  .link-line:hover::after,
+  .link-line:focus-visible::after,
+  .link-line[aria-current='true']::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Architectural corner ticks used to frame media */
+  .frame-ticks {
+    position: relative;
+  }
+  .frame-ticks::before,
+  .frame-ticks::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--color-gold);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .frame-ticks::before {
+    top: -7px;
+    left: -7px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .frame-ticks::after {
+    bottom: -7px;
+    right: -7px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .field-input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.85rem 0 0.75rem;
+    color: var(--color-cream);
+    font-size: 1.05rem;
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-luxe);
+  }
+  .field-input::placeholder {
+    color: rgb(232 223 208 / 0.32);
+  }
+  .field-input:hover {
+    border-bottom-color: rgb(232 223 208 / 0.32);
+  }
+  .field-input:focus {
+    outline: none;
+    border-bottom-color: var(--color-gold);
+  }
+  .field-input:focus-visible {
+    outline: none;
+  }
+  .field-input[aria-invalid='true'] {
+    border-bottom-color: var(--color-danger);
+  }
+  select.field-input {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-gold) 50%),
+      linear-gradient(135deg, var(--color-gold) 50%, transparent 50%);
+    background-position:
+      calc(100% - 10px) 55%,
+      calc(100% - 5px) 55%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+  }
+  select.field-input option {
+    background: var(--color-espresso);
+    color: var(--color-cream);
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  .animate-marquee {
+    animation: marquee 60s linear infinite;
+  }
+
+  @keyframes scroll-cue {
+    0% {
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    45% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    55% {
+      transform: scaleY(1);
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+  .animate-scroll-cue {
+    animation: scroll-cue 2.6s var(--ease-curtain) infinite;
+  }
+
+  @keyframes loading-bar {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(300%);
+    }
+  }
+
+  .animate-loading-bar {
+    animation: loading-bar 1.6s var(--ease-curtain) infinite;
+  }
+}

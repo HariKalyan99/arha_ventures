@@ -1,0 +1,76 @@
+import { useRef } from 'react'
+import { PageHeader } from '../components/ui/PageHeader'
+import { InquiryForm } from '../components/contact/InquiryForm'
+import { studio } from '../data/site'
+import { useReveal } from '../animations/reveal'
+import { usePageMeta } from '../hooks/usePageMeta'
+
+export default function ContactPage() {
+  usePageMeta('Contact', 'Begin a conversation about your residence, villa, hospitality or workplace project.')
+  const ref = useRef<HTMLElement>(null)
+  useReveal(ref)
+
+  const details = [
+    { label: 'Email', value: studio.email, href: `mailto:${studio.email}` },
+    { label: 'Telephone', value: studio.phone, href: `tel:${studio.phone.replace(/[^+\d]/g, '')}` },
+    { label: 'Studio', value: studio.location },
+    { label: 'Hours', value: studio.hours },
+  ]
+
+  return (
+    <>
+      <PageHeader
+        index="01"
+        label="Contact"
+        title={['Begin with', <>a <em>conversation.</em></>]}
+        intro="Tell us about the space, the way you want to live in it and the timing you have in mind. We reply to every enquiry personally."
+      />
+      <section ref={ref} aria-label="Enquiry" className="bg-obsidian pb-[var(--section-y)]">
+        <div className="shell grid gap-16 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <InquiryForm />
+          </div>
+          <aside aria-label="Studio details" className="lg:col-span-4 lg:col-start-9">
+            <div className="flex flex-col gap-10 lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
+              <dl className="flex flex-col border-t border-line">
+                {details.map((d) => (
+                  <div key={d.label} data-reveal="fade" className="flex flex-col gap-1 border-b border-line py-5">
+                    <dt className="eyebrow text-cream/50">{d.label}</dt>
+                    <dd className="text-cream">
+                      {d.href && !studio.contactIsPlaceholder ? (
+                        <a href={d.href} className="link-line">
+                          {d.value}
+                        </a>
+                      ) : (
+                        d.value
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              {studio.contactIsPlaceholder && (
+                <p data-reveal="fade" className="border-l border-gold/50 pl-4 text-sm text-gold/90">
+                  These contact details are placeholders and will be replaced with the studio’s real address, email and telephone before launch.
+                </p>
+              )}
+              <div data-reveal="fade">
+                <p className="eyebrow text-cream/50">What happens next</p>
+                <ol className="mt-5 flex flex-col gap-4 text-sm text-cream/75">
+                  <li className="flex gap-4">
+                    <span className="text-gold">01</span>We read your enquiry and reply by email.
+                  </li>
+                  <li className="flex gap-4">
+                    <span className="text-gold">02</span>An introductory call to understand the brief.
+                  </li>
+                  <li className="flex gap-4">
+                    <span className="text-gold">03</span>A site visit and a written proposal.
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </>
+  )
+}

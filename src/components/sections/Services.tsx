@@ -1,0 +1,135 @@
+import { useRef, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Plus } from 'lucide-react'
+import { services } from '../../data/services'
+import { EASE_LUXE } from '../../lib/motion'
+import { useReveal } from '../../animations/reveal'
+import { useFinePointer } from '../../hooks/useMediaQuery'
+import { Img } from '../ui/Img'
+import { SectionLabel } from '../ui/SectionLabel'
+import { Lines } from '../ui/Text'
+
+interface ServicesProps {
+  index: string
+  heading?: ReactNode[]
+  intro?: string
+  footer?: ReactNode
+}
+
+/** Editorial services index: the active service expands and a sticky frame crossfades to its image. */
+export function Services({ index, heading = ['What we', <em key="e">take on.</em>], intro, footer }: ServicesProps) {
+  const ref = useRef<HTMLElement>(null)
+  const [active, setActive] = useState(0)
+  const finePointer = useFinePointer()
+  useReveal(ref)
+  const current = services[active]
+
+  return (
+    <section ref={ref} aria-labelledby="services-title" className="relative bg-espresso section-y">
+      <div className="shell">
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
+            <SectionLabel index={index} label="Services" />
+            <h2 id="services-title" className="display mt-8 text-display-xl text-cream">
+              <Lines lines={heading} />
+            </h2>
+          </div>
+          {intro && (
+            <p data-reveal="fade" className="text-cream/75 lg:col-span-4 lg:col-start-9">
+              {intro}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-[clamp(3.5rem,7vw,6rem)] grid gap-12 lg:grid-cols-12">
+          <div className="hidden lg:col-span-5 lg:block">
+            <div className="sticky top-[calc(var(--header-h)+2rem)]">
+              <div className="frame-ticks relative aspect-[4/5] overflow-hidden bg-obsidian">
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={current.id}
+                    className="absolute inset-0"
+                    initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
+                    animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+                    exit={{ opacity: 0, transition: { duration: 0.6, delay: 0.3 } }}
+                    transition={{ duration: 1, ease: EASE_LUXE }}
+                  >
+                    <motion.div className="size-full" initial={{ scale: 1.15 }} animate={{ scale: 1 }} transition={{ duration: 1.6, ease: EASE_LUXE }}>
+                      <Img media={current.image} className="size-full object-cover" sizes="40vw" />
+                    </motion.div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <p className="eyebrow mt-4 flex justify-between text-cream/55">
+                <span>{String(active + 1).padStart(2, '0')} / {String(services.length).padStart(2, '0')}</span>
+                <span>{current.title}</span>
+              </p>
+            </div>
+          </div>
+
+          <ul className="border-t border-cream/15 lg:col-span-7">
+            {services.map((service, i) => {
+              const open = active === i
+              return (
+                <li key={service.id} className="border-b border-cream/15">
+                  <h3>
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={`service-${service.id}`}
+                      onClick={() => setActive(i)}
+                      onPointerEnter={finePointer ? () => setActive(i) : undefined}
+                      onFocus={() => setActive(i)}
+                      className="group flex w-full items-center gap-5 py-6 text-left sm:py-7"
+                    >
+                      <span className="eyebrow w-8 shrink-0 text-gold tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                      <span
+                        className={`display flex-1 text-[clamp(1.6rem,1.1rem+1.9vw,3rem)] leading-tight transition-[color,transform] duration-700 ease-[var(--ease-luxe)] ${
+                          open ? 'translate-x-2 text-cream' : 'text-cream/55 group-hover:text-cream/85'
+                        }`}
+                      >
+                        {service.title}
+                      </span>
+                      <Plus
+                        aria-hidden
+                        strokeWidth={1.25}
+                        className={`size-5 shrink-0 text-gold transition-transform duration-700 ease-[var(--ease-luxe)] ${open ? 'rotate-45' : ''}`}
+                      />
+                    </button>
+                  </h3>
+                  <AnimatePresence initial={false}>
+                    {open && (
+                      <motion.div
+                        id={`service-${service.id}`}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.7, ease: EASE_LUXE }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid gap-6 pb-8 pl-13 sm:grid-cols-[1fr_auto]">
+                          <p className="max-w-md text-cream/75">{service.summary}</p>
+                          <ul className="flex flex-wrap gap-2 sm:max-w-56 sm:justify-end">
+                            {service.scope.map((s) => (
+                              <li key={s} className="eyebrow border border-gold/30 px-2.5 py-1.5 text-[0.62rem] text-gold-soft">
+                                {s}
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="aspect-[16/10] overflow-hidden sm:col-span-2 lg:hidden">
+                            <Img media={service.image} className="size-full object-cover" sizes="90vw" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        {footer && <div className="mt-12 flex justify-end">{footer}</div>}
+      </div>
+    </section>
+  )
+}
