@@ -35,6 +35,7 @@ export function SceneCanvas({ tier, active, onReady, className, children }: Scen
   return (
     <Canvas
       className={className}
+      style={{ pointerEvents: 'auto' }}
       shadows={settings.shadows ? { type: THREE.PCFShadowMap } : false}
       dpr={dpr}
       frameloop={active ? 'always' : 'never'}

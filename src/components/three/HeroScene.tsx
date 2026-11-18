@@ -3,7 +3,9 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { defaultFinishes } from '../../data/configurator'
 import type { QualityTier } from '../../lib/device'
+import { HeroTourCamera } from './HeroTourCamera'
 import { RoomScene } from './RoomScene'
+import { HERO_ROOM_SOURCE } from './roomSource'
 import { SceneCanvas } from './SceneCanvas'
 
 interface HeroSceneProps {
@@ -15,23 +17,24 @@ interface HeroSceneProps {
   onReady: () => void
 }
 
-const pose = {
+/** Camera framing for the procedural room (fireplace left, glazing ahead). */
+const proceduralPose = {
   landscape: { position: new THREE.Vector3(2.6, 1.45, 4.7), target: new THREE.Vector3(-0.2, 1.08, -3.2), fov: 42 },
   portrait: { position: new THREE.Vector3(1.6, 1.4, 4.75), target: new THREE.Vector3(-0.6, 1.05, -3), fov: 64 },
 }
 
 /**
- * Cinematic camera: a slow ambient drift, pointer parallax, and a scroll-driven
- * dolly into the room. All inputs are damped so motion always settles smoothly.
+ * Procedural-room camera: ambient drift, pointer parallax, scroll dolly.
+ * Kept for when HERO_ROOM_SOURCE is flipped back to `'procedural'`.
  */
-function HeroCamera({ progress, reducedMotion }: { progress: RefObject<number>; reducedMotion: boolean }) {
+function ProceduralHeroCamera({ progress, reducedMotion }: { progress: RefObject<number>; reducedMotion: boolean }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
   const size = useThree((s) => s.size)
   const pointer = useRef({ x: 0, y: 0 })
   const smooth = useRef({ x: 0, y: 0, p: 0 })
   const look = useMemo(() => new THREE.Vector3(), [])
   const portrait = size.width / size.height < 0.9
-  const base = portrait ? pose.portrait : pose.landscape
+  const base = portrait ? proceduralPose.portrait : proceduralPose.landscape
 
   useEffect(() => {
     camera.fov = base.fov
@@ -77,8 +80,12 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
   const blend = useMemo(() => ({ from: 'evening' as const, to: 'night' as const, progress }), [progress])
   return (
     <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0">
-      <HeroCamera progress={progress} reducedMotion={reducedMotion} />
-      <RoomScene finishes={defaultFinishes} mood="evening" blend={blend} tier={tier} />
+      {HERO_ROOM_SOURCE === 'glb' ? (
+        <HeroTourCamera progress={progress} reducedMotion={reducedMotion} />
+      ) : (
+        <ProceduralHeroCamera progress={progress} reducedMotion={reducedMotion} />
+      )}
+      <RoomScene finishes={defaultFinishes} mood="evening" blend={blend} tier={tier} source={HERO_ROOM_SOURCE} />
     </SceneCanvas>
   )
 }
