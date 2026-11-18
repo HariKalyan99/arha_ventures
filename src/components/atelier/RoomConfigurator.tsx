@@ -14,12 +14,16 @@ import {
   type RoomFinishes,
   type RoomView,
 } from '../../data/configurator'
+import {
+  getPaletteGuidance,
+  recommendedIds,
+  type FinishCategory,
+} from '../../data/atelierGuide'
 import { media } from '../../data/media'
 import { getQualityTier, hasWebGL } from '../../lib/device'
 import { useInViewport } from '../../hooks/useInViewport'
 import { useFinePointer } from '../../hooks/useMediaQuery'
 import { Img } from '../ui/Img'
-import { ArrowLink } from '../ui/ArrowButton'
 import { SceneErrorBoundary } from '../three/SceneErrorBoundary'
 
 const ConfiguratorScene = lazy(() => import('../three/ConfiguratorScene'))
@@ -32,12 +36,15 @@ function SwatchGroup<T extends string>({
   legend,
   options,
   value,
+  recommended,
   onChange,
 }: {
   name: string
   legend: string
   options: Option<T>[]
   value: T
+  /** Finish ids that pair well with the current focus choice */
+  recommended?: Set<string>
   onChange: (value: T) => void
 }) {
   const selected = options.find((o) => o.id === value)
@@ -48,40 +55,56 @@ function SwatchGroup<T extends string>({
         <span className="eyebrow text-cream/55">{legend}</span>
         <span className="font-display text-lg text-cream italic">{selected?.label}</span>
       </div>
-      <div className="mt-4 flex flex-wrap gap-3">
-        {options.map((o) => (
-          <label key={o.id} className="group relative cursor-pointer" title={o.label}>
-            <input
-              type="radio"
-              name={name}
-              value={o.id}
-              checked={value === o.id}
-              onChange={() => onChange(o.id)}
-              className="peer sr-only"
-            />
-            <span className="sr-only">
-              {o.label} — {o.note}
-            </span>
-            <span
-              aria-hidden
-              className="block size-12 border border-cream/15 ring-gold ring-offset-2 ring-offset-obsidian transition-[box-shadow,transform] duration-500 group-hover:scale-105 peer-checked:ring-1 peer-focus-visible:ring-2 peer-focus-visible:ring-cream sm:size-14"
-              style={{ background: o.swatch }}
-            />
-          </label>
-        ))}
+      <div className="mt-4 flex flex-wrap gap-2.5 sm:gap-3">
+        {options.map((o) => {
+          const isRec = recommended?.has(o.id) && o.id !== value
+          return (
+            <label
+              key={o.id}
+              className="group relative cursor-pointer"
+              title={isRec ? `${o.label} — pairs well with your current focus` : `${o.label} — ${o.note}`}
+            >
+              <input
+                type="radio"
+                name={name}
+                value={o.id}
+                checked={value === o.id}
+                onChange={() => onChange(o.id)}
+                className="peer sr-only"
+              />
+              <span className="sr-only">
+                {o.label} — {o.note}
+                {isRec ? '. Suggested pairing.' : ''}
+              </span>
+              <span
+                aria-hidden
+                className={`block size-11 border transition-[box-shadow,transform,border-color] duration-500 group-hover:scale-105 peer-checked:ring-1 peer-checked:ring-gold peer-checked:ring-offset-2 peer-checked:ring-offset-obsidian peer-focus-visible:ring-2 peer-focus-visible:ring-cream sm:size-12 ${
+                  isRec ? 'border-gold/70 shadow-[0_0_0_1px_rgba(180,154,115,0.35)]' : 'border-cream/15'
+                }`}
+                style={{ background: o.swatch }}
+              />
+              {isRec && (
+                <span aria-hidden className="pointer-events-none absolute -top-1 -right-1 size-1.5 rounded-full bg-gold" />
+              )}
+            </label>
+          )
+        })}
       </div>
       <p className="mt-3 text-xs text-cream/50" aria-hidden>
         {selected?.note}
+        {recommended && recommended.size > 0 ? ' · Gold-marked swatches pair with your focus choice.' : ''}
       </p>
     </fieldset>
   )
 }
 
+/** Interactive study room — teaches finish pairing through live 3D feedback. */
 export function RoomConfigurator() {
   const [finishes, setFinishes] = useState<RoomFinishes>(defaultFinishes)
   const [mood, setMood] = useState<LightingMood>(DEFAULT_MOOD)
   const [view, setView] = useState<RoomView>(DEFAULT_VIEW)
   const [viewRequest, setViewRequest] = useState(0)
+  const [focus, setFocus] = useState<FinishCategory>('floor')
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [exploring, setExploring] = useState(false)
@@ -92,10 +115,37 @@ export function RoomConfigurator() {
   const webgl = useMemo(() => hasWebGL(), [])
   const tier = useMemo(() => getQualityTier(), [])
   const show3d = webgl && !failed
-  // On touch screens the canvas only captures gestures once the visitor opts in, so the page stays scrollable.
+  // Touch: canvas only captures gestures after Explore, so the page stays scrollable.
   const interactive = finePointer || exploring
 
-  const set = <K extends keyof RoomFinishes>(key: K) => (value: RoomFinishes[K]) => setFinishes((f) => ({ ...f, [key]: value }))
+  const guidance = useMemo(() => getPaletteGuidance(finishes, mood, focus), [finishes, mood, focus])
+
+  const recWall = useMemo(() => recommendedIds(finishes, mood, focus, 'wall'), [finishes, mood, focus])
+  const recFloor = useMemo(() => recommendedIds(finishes, mood, focus, 'floor'), [finishes, mood, focus])
+  const recUpholstery = useMemo(() => recommendedIds(finishes, mood, focus, 'upholstery'), [finishes, mood, focus])
+  const recMetal = useMemo(() => recommendedIds(finishes, mood, focus, 'metal'), [finishes, mood, focus])
+  const recMood = useMemo(() => recommendedIds(finishes, mood, focus, 'mood'), [finishes, mood, focus])
+
+  const setFinish =
+    <K extends keyof RoomFinishes>(key: K) =>
+    (value: RoomFinishes[K]) => {
+      setFocus(key)
+      setFinishes((f) => ({ ...f, [key]: value }))
+    }
+
+  const changeMood = (next: LightingMood) => {
+    setFocus('mood')
+    setMood(next)
+  }
+
+  const applySuggestion = (category: FinishCategory, id: string) => {
+    setFocus(category)
+    if (category === 'mood') {
+      setMood(id as LightingMood)
+      return
+    }
+    setFinishes((f) => ({ ...f, [category]: id }))
+  }
 
   const frame = (next: RoomView) => {
     setView(next)
@@ -105,6 +155,7 @@ export function RoomConfigurator() {
   const reset = () => {
     setFinishes(defaultFinishes)
     setMood(DEFAULT_MOOD)
+    setFocus('floor')
     frame(DEFAULT_VIEW)
   }
 
@@ -128,14 +179,6 @@ export function RoomConfigurator() {
       action()
     }
   }
-
-  const summary = [
-    `Floor: ${floorOptions.find((o) => o.id === finishes.floor)?.label}`,
-    `Walls: ${wallOptions.find((o) => o.id === finishes.wall)?.label}`,
-    `Upholstery: ${upholsteryOptions.find((o) => o.id === finishes.upholstery)?.label}`,
-    `Metal: ${metalOptions.find((o) => o.id === finishes.metal)?.label}`,
-    `Light: ${moodOptions.find((o) => o.id === mood)?.label}`,
-  ]
 
   return (
     <div className="grid gap-px bg-line lg:grid-cols-12">
@@ -190,7 +233,6 @@ export function RoomConfigurator() {
                 </div>
               )}
 
-              {/* Camera tools */}
               <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 bg-gradient-to-t from-ink/80 to-transparent p-4 sm:p-6">
                 <div role="group" aria-label="Camera view" className="flex flex-wrap gap-1 bg-obsidian/80 p-1 backdrop-blur-sm">
                   {viewOptions.map((o) => (
@@ -245,8 +287,7 @@ export function RoomConfigurator() {
               <div className="absolute inset-0 bg-ink/55" />
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
                 <p className="max-w-md text-cream/85">
-                  The 3D room needs WebGL, which isn’t available in this browser. You can still compose a palette — your selections are listed alongside
-                  and can be sent with an enquiry.
+                  The 3D study needs WebGL, which isn’t available here. You can still explore the finish guide and pairing notes in the panel alongside.
                 </p>
               </div>
             </div>
@@ -254,49 +295,135 @@ export function RoomConfigurator() {
         </div>
       </div>
 
-      {/* Controls */}
+      {/* Educational controls */}
       <div className="bg-obsidian lg:col-span-4">
         <div className="flex flex-col gap-6 p-6 sm:p-10 lg:p-8 xl:p-10">
+          <div>
+            <p className="eyebrow text-gold">Material study</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream/70">
+              Choose a finish to learn what it asks of the room. Suggested companions are marked in gold — try them and watch the scene respond.
+            </p>
+          </div>
+
+          {/* Live lesson for the last choice */}
+          <aside
+            className="rounded-sm border border-gold/25 bg-ink/50 p-4 sm:p-5"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <p className="eyebrow text-gold/90">Focus</p>
+            <h3 className="font-display mt-2 text-xl text-cream italic sm:text-2xl">{guidance.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-cream/75">{guidance.lesson}</p>
+
+            {guidance.suggestions.length > 0 && (
+              <div className="mt-5">
+                <p className="eyebrow text-cream/45">Works well with</p>
+                <ul className="mt-3 flex flex-col gap-2.5">
+                  {guidance.suggestions.map((s) => (
+                    <li key={`${s.category}-${s.id}`}>
+                      <button
+                        type="button"
+                        onClick={() => !s.active && applySuggestion(s.category, s.id)}
+                        disabled={s.active}
+                        className={`group flex w-full gap-3 border px-3 py-3 text-left transition-colors duration-500 ${
+                          s.active
+                            ? 'cursor-default border-gold/30 bg-gold/5'
+                            : 'border-line bg-obsidian/60 hover:border-gold/40 hover:bg-espresso/40'
+                        }`}
+                      >
+                        {s.swatch ? (
+                          <span
+                            aria-hidden
+                            className="mt-0.5 size-10 shrink-0 border border-cream/15 sm:size-11"
+                            style={{ background: s.swatch }}
+                          />
+                        ) : (
+                          <span
+                            aria-hidden
+                            className={`mt-0.5 flex size-10 shrink-0 items-center justify-center border border-cream/15 text-[0.55rem] tracking-[0.18em] uppercase sm:size-11 ${
+                              s.id === 'daylight' ? 'bg-cream/20 text-cream' : s.id === 'evening' ? 'bg-gold/30 text-cream' : 'bg-ink text-cream/70'
+                            }`}
+                          >
+                            {s.id === 'daylight' ? 'Day' : s.id === 'evening' ? 'Eve' : 'Ngt'}
+                          </span>
+                        )}
+                        <span className="min-w-0 flex-1">
+                          <span className="eyebrow block text-[0.6rem] text-cream/45">{s.categoryLabel}</span>
+                          <span className={`mt-0.5 block text-sm ${s.active ? 'text-gold-soft' : 'text-cream group-hover:text-gold-soft'}`}>
+                            {s.label}
+                          </span>
+                          <span className="mt-1.5 block text-xs leading-relaxed text-cream/55">{s.reason}</span>
+                        </span>
+                        <span className={`eyebrow shrink-0 self-center ${s.active ? 'text-gold/80' : 'text-gold/70'}`}>
+                          {s.active ? 'In use' : 'Try'}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {guidance.tension && (
+              <p className="mt-5 border-t border-line pt-4 text-xs leading-relaxed text-gold-soft/90">
+                <span className="eyebrow mr-2 text-gold">Note</span>
+                {guidance.tension}
+              </p>
+            )}
+          </aside>
+
           <fieldset>
             <legend className="eyebrow text-cream/55">Light</legend>
             <div className="mt-4 grid grid-cols-3 gap-px bg-line">
-              {moodOptions.map((o) => (
-                <label key={o.id} className="relative cursor-pointer bg-obsidian">
-                  <input type="radio" name="mood" value={o.id} checked={mood === o.id} onChange={() => setMood(o.id)} className="peer sr-only" />
-                  <span className="flex h-full flex-col gap-1 p-3 transition-colors duration-500 peer-checked:bg-cream peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-gold hover:bg-espresso peer-checked:hover:bg-cream">
-                    <span className="text-sm">{o.label}</span>
-                    <span className="text-[0.7rem] leading-snug opacity-60">{o.note}</span>
-                  </span>
-                </label>
-              ))}
+              {moodOptions.map((o) => {
+                const isRec = recMood.has(o.id) && o.id !== mood
+                return (
+                  <label key={o.id} className="relative cursor-pointer bg-obsidian">
+                    <input type="radio" name="mood" value={o.id} checked={mood === o.id} onChange={() => changeMood(o.id)} className="peer sr-only" />
+                    <span
+                      className={`flex h-full flex-col gap-1 p-3 transition-colors duration-500 peer-checked:bg-cream peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-gold hover:bg-espresso peer-checked:hover:bg-cream ${
+                        isRec ? 'ring-1 ring-inset ring-gold/50' : ''
+                      }`}
+                    >
+                      <span className="text-sm">{o.label}</span>
+                      <span className="text-[0.7rem] leading-snug opacity-60">{o.note}</span>
+                    </span>
+                  </label>
+                )
+              })}
             </div>
           </fieldset>
 
-          <SwatchGroup name="floor" legend="Floor" options={floorOptions} value={finishes.floor} onChange={set('floor')} />
-          <SwatchGroup name="wall" legend="Feature wall" options={wallOptions} value={finishes.wall} onChange={set('wall')} />
-          <SwatchGroup name="upholstery" legend="Upholstery" options={upholsteryOptions} value={finishes.upholstery} onChange={set('upholstery')} />
-          <SwatchGroup name="metal" legend="Metalwork" options={metalOptions} value={finishes.metal} onChange={set('metal')} />
+          <SwatchGroup name="floor" legend="Floor" options={floorOptions} value={finishes.floor} recommended={recFloor} onChange={setFinish('floor')} />
+          <SwatchGroup name="wall" legend="Feature wall" options={wallOptions} value={finishes.wall} recommended={recWall} onChange={setFinish('wall')} />
+          <SwatchGroup
+            name="upholstery"
+            legend="Upholstery"
+            options={upholsteryOptions}
+            value={finishes.upholstery}
+            recommended={recUpholstery}
+            onChange={setFinish('upholstery')}
+          />
+          <SwatchGroup name="metal" legend="Metalwork" options={metalOptions} value={finishes.metal} recommended={recMetal} onChange={setFinish('metal')} />
 
           <div className="border-t border-line pt-6">
-            <h3 className="eyebrow text-gold">Your palette</h3>
-            <ul className="mt-4 flex flex-col gap-1.5 text-sm text-cream/75" aria-live="polite">
-              {summary.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
+            <h3 className="eyebrow text-gold">Reading this palette</h3>
+            <p className="mt-4 text-sm leading-relaxed text-cream/75">{guidance.reading}</p>
+            <ul className="mt-5 flex flex-col gap-1.5 text-xs text-cream/55" aria-live="polite">
+              <li>Floor · {floorOptions.find((o) => o.id === finishes.floor)?.label}</li>
+              <li>Wall · {wallOptions.find((o) => o.id === finishes.wall)?.label}</li>
+              <li>Upholstery · {upholsteryOptions.find((o) => o.id === finishes.upholstery)?.label}</li>
+              <li>Metal · {metalOptions.find((o) => o.id === finishes.metal)?.label}</li>
+              <li>Light · {moodOptions.find((o) => o.id === mood)?.label}</li>
             </ul>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <ArrowLink variant="solid" to={`/contact?palette=${encodeURIComponent(summary.join('; '))}`}>
-                Discuss this palette
-              </ArrowLink>
-              <button
-                type="button"
-                onClick={reset}
-                className="eyebrow inline-flex min-h-12 items-center gap-2 px-2 text-cream/70 transition-colors duration-500 hover:text-cream"
-              >
-                <RotateCcw className="size-4" strokeWidth={1.25} aria-hidden />
-                Reset
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={reset}
+              className="eyebrow mt-8 inline-flex min-h-12 items-center gap-2 px-2 text-cream/70 transition-colors duration-500 hover:text-cream"
+            >
+              <RotateCcw className="size-4" strokeWidth={1.25} aria-hidden />
+              Reset study
+            </button>
           </div>
         </div>
       </div>
