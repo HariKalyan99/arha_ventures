@@ -25,7 +25,7 @@ export function Services({ index, heading = ['What we', <em key="e">take on.</em
   const current = services[active]
 
   return (
-    <section ref={ref} aria-labelledby="services-title" className="relative bg-espresso section-y">
+    <section ref={ref} aria-labelledby="services-title" className="relative surface-espresso section-y">
       <div className="shell">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
@@ -35,7 +35,7 @@ export function Services({ index, heading = ['What we', <em key="e">take on.</em
             </h2>
           </div>
           {intro && (
-            <p data-reveal="fade" className="text-cream/75 lg:col-span-4 lg:col-start-9">
+            <p data-reveal="fade" className="text-cream/60 lg:col-span-4 lg:col-start-9">
               {intro}
             </p>
           )}
@@ -44,7 +44,7 @@ export function Services({ index, heading = ['What we', <em key="e">take on.</em
         <div className="mt-[clamp(3.5rem,7vw,6rem)] grid gap-12 lg:grid-cols-12">
           <div className="hidden lg:col-span-5 lg:block">
             <div className="sticky top-[calc(var(--header-h)+2rem)]">
-              <div className="frame-ticks relative aspect-[4/5] overflow-hidden bg-obsidian">
+              <div className="frame-ticks media-grade relative aspect-[4/5] overflow-hidden bg-obsidian">
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={current.id}

@@ -15,7 +15,7 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer ref={ref} className="relative overflow-hidden bg-ink">
+    <footer ref={ref} className="relative overflow-hidden surface-ink">
       {pathname !== '/contact' && !pathname.startsWith('/projects/') && (
         <div className="shell section-y border-b border-line">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
@@ -24,7 +24,7 @@ export function Footer() {
               <Lines lines={['Have a space', <>in <em>mind?</em></>]} />
             </h2>
             <div data-reveal="fade" className="flex flex-col gap-6 lg:col-span-4">
-              <p className="text-cream/75">
+              <p className="text-cream/60">
                 Tell us about the place, the people who will live in it, and what you hope it will feel like. We reply to every enquiry personally.
               </p>
               <ArrowLink to="/contact" variant="solid" className="self-start">

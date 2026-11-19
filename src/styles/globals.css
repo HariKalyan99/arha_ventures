@@ -189,6 +189,49 @@
     color: var(--color-gold-soft);
   }
 
+  /* Soft veil for display type over photography / 3D — not a sitewide glow */
+  .display-on-media {
+    text-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.35),
+      0 10px 36px rgba(0, 0, 0, 0.38);
+  }
+
+  /* Quiet depth on solid section fields */
+  .surface-ink {
+    background:
+      radial-gradient(90% 70% at 50% -10%, rgba(180, 154, 115, 0.06), transparent 55%),
+      linear-gradient(180deg, #141413 0%, var(--color-ink) 42%, #0c0c0b 100%);
+  }
+  .surface-obsidian {
+    background:
+      radial-gradient(80% 55% at 85% 0%, rgba(96, 75, 59, 0.18), transparent 50%),
+      linear-gradient(180deg, #1a1918 0%, var(--color-obsidian) 48%, #121211 100%);
+  }
+  .surface-espresso {
+    background:
+      radial-gradient(70% 50% at 12% 0%, rgba(180, 154, 115, 0.07), transparent 45%),
+      linear-gradient(180deg, #362c26 0%, var(--color-espresso) 50%, #261f1b 100%);
+  }
+
+  /* Warm grade + edge vignette for editorial imagery */
+  .media-grade {
+    position: relative;
+    isolation: isolate;
+  }
+  .media-grade img {
+    filter: saturate(0.9) contrast(1.05) brightness(0.97);
+  }
+  .media-grade::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(to top, rgba(16, 16, 15, 0.28), transparent 38%),
+      radial-gradient(120% 95% at 50% 40%, transparent 42%, rgba(16, 16, 15, 0.32) 100%);
+  }
+
   /* Underline-on-hover links */
   .link-line {
     position: relative;

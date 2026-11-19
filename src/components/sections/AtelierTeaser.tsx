@@ -6,7 +6,14 @@ import { SectionLabel } from '../ui/SectionLabel'
 import { ArrowLink } from '../ui/ArrowButton'
 import { Lines } from '../ui/Text'
 
-const samples = [floorOptions[0], wallOptions[0], upholsteryOptions[1], metalOptions[0], floorOptions[1]]
+/** Curated board — one from each family, skewed toward newer finishes so the teaser matches the study. */
+const samples = [
+  floorOptions.find((o) => o.id === 'limestone')!,
+  wallOptions.find((o) => o.id === 'oak-slats')!,
+  upholsteryOptions.find((o) => o.id === 'ink')!,
+  metalOptions.find((o) => o.id === 'copper')!,
+  floorOptions.find((o) => o.id === 'nero')!,
+]
 
 /** Home-page invitation into the configurator: a fanned sample board rendered with CSS 3D transforms. */
 export function AtelierTeaser({ index }: { index: string }) {
@@ -14,14 +21,14 @@ export function AtelierTeaser({ index }: { index: string }) {
   useReveal(ref)
 
   return (
-    <section ref={ref} aria-labelledby="atelier-title" className="relative overflow-hidden bg-espresso section-y">
+    <section ref={ref} aria-labelledby="atelier-title" className="relative overflow-hidden surface-espresso section-y">
       <div className="shell grid items-center gap-16 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <SectionLabel index={index} label="The Atelier" />
           <h2 id="atelier-title" className="display mt-8 text-display-xl text-cream">
             <Lines lines={['Learn', <>how materials <em>belong together.</em></>]} />
           </h2>
-          <p data-reveal="fade" className="mt-8 max-w-md text-cream/75">
+          <p data-reveal="fade" className="mt-8 max-w-md text-cream/60">
             Step inside a living room rendered live in your browser. Change a finish, see what pairs with it, and watch the same space move from daylight to
             firelight — a quiet education in how rooms hold together.
           </p>
@@ -55,7 +62,7 @@ export function AtelierTeaser({ index }: { index: string }) {
               </div>
             ))}
           </div>
-          <span className="eyebrow absolute right-0 bottom-0 text-cream/50 transition-colors duration-500 group-hover:text-gold">Live 3D · WebGL</span>
+          <span className="eyebrow absolute right-0 bottom-0 text-cream/40 transition-colors duration-500 group-hover:text-gold">Live 3D · WebGL</span>
         </Link>
       </div>
     </section>
