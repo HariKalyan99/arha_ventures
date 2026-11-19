@@ -128,7 +128,7 @@ export function Lighting({ mood, blend }: LightingProps) {
         <Lightformer form="rect" intensity={3} color="#f2e6d6" position={[1, 1.8, -9]} scale={[14, 5, 1]} />
         <Lightformer form="rect" intensity={0.8} color="#ffdcb0" position={[0, 6, 0]} rotation-x={Math.PI / 2} scale={[9, 9, 1]} />
         <Lightformer form="rect" intensity={0.5} color="#a07a5a" position={[-7, 1.5, 0]} rotation-y={Math.PI / 2} scale={[9, 3, 1]} />
-        <Lightformer form="rect" intensity={0.35} color="#e8dfd0" position={[7, 1.5, 0]} rotation-y={-Math.PI / 2} scale={[9, 3, 1]} />
+        <Lightformer form="rect" intensity={0.35} color="#e8e0d2" position={[7, 1.5, 0]} rotation-y={-Math.PI / 2} scale={[9, 3, 1]} />
       </Environment>
     </>
   )

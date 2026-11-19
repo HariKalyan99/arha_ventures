@@ -160,7 +160,7 @@ function ShowcasePanel({ project, index }: { project: Project; index: number }) 
         <span>{project.year}</span>
         {project.sample && <span className="border border-gold/40 px-1.5 py-0.5 text-[0.6rem] text-gold">Sample</span>}
       </p>
-      <h3 className="display text-display-md text-cream transition-colors duration-700 group-hover:text-gold-soft">{project.title}</h3>
+      <h3 className="display text-display-md text-cream transition-colors duration-700 group-hover:text-brass-soft">{project.title}</h3>
       <p className="max-w-sm text-sm text-cream/55">{project.summary}</p>
     </div>
   )

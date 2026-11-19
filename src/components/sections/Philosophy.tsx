@@ -24,7 +24,7 @@ export function Philosophy() {
           decal.current,
           { yPercent: 110, autoAlpha: 0 },
           {
-            yPercent: 48,
+            yPercent: 42,
             autoAlpha: 1,
             ease: 'none',
             scrollTrigger: {
@@ -37,7 +37,7 @@ export function Philosophy() {
         )
       })
       mm.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set(decal.current, { yPercent: 48, autoAlpha: 0.9 })
+        gsap.set(decal.current, { yPercent: 42, autoAlpha: 0.9 })
       })
     },
     { scope: ref },
@@ -112,8 +112,8 @@ export function Philosophy() {
         </div>
       </div>
 
-      {/* Sticky bottom decal — rises in, then sits half out of the viewport */}
-      <div className="pointer-events-none sticky bottom-0 z-[5] -mb-[1px] flex justify-center overflow-visible pt-[min(28vh,16rem)]">
+      {/* Sticky bottom decal — rises in, then sits partially out of the viewport */}
+      <div className="pointer-events-none sticky bottom-0 z-[5] -mb-[1px] flex justify-center overflow-visible pt-6 sm:pt-8">
         <div
           ref={decal}
           className="will-change-transform"
@@ -123,10 +123,10 @@ export function Philosophy() {
           <img
             src={LOGO_ON_DARK_SRC}
             alt=""
-            width={1024}
-            height={1024}
+            width={700}
+            height={620}
             decoding="async"
-            className="h-auto w-[min(92vw,42rem)] max-w-none object-contain object-bottom drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] sm:w-[min(85vw,48rem)] lg:w-[min(70vw,56rem)]"
+            className="h-auto w-[min(92vw,34rem)] max-w-none object-contain object-bottom drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] sm:w-[min(80vw,40rem)] lg:w-[min(62vw,44rem)]"
           />
           <span className="sr-only">{studio.name}</span>
         </div>

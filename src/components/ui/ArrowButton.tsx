@@ -11,10 +11,10 @@ const base =
 const variants: Record<Variant, string> = {
   // Soft relief (restrained neumorphism) — dual light/dark shadows, pressed on active. No pill rounding.
   solid:
-    'overflow-hidden bg-gold px-6 text-obsidian transition-[background-color,box-shadow,color,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.42),5px_5px_12px_rgba(0,0,0,0.42),-4px_-4px_10px_rgba(255,248,235,0.22)] hover:bg-cream hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),6px_6px_14px_rgba(0,0,0,0.38),-5px_-5px_12px_rgba(255,248,235,0.28)] active:translate-y-px active:shadow-[inset_4px_4px_10px_rgba(96,75,59,0.35),inset_-3px_-3px_8px_rgba(255,255,255,0.35)] focus-visible:bg-cream',
+    'overflow-hidden bg-terracotta px-6 text-cream transition-[background-color,box-shadow,color,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),5px_5px_12px_rgba(0,0,0,0.42),-4px_-4px_10px_rgba(232,224,210,0.08)] hover:bg-cream hover:text-obsidian hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),6px_6px_14px_rgba(0,0,0,0.38),-5px_-5px_12px_rgba(232,224,210,0.28)] active:translate-y-px active:shadow-[inset_4px_4px_10px_rgba(96,74,59,0.35),inset_-3px_-3px_8px_rgba(255,255,255,0.35)] focus-visible:bg-cream focus-visible:text-obsidian',
   outline:
-    'overflow-hidden border border-gold/45 bg-[#1a1917] px-6 text-cream transition-[border-color,background-color,box-shadow,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(232,223,208,0.1),5px_5px_14px_rgba(0,0,0,0.55),-4px_-4px_10px_rgba(232,223,208,0.045)] hover:border-gold hover:bg-[#201f1c] hover:shadow-[inset_0_1px_0_rgba(232,223,208,0.14),6px_6px_16px_rgba(0,0,0,0.5),-5px_-5px_12px_rgba(232,223,208,0.06)] active:translate-y-px active:shadow-[inset_4px_4px_12px_rgba(0,0,0,0.65),inset_-2px_-2px_8px_rgba(232,223,208,0.04)] focus-visible:border-gold',
-  ghost: 'px-0 text-cream hover:text-gold focus-visible:text-gold',
+    'overflow-hidden border border-terracotta/45 bg-obsidian px-6 text-cream transition-[border-color,background-color,box-shadow,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(232,224,210,0.1),5px_5px_14px_rgba(0,0,0,0.55),-4px_-4px_10px_rgba(232,224,210,0.045)] hover:border-terracotta hover:bg-espresso hover:shadow-[inset_0_1px_0_rgba(232,224,210,0.14),6px_6px_16px_rgba(0,0,0,0.5),-5px_-5px_12px_rgba(232,224,210,0.06)] active:translate-y-px active:shadow-[inset_4px_4px_12px_rgba(0,0,0,0.65),inset_-2px_-2px_8px_rgba(232,224,210,0.04)] focus-visible:border-terracotta',
+  ghost: 'px-0 text-cream hover:text-terracotta focus-visible:text-terracotta',
 }
 
 function ArrowIcon({ className = '' }: { className?: string }) {
@@ -33,7 +33,7 @@ function Inner({ children, variant }: { children: ReactNode; variant: Variant })
           {children}
           <span
             aria-hidden
-            className="absolute inset-x-0 -bottom-[0.2em] h-px origin-left scale-x-0 bg-gold transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
+            className="absolute inset-x-0 -bottom-[0.2em] h-px origin-left scale-x-0 bg-terracotta transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
           />
         </span>
         <ArrowIcon className="transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-focus-visible:translate-x-0.5 group-focus-visible:-translate-y-0.5 motion-reduce:transition-none" />

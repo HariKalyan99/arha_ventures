@@ -37,7 +37,7 @@ export default function JournalPage() {
               <p className="eyebrow text-gold">
                 {lead.category} · <time dateTime={lead.date}>{formatDate(lead.date)}</time>
               </p>
-              <h2 className="display mt-4 text-display-md text-cream transition-colors duration-500 group-hover:text-gold-soft">{lead.title}</h2>
+              <h2 className="display mt-4 text-display-md text-cream transition-colors duration-500 group-hover:text-brass-soft">{lead.title}</h2>
               <p className="mt-4 text-cream/70">{lead.excerpt}</p>
               <p className="eyebrow mt-6 text-cream/50">{lead.readTime}</p>
             </div>
@@ -58,7 +58,7 @@ export default function JournalPage() {
                     <p className="eyebrow text-gold">
                       {entry.category} · <time dateTime={entry.date}>{formatDate(entry.date)}</time>
                     </p>
-                    <h2 className="display mt-3 text-display-sm text-cream transition-colors duration-500 group-hover:text-gold-soft">{entry.title}</h2>
+                    <h2 className="display mt-3 text-display-sm text-cream transition-colors duration-500 group-hover:text-brass-soft">{entry.title}</h2>
                     <p className="mt-3 max-w-md text-cream/70">{entry.excerpt}</p>
                   </div>
                 </Link>

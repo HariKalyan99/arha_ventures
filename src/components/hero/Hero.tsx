@@ -103,7 +103,7 @@ export function Hero() {
         <div className="absolute inset-0" aria-hidden>
           {webgl ? (
             <>
-              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_40%,#3a2c22_0%,#171716_60%,#10100f_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]" />
               <SceneErrorBoundary fallback={<StaticHeroImage />}>
                 <Suspense fallback={null}>
                   <div className={`absolute inset-0 transition-opacity duration-[2400ms] ease-[var(--ease-luxe)] ${ready ? 'opacity-100' : 'opacity-0'}`}>
@@ -176,7 +176,7 @@ export function Hero() {
                   transition={{ duration: 0.7, ease: EASE_LUXE }}
                   className={`relative max-w-[min(34rem,100%)] rounded-sm px-3 py-3 shadow-[inset_0_1px_0_rgba(232,223,208,0.06),0_24px_48px_-28px_rgba(0,0,0,0.7)] sm:px-4 sm:py-4 md:max-w-[36rem] ${
                     isConclusion
-                      ? 'bg-ink/75 shadow-[0_0_0_1px_rgba(180,154,115,0.28),inset_0_1px_0_rgba(232,223,208,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
+                      ? 'bg-ink/75 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
                       : 'bg-ink/60 backdrop-blur-sm'
                   }`}
                 >

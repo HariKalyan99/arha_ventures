@@ -89,10 +89,10 @@ export function ModelLighting({ mood, blend }: ModelLightingProps) {
 
       <Environment frames={1} resolution={256}>
         <Lightformer form="rect" intensity={3.4} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
-        <Lightformer form="rect" intensity={1.5} position={[-7, 2.5, 2]} scale={[3, 8, 1]} color="#cbb592" />
+        <Lightformer form="rect" intensity={1.5} position={[-7, 2.5, 2]} scale={[3, 8, 1]} color="#b69b75" />
         <Lightformer form="rect" intensity={0.95} position={[7, 2, 1]} scale={[3, 7, 1]} color="#d4c0a8" />
-        <Lightformer form="ring" intensity={0.6} position={[0, 7, 0]} scale={10} color="#e8dfd0" />
-        <Lightformer form="rect" intensity={0.4} position={[0, 1, 8]} scale={[12, 4, 1]} color="#6a5644" />
+        <Lightformer form="ring" intensity={0.6} position={[0, 7, 0]} scale={10} color="#e8e0d2" />
+        <Lightformer form="rect" intensity={0.4} position={[0, 1, 8]} scale={[12, 4, 1]} color="#604a3b" />
       </Environment>
     </>
   )

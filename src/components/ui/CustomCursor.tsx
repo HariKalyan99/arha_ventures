@@ -110,7 +110,7 @@ export function CustomCursor() {
   const hovering = mode === 'hover'
   const grabbing = mode === 'grabbing' || mode === 'grab'
   const show = visible && mode !== 'hidden'
-  const tick = 'absolute bg-gold-soft'
+  const tick = 'absolute bg-terracotta-soft'
   const corner = hovering
     ? 'opacity-100'
     : grabbing
@@ -134,7 +134,7 @@ export function CustomCursor() {
             hovering ? 'opacity-40' : 'opacity-90'
           }`}
         />
-        <span className="absolute top-1/2 left-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold" />
+        <span className="absolute top-1/2 left-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-terracotta" />
       </span>
 
       {/* Lagging L-corner ticks — open into a frame on hover */}

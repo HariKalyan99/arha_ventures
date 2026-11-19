@@ -79,7 +79,7 @@ function SwatchGroup<T extends string>({
               <span
                 aria-hidden
                 className={`block size-11 border transition-[box-shadow,transform,border-color] duration-500 group-hover:scale-105 peer-checked:ring-1 peer-checked:ring-gold peer-checked:ring-offset-2 peer-checked:ring-offset-obsidian peer-focus-visible:ring-2 peer-focus-visible:ring-cream sm:size-12 ${
-                  isRec ? 'border-gold/70 shadow-[0_0_0_1px_rgba(180,154,115,0.35)]' : 'border-cream/15'
+                  isRec ? 'border-gold/70 shadow-[0_0_0_1px_rgba(182,155,117,0.35)]' : 'border-cream/15'
                 }`}
                 style={{ background: o.swatch }}
               />
@@ -92,7 +92,7 @@ function SwatchGroup<T extends string>({
       </div>
       <p className="mt-3 text-xs text-cream/50" aria-hidden>
         {selected?.note}
-        {recommended && recommended.size > 0 ? ' · Gold-marked swatches pair with your focus choice.' : ''}
+        {recommended && recommended.size > 0 ? ' · Highlighted swatches pair with your focus choice.' : ''}
       </p>
     </fieldset>
   )
@@ -201,7 +201,7 @@ export function RoomConfigurator() {
         >
           {show3d ? (
             <>
-              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_40%,#3a2c22_0%,#171716_60%,#10100f_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_40%,#2d2420_0%,#171717_60%,#111111_100%)]" />
               <SceneErrorBoundary fallback={null} onError={() => setFailed(true)}>
                 <Suspense fallback={null}>
                   <div
@@ -301,7 +301,7 @@ export function RoomConfigurator() {
           <div>
             <p className="eyebrow text-gold">Material study</p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Choose a finish to learn what it asks of the room. Suggested companions are marked in gold — try them and watch the scene respond.
+              Choose a finish to learn what it asks of the room. Suggested companions are highlighted — try them and watch the scene respond.
             </p>
           </div>
 
@@ -349,7 +349,7 @@ export function RoomConfigurator() {
                         )}
                         <span className="min-w-0 flex-1">
                           <span className="eyebrow block text-[0.6rem] text-cream/45">{s.categoryLabel}</span>
-                          <span className={`mt-0.5 block text-sm ${s.active ? 'text-gold-soft' : 'text-cream group-hover:text-gold-soft'}`}>
+                          <span className={`mt-0.5 block text-sm ${s.active ? 'text-gold-soft' : 'text-cream group-hover:text-brass-soft'}`}>
                             {s.label}
                           </span>
                           <span className="mt-1.5 block text-xs leading-relaxed text-cream/55">{s.reason}</span>

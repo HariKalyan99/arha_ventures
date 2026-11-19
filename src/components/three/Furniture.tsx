@@ -126,7 +126,7 @@ function CoffeeTable(props: GroupProps) {
       </mesh>
       <mesh position={[0.28, 0.465, 0.12]} rotation-y={0.45} castShadow>
         <boxGeometry args={[0.28, 0.04, 0.21]} />
-        <meshStandardMaterial color="#604b3b" roughness={0.9} />
+        <meshStandardMaterial color="#604a3b" roughness={0.9} />
       </mesh>
       <Vessel position={[-0.3, 0.39, -0.1]} profile="bowl" material={lib.ceramicDark} scale={0.9} />
     </group>

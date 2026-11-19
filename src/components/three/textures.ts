@@ -159,7 +159,7 @@ const painters: Record<string, Painter> = {
   limestone(ctx, s, rand) {
     ctx.fillStyle = '#ddd2c2'
     ctx.fillRect(0, 0, s, s)
-    mottle(ctx, s, rand, ['#cfc3b0', '#e8dfd0', '#c4b8a4'], 55, [0.06, 0.28], [0.18, 0.42])
+    mottle(ctx, s, rand, ['#cfc3b0', '#e8e0d2', '#c4b8a4'], 55, [0.06, 0.28], [0.18, 0.42])
     for (let i = 0; i < 5; i++) vein(ctx, s, rand, '#b5a890', s * 0.003, 0.18, s * 0.004)
     speckle(ctx, s, rand, 7)
     ctx.fillStyle = 'rgba(130,118,100,0.28)'

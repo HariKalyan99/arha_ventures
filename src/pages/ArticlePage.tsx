@@ -84,7 +84,7 @@ function Article({ slug }: { slug: string }) {
                   </div>
                   <div>
                     <p className="eyebrow text-gold">{m.category}</p>
-                    <p className="display mt-2 text-display-sm text-cream transition-colors duration-500 group-hover:text-gold-soft">{m.title}</p>
+                    <p className="display mt-2 text-display-sm text-cream transition-colors duration-500 group-hover:text-brass-soft">{m.title}</p>
                   </div>
                 </Link>
               </li>

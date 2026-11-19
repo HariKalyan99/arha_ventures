@@ -39,7 +39,7 @@ export function Layout() {
       <CursorAtmosphere />
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-gold focus:px-4 focus:py-3 focus:text-obsidian"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-terracotta focus:px-4 focus:py-3 focus:text-cream"
       >
         Skip to content
       </a>
@@ -59,10 +59,10 @@ export function Layout() {
             </main>
             <Footer />
           </motion.div>
-          {/* Gold hairline sweeps across as each page arrives */}
+          {/* Brand hairline sweeps across as each page arrives */}
           <motion.span
             aria-hidden
-            className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-px origin-left bg-gold"
+            className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-px origin-left bg-terracotta"
             initial={{ scaleX: 0, opacity: 1 }}
             animate={{ scaleX: 1, opacity: 0, transition: { scaleX: { duration: 1.1, ease: EASE_CURTAIN }, opacity: { delay: 0.9, duration: 0.5 } } }}
           />

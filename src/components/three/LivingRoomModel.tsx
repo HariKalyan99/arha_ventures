@@ -61,15 +61,15 @@ function InteriorEnclosure() {
       </mesh>
       <mesh position={[-8.5, 3.2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#3a2c22" toneMapped={false} />
+        <meshBasicMaterial color="#2d2420" toneMapped={false} />
       </mesh>
       <mesh position={[8.5, 3.2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#322820" toneMapped={false} />
+        <meshBasicMaterial color="#241c19" toneMapped={false} />
       </mesh>
       <mesh position={[0, 3.2, 8.5]} rotation={[0, Math.PI, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#241c16" toneMapped={false} />
+        <meshBasicMaterial color="#171717" toneMapped={false} />
       </mesh>
     </group>
   )

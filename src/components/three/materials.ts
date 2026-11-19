@@ -115,8 +115,8 @@ export function getMaterialLibrary(size: number): MaterialLibrary {
       }),
     },
     metal: {
-      brass: std({ color: '#c9a86a', metalness: 1, roughness: 0.3 }),
-      bronze: std({ color: '#7a5a3c', metalness: 1, roughness: 0.42 }),
+      brass: std({ color: '#b69b75', metalness: 1, roughness: 0.3 }),
+      bronze: std({ color: '#604a3b', metalness: 1, roughness: 0.42 }),
       copper: std({ color: '#b8734d', metalness: 1, roughness: 0.35 }),
       nickel: std({ color: '#b0aea8', metalness: 1, roughness: 0.28 }),
       steel: std({ color: '#3a3936', metalness: 0.85, roughness: 0.48 }),
@@ -145,7 +145,7 @@ export function getMaterialLibrary(size: number): MaterialLibrary {
     foliage: std({ color: '#4a5236', roughness: 0.85 }),
     bark: std({ color: '#3d3128', roughness: 0.9 }),
     firebox: std({ color: '#0d0c0b', roughness: 0.95 }),
-    cushionAccent: std({ color: '#604b3b', roughness: 0.9 }),
+    cushionAccent: std({ color: '#604a3b', roughness: 0.9 }),
   }
 
   libraries.set(size, lib)
