@@ -86,10 +86,14 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark, cropped by the page edge */}
-      <div aria-hidden className="pointer-events-none select-none px-[var(--gutter)]">
-        <p className="font-display text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.06]">
-          {studio.name}
+      {/* Oversized wordmark — each letter grows / shrinks once on hover */}
+      <div className="select-none px-[var(--gutter)]" aria-hidden>
+        <p className="footer-mark font-display cursor-default text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.06]">
+          {studio.name.split('').map((char, i) => (
+            <span key={`${char}-${i}`} className="footer-mark-letter">
+              {char}
+            </span>
+          ))}
         </p>
       </div>
 

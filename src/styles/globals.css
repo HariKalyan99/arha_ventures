@@ -165,15 +165,39 @@
 }
 
 @layer components {
-  /* Film grain over the whole experience — purely decorative */
+  /* Film grain — base opacity + speed-gated surge from CursorAtmosphere (--grain-energy) */
   .grain::after {
     content: '';
     position: fixed;
     inset: -50%;
     z-index: 90;
     pointer-events: none;
-    opacity: 0.055;
+    opacity: calc(0.055 + (var(--grain-energy, 0) * 0.1));
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    transition: opacity 80ms linear;
+  }
+
+  /* Warm vignette that follows aggressive cursor motion */
+  .cursor-atmosphere {
+    background: radial-gradient(
+      circle 32vmax at var(--cx, 50%) var(--cy, 50%),
+      rgba(180, 154, 115, 0.16) 0%,
+      rgba(180, 154, 115, 0.05) 32%,
+      transparent 62%
+    );
+    opacity: var(--atmosphere-energy, 0);
+    mix-blend-mode: soft-light;
+    will-change: opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce), (pointer: coarse) {
+    .grain::after {
+      opacity: 0.055;
+      transition: none;
+    }
+    .cursor-atmosphere {
+      display: none !important;
+    }
   }
 
   .display {
@@ -377,5 +401,36 @@
 
   .animate-loading-bar {
     animation: loading-bar 1.6s var(--ease-curtain) infinite;
+  }
+
+  /* Footer wordmark — each letter grows on hover, shrinks on leave (no loop) */
+  .footer-mark {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .footer-mark-letter {
+    display: inline-block;
+    transform-origin: 50% 70%;
+    will-change: transform;
+    transition:
+      transform 0.65s ease-in-out,
+      color 0.65s ease-in-out;
+  }
+
+  .footer-mark-letter:hover {
+    transform: scale(1.12);
+    color: rgb(232 223 208 / 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-mark-letter {
+      transition: none;
+    }
+    .footer-mark-letter:hover {
+      transform: none;
+      color: rgb(232 223 208 / 0.14);
+    }
   }
 }

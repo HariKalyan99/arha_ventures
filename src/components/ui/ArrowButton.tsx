@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router'
 import { ArrowUpRight } from 'lucide-react'
+import { Magnetic } from './Magnetic'
 
 type Variant = 'solid' | 'outline' | 'ghost'
 
@@ -65,12 +66,14 @@ interface ArrowButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
 }
 
-export function ArrowButton({ variant = 'outline', className = '', children, ...rest }: ArrowButtonProps) {
-  return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...rest}>
+export function ArrowButton({ variant = 'outline', className = '', children, disabled, ...rest }: ArrowButtonProps) {
+  const el = (
+    <button className={`${base} ${variants[variant]} ${className}`} disabled={disabled} {...rest}>
       <Inner variant={variant}>{children}</Inner>
     </button>
   )
+  if (variant === 'ghost' || disabled) return el
+  return <Magnetic strength={0.26}>{el}</Magnetic>
 }
 
 interface ArrowLinkProps {
@@ -81,9 +84,11 @@ interface ArrowLinkProps {
 }
 
 export function ArrowLink({ to, variant = 'outline', className = '', children }: ArrowLinkProps) {
-  return (
+  const el = (
     <Link to={to} className={`${base} ${variants[variant]} ${className}`}>
       <Inner variant={variant}>{children}</Inner>
     </Link>
   )
+  if (variant === 'ghost') return el
+  return <Magnetic strength={0.26}>{el}</Magnetic>
 }
