@@ -1,30 +1,32 @@
 import type { Testimonial } from '../types/content'
 
 /**
- * PLACEHOLDER TESTIMONIALS — written to demonstrate the layout only.
- * They are not real client statements. Replace with verified feedback
- * (with the client’s permission) and set `sample: false`.
+ * Client voices drawn from public Google reviews for Arha Ventures (Shivakote).
+ * Full thread: https://share.google/aubZ5UDGi6O2u9kAQ
  */
 export const testimonials: Testimonial[] = [
   {
     id: 't1',
-    quote: 'They listened for longer than anyone else we met, and it shows in every room. The house feels like it was always ours.',
-    attribution: 'Client name',
-    reference: 'Private residence',
-    sample: true,
+    quote:
+      'Had a really great experience with Arha Ventures throughout our construction and interior journey. The team was very understanding, patient, and easy to work with from start to finish. They paid attention to even the smallest details.',
+    attribution: 'Akarsha S Gowda',
+    reference: 'Google review',
+    sample: false,
   },
   {
     id: 't2',
-    quote: 'What surprised us most was the calm — of the process as much as the result. Every decision arrived with a reason.',
-    attribution: 'Client name',
-    reference: 'Penthouse interior',
-    sample: true,
+    quote:
+      'We’re truly grateful to Arha Ventures for turning our vision into such a beautiful reality. Every detail was handled with so much care, professionalism, and perfection. More than just construction, they created a space that feels warm.',
+    attribution: 'Vini Rathore',
+    reference: 'Google review',
+    sample: false,
   },
   {
     id: 't3',
-    quote: 'Our guests talk about the light before anything else. That was exactly the brief, and it was delivered without compromise.',
-    attribution: 'Client name',
-    reference: 'Hospitality project',
-    sample: true,
+    quote:
+      'I recently got my construction and interior work done by Arha Ventures and I’m really happy with the outcome. The quality of work is excellent and everything was completed on time. The owner was very helpful throughout the process.',
+    attribution: 'Sakshi Sul',
+    reference: 'Google review',
+    sample: false,
   },
 ]

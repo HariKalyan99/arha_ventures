@@ -8,13 +8,11 @@ import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
 import { CustomCursor } from '../ui/CustomCursor'
 import { CursorAtmosphere } from '../ui/CursorAtmosphere'
+import { PageLoader } from '../ui/PageLoader'
 
 function PageFallback() {
-  return (
-    <div className="flex h-svh items-center justify-center bg-obsidian" role="status">
-      <span className="eyebrow text-cream/50">Loading</span>
-    </div>
-  )
+  /* Obsidian hold — cream boot is reserved for #boot / PageLoader only */
+  return <div className="min-h-svh bg-obsidian" role="status" aria-label="Loading" />
 }
 
 /** Resets scroll and re-measures scroll-linked animations once a new page has mounted. */
@@ -35,6 +33,7 @@ export function Layout() {
 
   return (
     <>
+      <PageLoader />
       <CustomCursor />
       <CursorAtmosphere />
       {/* Sticky terracotta wash at the bottom of the frame */}

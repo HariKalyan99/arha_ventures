@@ -7,20 +7,32 @@ import type { InquiryConfig, NavItem, StudioConfig } from '../types/content'
  */
 export const studio: StudioConfig = {
   name: 'ARHA',
-  legalName: 'ARHA Studio',
+  legalName: 'Arha Ventures',
   tagline: 'Architecture & Interiors',
   descriptor: 'Interiors composed in stone, timber and light.',
-  email: 'studio@example.com', // PLACEHOLDER
-  phone: '+00 000 000 0000', // PLACEHOLDER
-  location: 'Studio address to be confirmed', // PLACEHOLDER
-  hours: 'Consultations by appointment',
+  email: 'studio@example.com', // PLACEHOLDER — not listed on Google Business Profile
+  phone: '+91 91136 16705',
+  location:
+    '19, S S Arcade, Guniagrahara, near Lakshmipura Layout cross, Shivakote, Bengaluru, Karnataka 560097',
+  coordinates: { lat: 13.092945, lng: 77.529367 },
+  hours: 'Mon–Sat · 9:30 am – 6:00 pm',
   socials: [
-    // PLACEHOLDER profiles — point these to the studio's real accounts
-    { label: 'Instagram', href: 'https://www.instagram.com/' },
-    { label: 'Pinterest', href: 'https://www.pinterest.com/' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/' },
+    { label: 'Instagram', href: 'https://www.instagram.com/arhaventures/' },
+    { label: 'Pinterest', href: 'https://www.pinterest.com/' }, // PLACEHOLDER
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/' }, // PLACEHOLDER
   ],
+  /** Email is still a placeholder; address and phone are live from Google. */
   contactIsPlaceholder: true,
+}
+
+/** Public Google reviews listing for Arha Ventures (Shivakote). */
+export const googleReviewsUrl = 'https://share.google/aubZ5UDGi6O2u9kAQ'
+
+/** Summary shown beside Voices — matches the Google Business Profile listing. */
+export const googleReviews = {
+  rating: 4.7,
+  count: 23,
+  href: googleReviewsUrl,
 }
 
 export const navigation: NavItem[] = [

@@ -3,10 +3,10 @@ import { useGLTF } from '@react-three/drei'
 import { LOGO_SRC } from '../../data/brand'
 import { LIVING_ROOM_GLB } from '../three/roomSource'
 
-const RISE_MS = 1100
-const MIN_MS = 1400
-const MAX_MS = 4500
-const FADE_MS = 750
+const RISE_MS = 2400
+const MIN_MS = 2800
+const MAX_MS = 6000
+const FADE_MS = 850
 
 function loadImage(src: string) {
   return new Promise<void>((resolve) => {

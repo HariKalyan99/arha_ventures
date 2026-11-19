@@ -1,10 +1,35 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { googleReviews, studio } from '../../data/site'
 import { testimonials } from '../../data/testimonials'
 import { EASE_LUXE } from '../../lib/motion'
 import { useReveal } from '../../animations/reveal'
 import { SectionLabel } from '../ui/SectionLabel'
+
+function GoogleStars({ rating }: { rating: number }) {
+  return (
+    <span className="inline-flex items-center gap-0.5" aria-hidden>
+      {Array.from({ length: 5 }, (_, i) => {
+        const fill = Math.min(1, Math.max(0, rating - i))
+        return (
+          <svg key={i} viewBox="0 0 24 24" className="size-3.5" aria-hidden>
+            <defs>
+              <linearGradient id={`star-fill-${i}`}>
+                <stop offset={`${fill * 100}%`} stopColor="#b69b75" />
+                <stop offset={`${fill * 100}%`} stopColor="rgb(232 224 210 / 0.18)" />
+              </linearGradient>
+            </defs>
+            <path
+              fill={`url(#star-fill-${i})`}
+              d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+            />
+          </svg>
+        )
+      })}
+    </span>
+  )
+}
 
 export function Testimonials({ index }: { index: string }) {
   const ref = useRef<HTMLElement>(null)
@@ -28,15 +53,29 @@ export function Testimonials({ index }: { index: string }) {
               Client voices
             </h2>
           </div>
-          {item.sample && (
-            <p className="eyebrow max-w-52 border-l border-gold/50 pl-4 text-[0.62rem] leading-relaxed text-gold/90">
-              Placeholder testimonials — to be replaced with verified client feedback
+
+          {/* Google Business–style rating summary */}
+          <div className="max-w-56 border-l border-gold/50 pl-4">
+            <p className="font-display text-[1.15rem] leading-snug tracking-[-0.01em] text-cream">{studio.legalName}</p>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8rem] text-mist">
+              <span className="tabular-nums text-cream/65">{googleReviews.rating.toFixed(1)}</span>
+              <GoogleStars rating={googleReviews.rating} />
+              <a
+                href={googleReviews.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-gold-soft transition-colors duration-500 hover:text-gold"
+              >
+                {googleReviews.count} Google reviews
+              </a>
             </p>
-          )}
+          </div>
         </div>
 
         <div className="lg:col-span-8 lg:col-start-5">
-          <span aria-hidden className="block font-display text-[clamp(5rem,10vw,9rem)] leading-[0.5] text-gold/70">“</span>
+          <span aria-hidden className="block font-display text-[clamp(5rem,10vw,9rem)] leading-[0.5] text-gold/70">
+            “
+          </span>
           <div className="relative min-h-[16rem] sm:min-h-[14rem]" aria-live="polite">
             <AnimatePresence mode="wait" custom={direction} initial={false}>
               <motion.figure
@@ -73,7 +112,9 @@ export function Testimonials({ index }: { index: string }) {
                   }}
                   className="group flex min-h-11 items-center"
                 >
-                  <span className={`block h-px transition-all duration-700 ${i === current ? 'w-12 bg-gold' : 'w-6 bg-cream/30 group-hover:bg-cream/60'}`} />
+                  <span
+                    className={`block h-px transition-all duration-700 ${i === current ? 'w-12 bg-gold' : 'w-6 bg-cream/30 group-hover:bg-cream/60'}`}
+                  />
                 </button>
               ))}
             </div>

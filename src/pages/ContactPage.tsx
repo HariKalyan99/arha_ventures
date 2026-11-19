@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { PageHeader } from '../components/ui/PageHeader'
 import { InquiryForm } from '../components/contact/InquiryForm'
+import { StudioMap } from '../components/contact/StudioMap'
 import { studio } from '../data/site'
 import { useReveal } from '../animations/reveal'
 import { usePageMeta } from '../hooks/usePageMeta'
@@ -48,9 +49,10 @@ export default function ContactPage() {
                   </div>
                 ))}
               </dl>
+              <StudioMap />
               {studio.contactIsPlaceholder && (
                 <p data-reveal="fade" className="border-l border-gold/50 pl-4 text-sm text-gold/90">
-                  These contact details are placeholders and will be replaced with the studio’s real address, email and telephone before launch.
+                  Studio email is still a placeholder and will be replaced before launch. Address and telephone are current.
                 </p>
               )}
               <div data-reveal="fade">

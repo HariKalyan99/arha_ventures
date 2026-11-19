@@ -102,7 +102,7 @@ export function Footer() {
           © {year} {studio.legalName}. All rights reserved.
         </p>
         {studio.contactIsPlaceholder && (
-          <p className="text-gold/80">Projects, testimonials, journal entries and contact details are sample content.</p>
+          <p className="text-gold/80">Projects, journal entries and studio email are still sample content.</p>
         )}
         <div className="flex items-center gap-6">
           {legalNavigation.map((item) => (

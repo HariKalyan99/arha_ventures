@@ -101,6 +101,79 @@
     overflow: hidden;
   }
 
+  /* Route-change loader — mirrors the first-paint #boot screen */
+  .page-loader-mark {
+    animation: boot-rise 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .page-loader-dots {
+    opacity: 0;
+    animation: boot-dots-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
+  }
+
+  .page-loader-dots span {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+    animation: boot-dot 1.25s ease-in-out infinite;
+  }
+
+  .page-loader-dots span:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+
+  .page-loader-dots span:nth-child(3) {
+    animation-delay: 0.36s;
+  }
+
+  @keyframes boot-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 3.25rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes boot-dots-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes boot-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.28;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader-mark {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .page-loader-dots {
+      animation: none;
+      opacity: 1;
+    }
+    .page-loader-dots span {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+
   ::selection {
     background: var(--color-terracotta);
     color: var(--color-cream);
@@ -463,4 +536,55 @@
       color: rgb(232 224 210 / 0.14);
     }
   }
+}
+
+/* OpenFreeMap (MapLibre) embed on Contact */
+.studio-map.maplibregl-map {
+  background: #171717;
+  font: inherit;
+}
+
+.studio-map .maplibregl-ctrl-group {
+  background: rgb(23 23 23 / 0.92);
+  border: 1px solid rgb(232 224 210 / 0.14);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.studio-map .maplibregl-ctrl-group button {
+  width: 2rem;
+  height: 2rem;
+}
+
+.studio-map .maplibregl-ctrl-group button + button {
+  border-top-color: rgb(232 224 210 / 0.14);
+}
+
+.studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.9);
+}
+
+.studio-map .maplibregl-ctrl-attrib {
+  background: rgb(23 23 23 / 0.75);
+  color: rgb(232 224 210 / 0.45);
+  font-size: 0.55rem;
+}
+
+.studio-map .maplibregl-ctrl-attrib a {
+  color: rgb(176 121 108 / 0.9);
+}
+
+.studio-map-popup .maplibregl-popup-content {
+  background: #171717;
+  color: #e8e0d2;
+  border-radius: 0;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.studio-map-popup .maplibregl-popup-tip {
+  border-top-color: #171717;
 }
