@@ -42,13 +42,13 @@ export const materialStories: MaterialStory[] = [
     name: 'Lighting',
     note: 'Light is designed as architecture: concealed lines, low pools and a few fittings worth looking at.',
     finishes: 'Indirect · Ambient · Accent',
-    image: media['facade-night'],
+    image: media['pendants-living'],
   },
   {
     id: 'furniture',
     name: 'Custom Furniture',
     note: 'Pieces drawn for the room they live in, made by workshops we have visited and trust.',
     finishes: 'Joinery · Upholstery · Casegoods',
-    image: media['vessels'],
+    image: media['chair'],
   },
 ]

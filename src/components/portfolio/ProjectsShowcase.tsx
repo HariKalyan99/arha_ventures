@@ -86,7 +86,7 @@ export function ProjectsShowcase() {
   }
 
   return (
-    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative bg-ink">
+    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative surface-ink">
       <div className="shell section-y pb-[clamp(3rem,6vw,6rem)]">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
@@ -96,7 +96,7 @@ export function ProjectsShowcase() {
             </h2>
           </div>
           <div className="flex flex-col gap-6 lg:col-span-4 lg:col-start-9">
-            <p data-reveal="fade" className="text-cream/75">
+            <p data-reveal="fade" className="text-cream/60">
               Residences, villas, hospitality and workplaces — each one conceived around a single idea and carried through to the smallest
               detail. The projects shown are sample content for this site.
             </p>
@@ -129,7 +129,7 @@ export function ProjectsShowcase() {
 
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-8 hidden px-[var(--gutter)] lg:block lg:motion-reduce:hidden">
           <div className="flex items-center gap-6">
-            <span className="eyebrow text-cream/60">
+            <span className="eyebrow text-cream/45">
               <span ref={counter} className="text-cream">
                 01
               </span>{' '}
@@ -138,7 +138,7 @@ export function ProjectsShowcase() {
             <span className="relative h-px flex-1 bg-line">
               <span ref={bar} className="absolute inset-0 origin-left scale-x-0 bg-gold" />
             </span>
-            <span className="eyebrow text-cream/60">Scroll to travel</span>
+            <span className="eyebrow text-cream/45">Scroll to travel</span>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ function ShowcasePanel({ project, index }: { project: Project; index: number }) 
 
   const meta = (
     <div className="flex flex-col gap-3">
-      <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-1 text-cream/60">
+      <p className="eyebrow flex flex-wrap items-center gap-x-3 gap-y-1 text-cream/45">
         <span className="text-gold">{number}</span>
         <span>{project.category}</span>
         <span aria-hidden>·</span>
@@ -161,12 +161,12 @@ function ShowcasePanel({ project, index }: { project: Project; index: number }) 
         {project.sample && <span className="border border-gold/40 px-1.5 py-0.5 text-[0.6rem] text-gold">Sample</span>}
       </p>
       <h3 className="display text-display-md text-cream transition-colors duration-700 group-hover:text-gold-soft">{project.title}</h3>
-      <p className="max-w-sm text-sm text-cream/65">{project.summary}</p>
+      <p className="max-w-sm text-sm text-cream/55">{project.summary}</p>
     </div>
   )
 
   const frame = (asset: Project['cover'], aspect: string, sizes: string, extra = '') => (
-    <div className={`overflow-hidden bg-espresso ${aspect} ${extra}`}>
+    <div className={`media-grade overflow-hidden bg-espresso ${aspect} ${extra}`}>
       <div className="size-full transition-transform duration-[1600ms] ease-[var(--ease-luxe)] group-hover:scale-[1.04]">
         <div data-hparallax className="size-full scale-[1.16]">
           <Img media={asset} className="size-full object-cover" sizes={sizes} />

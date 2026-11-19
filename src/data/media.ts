@@ -1,5 +1,5 @@
-// Generated sample photography (Unsplash License), colour graded to the studio palette.
-// Replace files in /public/images and update this manifest when real project photography is available.
+// Studio photography manifest. Files under /public/images/to-replace are stock stand-ins
+// that should be swapped for licensed project photography — see that folder’s README.
 import type { MediaAsset } from '../types/content'
 
 export const media = {
@@ -31,7 +31,7 @@ export const media = {
   'office-glass': { src: '/images/office-glass.webp', srcSmall: '/images/office-glass-960.webp', width: 1920, height: 1282, alt: "Office floor with full-height glazing and an exposed concrete ceiling", source: 'unsplash:1497366811353-6870744d04b2' },
   'loft-lounge': { src: '/images/loft-lounge.webp', srcSmall: '/images/loft-lounge-960.webp', width: 1920, height: 1440, alt: "Lounge area in a converted loft with brick walls", source: 'unsplash:1538688525198-9b88f6f53126' },
   'office-open': { src: '/images/office-open.webp', srcSmall: '/images/office-open-960.webp', width: 1920, height: 1282, alt: "Open-plan office with a polished floor and minimalist reception", source: 'unsplash:1497366216548-37526070297c' },
-  'office-studio': { src: '/images/office-studio.webp', srcSmall: '/images/office-studio-960.webp', width: 1920, height: 1281, alt: "Open studio workspace with exposed ceiling services", source: 'unsplash:1531973576160-7125cd663d86' },
+  'office-studio': { src: '/images/to-replace/office-studio.webp', srcSmall: '/images/to-replace/office-studio-960.webp', width: 1920, height: 1281, alt: "Open studio workspace with exposed ceiling services", source: 'unsplash:1531973576160-7125cd663d86' },
   'lounge-chairs': { src: '/images/lounge-chairs.webp', srcSmall: '/images/lounge-chairs-960.webp', width: 1920, height: 1221, alt: "Reception lounge with dark lounge chairs and garden views", source: 'unsplash:1503174971373-b1f69850bded' },
   'facade-night': { src: '/images/facade-night.webp', srcSmall: '/images/facade-night-960.webp', width: 1920, height: 1280, alt: "Two-storey residence with glowing vertical windows at night", source: 'unsplash:1600585153490-76fb20a32601' },
   'living-pool-view': { src: '/images/living-pool-view.webp', srcSmall: '/images/living-pool-view-960.webp', width: 1920, height: 1280, alt: "Living room opening onto a pool terrace", source: 'unsplash:1600566753151-384129cf4e3e' },
@@ -44,9 +44,7 @@ export const media = {
   'living-modern': { src: '/images/living-modern.webp', srcSmall: '/images/living-modern-960.webp', width: 1920, height: 1080, alt: "Living room with a modern fireplace and neutral seating", source: 'unsplash:1616137466211-f939a420be84' },
   'vessels': { src: '/images/vessels.webp', srcSmall: '/images/vessels-960.webp', width: 1920, height: 1280, alt: "Ceramic vessels with dried stems against a dark wall", source: 'unsplash:1565193566173-7a0ee3dbe261' },
   'drawing': { src: '/images/drawing.webp', srcSmall: '/images/drawing-960.webp', width: 1920, height: 1080, alt: "Architect sketching a plan by hand under low light", source: 'unsplash:1503387762-592deb58ef4e' },
-  'plans': { src: '/images/plans.webp', srcSmall: '/images/plans-960.webp', width: 1920, height: 1280, alt: "Overhead view of architectural plans being drawn", source: 'unsplash:1581092160562-40aa08e78837' },
-  'meeting': { src: '/images/meeting.webp', srcSmall: '/images/meeting-960.webp', width: 1920, height: 1080, alt: "Client meeting in a studio with brick walls", source: 'unsplash:1556761175-5973dc0f32e7' },
-  'samples': { src: '/images/samples.webp', srcSmall: '/images/samples-960.webp', width: 1920, height: 1280, alt: "Craft tools and samples laid out on a work surface", source: 'unsplash:1452860606245-08befc0ff44b' },
+  'meeting': { src: '/images/to-replace/meeting.webp', srcSmall: '/images/to-replace/meeting-960.webp', width: 1920, height: 1080, alt: "Client meeting in a studio with brick walls", source: 'unsplash:1556761175-5973dc0f32e7' },
   'construction': { src: '/images/construction.webp', srcSmall: '/images/construction-960.webp', width: 1920, height: 1272, alt: "Construction site during structural works", source: 'unsplash:1504307651254-35680f356dfd' },
   'living-bright': { src: '/images/living-bright.webp', srcSmall: '/images/living-bright-960.webp', width: 1920, height: 1440, alt: "Completed living room filled with natural light", source: 'unsplash:1600210492486-724fe5c67fb0' },
   'marble-black': { src: '/images/marble-black.webp', srcSmall: '/images/marble-black-960.webp', width: 1920, height: 2878, alt: "Close-up of black marble with fine white veining", source: 'unsplash:1550053808-52a75a05955d' },

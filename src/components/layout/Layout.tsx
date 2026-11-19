@@ -7,6 +7,7 @@ import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
 import { CustomCursor } from '../ui/CustomCursor'
+import { CursorAtmosphere } from '../ui/CursorAtmosphere'
 
 function PageFallback() {
   return (
@@ -35,6 +36,7 @@ export function Layout() {
   return (
     <>
       <CustomCursor />
+      <CursorAtmosphere />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-gold focus:px-4 focus:py-3 focus:text-obsidian"

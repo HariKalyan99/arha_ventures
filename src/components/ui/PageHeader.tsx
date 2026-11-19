@@ -20,7 +20,7 @@ export function PageHeader({ index, label, title, intro, aside, image }: PageHea
   useReveal(ref)
 
   return (
-    <header ref={ref} className="relative bg-obsidian pt-[calc(var(--header-h)+clamp(4rem,10vw,9rem))]">
+    <header ref={ref} className="relative surface-obsidian pt-[calc(var(--header-h)+clamp(4rem,10vw,9rem))]">
       <div className="shell">
         <SectionLabel index={index} label={label} />
         <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:items-end">
@@ -28,8 +28,8 @@ export function PageHeader({ index, label, title, intro, aside, image }: PageHea
             <Lines lines={title} />
           </h1>
           {(intro || aside) && (
-            <div data-reveal="fade" className="flex flex-col gap-6 text-cream/75 lg:col-span-4 lg:pb-3">
-              {intro && <div className="text-lead">{intro}</div>}
+            <div data-reveal="fade" className="flex flex-col gap-6 text-cream/60 lg:col-span-4 lg:pb-3">
+              {intro && <div className="text-lead text-cream/70">{intro}</div>}
               {aside}
             </div>
           )}
@@ -38,7 +38,7 @@ export function PageHeader({ index, label, title, intro, aside, image }: PageHea
       </div>
       {image && (
         <div className="mt-[clamp(3rem,6vw,5rem)] px-[var(--gutter)]">
-          <div data-reveal="image" className="overflow-hidden">
+          <div data-reveal="image" className="media-grade overflow-hidden">
             <div className="aspect-[4/5] overflow-hidden sm:aspect-[16/9] lg:aspect-[21/9]">
               <div data-parallax="7" className="h-[114%] -translate-y-[7%]">
                 <Img media={image} priority className="size-full object-cover" sizes="100vw" />

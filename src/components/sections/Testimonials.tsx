@@ -19,7 +19,7 @@ export function Testimonials({ index }: { index: string }) {
   }
 
   return (
-    <section ref={ref} aria-labelledby="voices-title" aria-roledescription="carousel" className="relative bg-obsidian section-y">
+    <section ref={ref} aria-labelledby="voices-title" aria-roledescription="carousel" className="relative surface-obsidian section-y">
       <div className="shell grid gap-12 lg:grid-cols-12">
         <div className="flex flex-col justify-between gap-10 lg:col-span-3">
           <div>

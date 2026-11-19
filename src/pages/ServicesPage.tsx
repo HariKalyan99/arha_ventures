@@ -21,7 +21,7 @@ export default function ServicesPage() {
             </ArrowLink>
           </div>
         }
-        image={media['plans']}
+        image={media['drawing']}
       />
       <Services index="02" heading={['Disciplines', <em key="e">we practise.</em>]} />
       <Process index="03" />
