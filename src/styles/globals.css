@@ -205,6 +205,20 @@
     will-change: opacity;
   }
 
+  /* Sticky terracotta vignette — soft brand wash pinned to the top edge */
+  .terracotta-vignette-top {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 55;
+    height: min(28vh, 11rem);
+    pointer-events: none;
+    background:
+      radial-gradient(120% 100% at 50% 0%, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.1) 42%, transparent 72%),
+      linear-gradient(180deg, rgba(147, 66, 54, 0.16) 0%, rgba(147, 66, 54, 0.05) 48%, transparent 100%);
+    mix-blend-mode: soft-light;
+  }
+
   @media (prefers-reduced-motion: reduce), (pointer: coarse) {
     .grain::after {
       opacity: 0.055;
