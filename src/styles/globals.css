@@ -84,6 +84,12 @@
     line-height: 1.6;
     overflow-x: clip;
     min-height: 100svh;
+    background: var(--color-ink);
+  }
+
+  html.is-booting,
+  html.is-booting body {
+    overflow: hidden;
   }
 
   ::selection {

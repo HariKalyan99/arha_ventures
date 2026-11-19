@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { Route, Routes } from 'react-router'
 import { SmoothScroll } from './components/layout/SmoothScroll'
 import { Layout } from './components/layout/Layout'
+import { BootLoader } from './components/ui/BootLoader'
 
 const HomePage = lazy(() => import('./pages/HomePage'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
@@ -18,6 +19,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 export default function App() {
   return (
     <SmoothScroll>
+      <BootLoader />
       <div className="grain">
         <Routes>
           <Route element={<Layout />}>

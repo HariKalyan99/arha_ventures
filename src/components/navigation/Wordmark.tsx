@@ -1,13 +1,11 @@
 import { Link } from 'react-router'
+import { LOGO_SRC } from '../../data/brand'
 import { studio } from '../../data/site'
 import { Magnetic } from '../ui/Magnetic'
 
-const LOGO_SRC = '/brand/arha-logo.png?v=2'
-
 /**
  * Brand mark for the header.
- * The asset uses black + terracotta on transparency, so it sits on a cream
- * plate with a hairline frame — readable on the dark nav without looking pasted on.
+ * Transparent terracotta + black logo on a cream plate — readable on the dark nav.
  */
 export function Wordmark({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -17,10 +15,10 @@ export function Wordmark({ onNavigate }: { onNavigate?: () => void }) {
           <img
             src={LOGO_SRC}
             alt=""
-            width={798}
-            height={798}
+            width={1024}
+            height={1024}
             decoding="async"
-            className="size-full object-contain p-[7%]"
+            className="size-full object-contain p-[8%]"
           />
         </span>
       </Link>

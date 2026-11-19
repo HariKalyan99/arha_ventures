@@ -1,6 +1,9 @@
 import { useRef } from 'react'
+import { LOGO_ON_DARK_SRC } from '../../data/brand'
 import { media } from '../../data/media'
+import { studio } from '../../data/site'
 import { useReveal } from '../../animations/reveal'
+import { gsap, MOTION_QUERY, useGSAP } from '../../lib/gsap'
 import { Img } from '../ui/Img'
 import { SectionLabel } from '../ui/SectionLabel'
 import { Words } from '../ui/Text'
@@ -8,11 +11,41 @@ import { ArrowLink } from '../ui/ArrowButton'
 
 export function Philosophy() {
   const ref = useRef<HTMLElement>(null)
+  const decal = useRef<HTMLDivElement>(null)
   useReveal(ref)
+
+  // Rise into a sticky bottom decal — large mark, partially emerging from the fold.
+  useGSAP(
+    () => {
+      if (!ref.current || !decal.current) return
+      const mm = gsap.matchMedia()
+      mm.add(MOTION_QUERY, () => {
+        gsap.fromTo(
+          decal.current,
+          { yPercent: 110, autoAlpha: 0 },
+          {
+            yPercent: 48,
+            autoAlpha: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: ref.current,
+              start: 'top 75%',
+              end: 'center 45%',
+              scrub: 1.1,
+            },
+          },
+        )
+      })
+      mm.add('(prefers-reduced-motion: reduce)', () => {
+        gsap.set(decal.current, { yPercent: 48, autoAlpha: 0.9 })
+      })
+    },
+    { scope: ref },
+  )
 
   return (
     <section ref={ref} id="intro" aria-labelledby="studio-title" className="relative surface-obsidian section-y">
-      <div className="shell">
+      <div className="shell relative z-10">
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <SectionLabel index="01" label="The Studio" />
@@ -76,6 +109,26 @@ export function Philosophy() {
               </ArrowLink>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Sticky bottom decal — rises in, then sits half out of the viewport */}
+      <div className="pointer-events-none sticky bottom-0 z-[5] -mb-[1px] flex justify-center overflow-visible pt-[min(28vh,16rem)]">
+        <div
+          ref={decal}
+          className="will-change-transform"
+          style={{ opacity: 0 }}
+          aria-hidden
+        >
+          <img
+            src={LOGO_ON_DARK_SRC}
+            alt=""
+            width={1024}
+            height={1024}
+            decoding="async"
+            className="h-auto w-[min(92vw,42rem)] max-w-none object-contain object-bottom drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] sm:w-[min(85vw,48rem)] lg:w-[min(70vw,56rem)]"
+          />
+          <span className="sr-only">{studio.name}</span>
         </div>
       </div>
     </section>
