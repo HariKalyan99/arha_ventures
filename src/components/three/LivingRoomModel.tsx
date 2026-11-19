@@ -1,7 +1,8 @@
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
 import { LIVING_ROOM_GLB, LIVING_ROOM_TARGET_SPAN, LIVING_ROOM_YAW } from './roomSource'
+import { WallLogo } from './WallLogo'
 
 /** Materials used by the free_loft city towers / exterior blocks — kept out of the hero. */
 const EXTERIOR_MATERIALS = new Set([
@@ -145,6 +146,9 @@ export function LivingRoomModel() {
         <primitive object={prepared} />
       </group>
       <InteriorEnclosure />
+      <Suspense fallback={null}>
+        <WallLogo />
+      </Suspense>
     </group>
   )
 }
