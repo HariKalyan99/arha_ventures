@@ -34,7 +34,7 @@ function PageReady() {
     const id = requestAnimationFrame(() => {
       try {
         ScrollTrigger.refresh()
-        const y = ScrollTrigger.scroll()
+        const y = window.scrollY
         ScrollTrigger.getAll().forEach((st) => {
           if (!st.vars.once || !st.animation) return
           if (st.start <= y + 1) st.animation.progress(1)

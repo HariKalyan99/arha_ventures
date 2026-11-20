@@ -102,7 +102,7 @@ export function registerReveals(scope: HTMLElement) {
      then finish any once-animation already past its start so content isn't left
      at autoAlpha:0 / clip-path inset(100%). */
   ScrollTrigger.refresh()
-  const y = ScrollTrigger.scroll()
+  const y = window.scrollY
   ScrollTrigger.getAll().forEach((st) => {
     const trigger = st.trigger as Element | null
     if (!trigger || !scope.contains(trigger)) return
