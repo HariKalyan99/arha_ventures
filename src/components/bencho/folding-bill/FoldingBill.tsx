@@ -32,9 +32,9 @@ type Three = typeof import("three");
 
 export const BILL_W = 340;
 export const BILL_H = 240;
-/* how far past its box the canvas reaches, as a multiple of it —
-   roomy so the sheet can be pulled around inside Services */
-const SPILL = 3;
+/* Default canvas spill (× host box). Services passes a larger spill so the
+   sheet can travel across the section instead of clipping in a small cell. */
+const SPILL_DEFAULT = 3;
 
 /* the sheet: points across and down, size, how far the camera
    stands, and how it is tipped to the light */
@@ -42,10 +42,8 @@ const SPEC = { nx: 46, ny: 20, w: 3.0, h: 3.0 / 2.35, cam: 3.95, tilt: [-0.32, 0
 
 type Link = { a: number; b: number; len: number; k: number };
 
-/* how far a point may be pulled from its place before the pull goes
-   to rubber, and how sharp a fold may get (a bend link's shortest,
-   as a share of its length) */
-const REACH = 1.5;
+/* Default drag reach in cloth space. Services raises this for freer play. */
+const REACH_DEFAULT = 1.5;
 const CREASE = 0.55;
 
 /* the glass: brand terracotta — clear on cream, matches site accent */
@@ -188,6 +186,10 @@ export function FoldingBill({
   print = "Plain",
   width = BILL_W,
   height = BILL_H,
+  /** Canvas size as a multiple of the host box — larger = freer travel before clipping. */
+  spill = SPILL_DEFAULT,
+  /** How far a held point may leave its rest pose before rubber-banding. */
+  reach = REACH_DEFAULT,
 }: {
   stiffness?: number;
   settle?: number;
@@ -195,11 +197,15 @@ export function FoldingBill({
   print?: string;
   width?: number;
   height?: number;
+  spill?: number;
+  reach?: number;
 }) {
   const host = useRef<HTMLDivElement | null>(null);
   const live = useRef({ stiffness, settle, print });
   live.current = { stiffness, settle, print };
   const spec = { ...SPEC, fw: width, fh: height };
+  const SPILL = Math.max(2, spill);
+  const REACH = Math.max(0.8, reach);
 
   useEffect(() => {
     const el = host.current;
@@ -247,8 +253,13 @@ export function FoldingBill({
     Object.assign(cv.style, {
       width: `${SPILL * 100}%`, height: `${SPILL * 100}%`,
       left: `${(-(SPILL - 1) / 2) * 100}%`, top: `${(-(SPILL - 1) / 2) * 100}%`,
+      /* Paint-only spill: empty canvas must not steal scroll / list clicks.
+         Pointer listeners sit on the host box; capture keeps a drag alive. */
+      pointerEvents: "none",
     });
     el.appendChild(cv);
+    el.style.touchAction = "none";
+    el.style.cursor = "default";
 
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -419,7 +430,8 @@ export function FoldingBill({
       calm = 0;
       aim();
       cv.dataset.held = "true";
-      try { cv.setPointerCapture(e.pointerId); } catch { /* scripted pointers */ }
+      el.dataset.held = "true";
+      try { el.setPointerCapture(e.pointerId); } catch { /* scripted pointers */ }
       wake();
     };
     const move = (e: PointerEvent) => {
@@ -429,6 +441,7 @@ export function FoldingBill({
         ray.setFromCamera(ndc, camera);
         const on = ray.intersectObject(mesh).length > 0;
         cv.dataset.over = on ? "true" : "";
+        el.dataset.over = on ? "true" : "";
         /* read by the wall card: only the bill itself is the block,
            the empty canvas round it is the card's to open */
         cv.dataset.ink = String(on);
@@ -441,12 +454,14 @@ export function FoldingBill({
       if (held < 0) return;
       held = -1;
       cv.dataset.held = "";
-      try { cv.releasePointerCapture(e.pointerId); } catch { /* never captured */ }
+      el.dataset.held = "";
+      try { el.releasePointerCapture(e.pointerId); } catch { /* never captured */ }
     };
-    cv.addEventListener("pointerdown", down);
-    cv.addEventListener("pointermove", move);
-    cv.addEventListener("pointerup", up);
-    cv.addEventListener("pointercancel", up);
+    /* Host receives hits (resting box); spill canvas is pointer-events: none. */
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
 
     /* ── the loop ── */
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -559,10 +574,10 @@ export function FoldingBill({
     return () => {
       cancelAnimationFrame(raf);
       io.disconnect();
-      cv.removeEventListener("pointerdown", down);
-      cv.removeEventListener("pointermove", move);
-      cv.removeEventListener("pointerup", up);
-      cv.removeEventListener("pointercancel", up);
+      el.removeEventListener("pointerdown", down);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", up);
+      el.removeEventListener("pointercancel", up);
       disposed = true;
       geo.dispose(); mat.dispose(); plain.dispose(); bump?.dispose(); ink?.dispose(); frost?.dispose(); cut.dispose();
       scene.environment?.dispose(); pmrem.dispose(); renderer.dispose();

@@ -419,7 +419,7 @@ export function RoomConfigurator() {
             <button
               type="button"
               onClick={reset}
-              className="eyebrow mt-8 inline-flex min-h-12 items-center gap-2 px-2 text-cream/70 transition-colors duration-500 hover:text-cream"
+              className="eyebrow mt-8 inline-flex min-h-10 items-center gap-2 px-2 text-cream/70 transition-colors duration-500 hover:text-cream sm:min-h-11"
             >
               <RotateCcw className="size-4" strokeWidth={1.25} aria-hidden />
               Reset study

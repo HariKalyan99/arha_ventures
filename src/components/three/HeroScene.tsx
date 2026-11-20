@@ -88,7 +88,16 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
     [progress, isDark],
   )
   return (
-    <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0">
+    <SceneCanvas
+      tier={tier}
+      active={active}
+      onReady={onReady}
+      className="!absolute inset-0"
+      pointerEvents
+      stabilizeDpr
+      dprCap={1.5}
+      shadows={false}
+    >
       {HERO_ROOM_SOURCE === 'glb' ? (
         <HeroTourCamera progress={progress} reducedMotion={reducedMotion} />
       ) : (

@@ -109,19 +109,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       <hemisphereLight ref={hemi} intensity={0.9} />
       <ambientLight ref={ambient} intensity={0.4} color="#e2d4c2" />
 
-      <directionalLight
-        ref={sun}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-near={0.5}
-        shadow-camera-far={50}
-        shadow-camera-left={-14}
-        shadow-camera-right={14}
-        shadow-camera-top={14}
-        shadow-camera-bottom={-14}
-        shadow-bias={-0.00025}
-        shadow-normalBias={0.035}
-      />
+      {/* No castShadow — sticky tour needs every frame; contact shadows cover the floor. */}
+      <directionalLight ref={sun} castShadow={false} />
 
       <directionalLight ref={windowKey} position={[1.4, 3.6, -6]} intensity={1.7} color="#e8d2b0" />
       <directionalLight ref={sheenKey} position={[-4.5, 4.2, 5.5]} intensity={0} color="#c8d0e0" />

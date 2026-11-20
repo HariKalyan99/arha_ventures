@@ -47,17 +47,20 @@ export function Hero() {
         trigger: section.current,
         start: 'top top',
         end: 'bottom bottom',
+        invalidateOnRefresh: true,
         onUpdate: (self) => {
           progress.current = self.progress
-          if (isTour) {
-            const mapped = mapTourScrollProgress(self.progress)
-            const { displayIndex } = tourStopAt(mapped)
-            setStopIndex((prev) => (prev === displayIndex ? prev : displayIndex))
-            setTouring(self.progress > 0.05)
-            setHolding(isTourHold(self.progress))
-            const nextReveal = Math.round(tourHoldReveal(self.progress) * 100) / 100
-            setHoldReveal((prev) => (prev === nextReveal ? prev : nextReveal))
-          }
+          if (!isTour) return
+          const mapped = mapTourScrollProgress(self.progress)
+          const { displayIndex } = tourStopAt(mapped)
+          /* Only commit React state when values change — avoids scroll-frame re-renders. */
+          setStopIndex((prev) => (prev === displayIndex ? prev : displayIndex))
+          const nextTouring = self.progress > 0.05
+          setTouring((prev) => (prev === nextTouring ? prev : nextTouring))
+          const nextHolding = isTourHold(self.progress)
+          setHolding((prev) => (prev === nextHolding ? prev : nextHolding))
+          const nextReveal = Math.round(tourHoldReveal(self.progress) * 50) / 50
+          setHoldReveal((prev) => (prev === nextReveal ? prev : nextReveal))
         },
       })
 
@@ -117,8 +120,8 @@ export function Hero() {
           )}
         </div>
 
-        {/* Cinematic veils — light enough that the loft stays readable */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
+        {/* Cinematic veils — stronger left plate on phones so copy clears the bright teapoy */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.72)_0%,rgba(16,16,15,0.42)_28%,rgba(16,16,15,0.12)_48%,rgba(16,16,15,0)_62%)] md:bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
@@ -129,7 +132,7 @@ export function Hero() {
             <p data-hero-fade className="eyebrow mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
               <span>{studio.name}</span>
               <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block" />
-              <span className="text-parchment/70">{studio.tagline}</span>
+              <span className="text-parchment/80">{studio.tagline}</span>
             </p>
             <h1 id="hero-title" className="display display-on-media max-w-[18ch] text-display-hero text-parchment sm:max-w-[22ch] md:max-w-none">
               <span className="block overflow-hidden pb-[0.05em]">
@@ -143,12 +146,13 @@ export function Hero() {
             </h1>
             <div data-hero-rule className="hairline mt-4 max-w-md bg-gold/40 sm:mt-7" />
             <div className="mt-4 flex max-w-[36rem] flex-col gap-4 sm:mt-7 sm:gap-6">
-              <p data-hero-fade className="max-w-[28rem] text-[0.875rem] leading-relaxed text-parchment/75 sm:text-[0.95rem] md:text-lead">
-                {isTour
-                  ? 'Scroll the loft. Each pause is a thought about height, gathering, ritual — and what a room might ask of you.'
-                  : 'An architecture and interior design studio shaping residences, villas and hospitality spaces with patience, precision and a reverence for material.'}
+              <p
+                data-hero-fade
+                className="hero-lead-on-media max-w-[28rem] text-[0.9375rem] font-medium leading-relaxed text-parchment sm:text-[0.95rem] md:text-lead md:font-normal md:text-parchment/80"
+              >
+                Architecture and interiors, shaped with patience and a reverence for material.
               </p>
-              <div data-hero-fade className="pointer-events-auto flex flex-wrap gap-3">
+              <div data-hero-fade className="pointer-events-auto flex flex-wrap gap-2 sm:gap-3">
                 <ArrowButton variant="solid" onClick={() => scrollTo('projects')}>
                   View the work
                 </ArrowButton>
@@ -168,17 +172,17 @@ export function Hero() {
             aria-live="polite"
           >
             <div className="shell">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="sync">
                 <motion.div
                   key={stop.id}
-                  initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                  initial={reducedMotion ? false : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={reducedMotion ? undefined : { opacity: 0, y: -12 }}
-                  transition={{ duration: 0.7, ease: EASE_LUXE }}
+                  exit={reducedMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.28, ease: EASE_LUXE }}
                   className={`relative max-w-[min(34rem,100%)] rounded-sm px-3 py-3 shadow-[inset_0_1px_0_rgba(232,223,208,0.06),0_24px_48px_-28px_rgba(0,0,0,0.7)] sm:px-4 sm:py-4 md:max-w-[36rem] ${
                     isConclusion
-                      ? 'bg-[#171717]/80 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
-                      : 'bg-[#171717]/65 backdrop-blur-sm'
+                      ? 'bg-[#171717]/80 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)]'
+                      : 'bg-[#171717]/65'
                   }`}
                 >
                   <p className={`eyebrow ${isConclusion || holding ? 'text-gold' : 'text-gold/80'}`}>{stop.eyebrow}</p>

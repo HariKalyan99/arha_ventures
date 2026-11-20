@@ -44,10 +44,10 @@ export const houseTourStops: TourStop[] = [
     target: [-2.95, 1.42, 1.45],
     fov: 48,
     mobile: {
-      // Same lounge beat as desktop, but pulled back and aimed lower so phones don’t see ceiling.
-      position: [-0.35, 1.64, 5.7],
-      target: [-2.55, 1.05, 1.4],
-      fov: 41,
+      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 0.82, 2.38).
+      position: [0.55, 1.58, 5.55],
+      target: [-2.84, 0.92, 2.25],
+      fov: 40,
     },
   },
   {
@@ -59,9 +59,10 @@ export const houseTourStops: TourStop[] = [
     target: [-2.9, 1.0, 1.5],
     fov: 50,
     mobile: {
-      position: [0.7, 1.55, 3.85],
-      target: [-2.35, 0.95, 1.35],
-      fov: 44,
+      // Stay with the teapoy a beat longer before the tour drifts right.
+      position: [0.85, 1.52, 3.9],
+      target: [-2.7, 0.9, 2.05],
+      fov: 42,
     },
   },
   {
@@ -146,6 +147,7 @@ export function tourPoseFor(stop: TourStop, compact: boolean, width = 0): TourPo
  * Tour travels through stops for most of the scroll, then holds on the final
  * shelf / question so the ending can breathe before the page continues down.
  */
+/** Tour travels through stops for most of the scroll, then holds on the final shelf. */
 export const TOUR_TRAVEL_END = 0.72
 
 export function mapTourScrollProgress(raw: number) {

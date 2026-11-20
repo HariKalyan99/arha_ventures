@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { FoldingBill } from './FoldingBill'
 import './FoldingBill.css'
 
@@ -16,7 +17,6 @@ function preferredWidth(vw: number) {
   if (vw >= 768) return BASE_W
   if (vw <= 320) return 104
   const t = (vw - 320) / (768 - 320)
-  /* ease-out so the drop is noticeable on phones, gentler into md */
   const e = 1 - (1 - t) * (1 - t)
   return Math.round(104 + e * (BASE_W - 104))
 }
@@ -26,58 +26,130 @@ function sizeFor(vw: number, cap = preferredWidth(vw)) {
   return { w, h: Math.round(w * RATIO) }
 }
 
+type Anchor = {
+  left: number
+  top: number
+  spill: number
+  ready: boolean
+}
+
 /**
- * Folding bill laid on the Services “take on.” phrase —
- * grab, drag and fold; canvas spills into the section for play.
- * Size tracks the phrase and the viewport so smaller screens get a smaller bill.
+ * Folding bill on the Services “take on.” phrase.
+ * The WebGL playfield is portaled onto `[data-bill-stage]` (the Services
+ * section) so the sheet is not clipped by the headline cell — you can
+ * drag it freely across that section.
  */
 export function TakeOnBill() {
   const root = useRef<HTMLSpanElement>(null)
+  const stageRef = useRef<HTMLElement | null>(null)
   const [{ w, h }, setSize] = useState(() =>
     sizeFor(typeof window !== 'undefined' ? window.innerWidth : BASE_W),
   )
+  const [anchor, setAnchor] = useState<Anchor>({ left: 0, top: 0, spill: 7, ready: false })
+  const [, setStageTick] = useState(0)
 
-  useEffect(() => {
-    const update = () => {
-      const vw = window.innerWidth
-      const fluid = preferredWidth(vw)
-      const em = root.current?.querySelector('em')
-      if (!em) {
-        setSize(sizeFor(vw, fluid))
-        return
-      }
-      const tr = em.getBoundingClientRect()
-      if (tr.width < 4) {
-        setSize(sizeFor(vw, fluid))
-        return
-      }
-      const center = tr.left + tr.width / 2
-      const maxW = Math.floor(2 * Math.min(center - EDGE_PAD, vw - center - EDGE_PAD))
-      /* Never exceed the fluid viewport cap — bill shrinks with lesser px */
-      const next = Math.min(fluid, Math.max(MIN_W, maxW))
-      setSize((prev) => (prev.w === next ? prev : { w: next, h: Math.round(next * RATIO) }))
-    }
-
-    update()
-    const raf = requestAnimationFrame(update)
-    void document.fonts?.ready?.then(update)
-    window.addEventListener('resize', update)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', update)
-    }
+  useLayoutEffect(() => {
+    const phrase = root.current
+    if (!phrase) return
+    const stage = phrase.closest('[data-bill-stage]') as HTMLElement | null
+    stageRef.current = stage
+    setStageTick((n) => n + 1)
   }, [])
 
+  useEffect(() => {
+    const sync = () => {
+      const vw = window.innerWidth
+      const fluid = preferredWidth(vw)
+      const phrase = root.current
+      const em = phrase?.querySelector('em')
+      const stage = (stageRef.current ?? phrase?.closest('[data-bill-stage]')) as HTMLElement | null
+      stageRef.current = stage
+
+      let nextW = sizeFor(vw, fluid).w
+      if (em) {
+        const tr = em.getBoundingClientRect()
+        if (tr.width >= 4) {
+          const center = tr.left + tr.width / 2
+          const maxW = Math.floor(2 * Math.min(center - EDGE_PAD, vw - center - EDGE_PAD))
+          nextW = Math.min(fluid, Math.max(MIN_W, maxW))
+        }
+      }
+      const nextH = Math.round(nextW * RATIO)
+      setSize((prev) => (prev.w === nextW ? prev : { w: nextW, h: nextH }))
+
+      if (!phrase || !stage) {
+        setAnchor((a) => (a.ready ? { ...a, ready: false } : a))
+        return
+      }
+
+      const pr = phrase.getBoundingClientRect()
+      const sr = stage.getBoundingClientRect()
+      /* Cover ~viewport-worth of the stage so the sheet can travel freely. */
+      const cover = Math.max(sr.width / Math.max(nextW, 1), Math.min(sr.height, vw * 1.2) / Math.max(nextH, 1))
+      const spill = Math.round(Math.min(10, Math.max(7, cover)) * 10) / 10
+
+      const left = pr.left - sr.left + pr.width / 2
+      const top = pr.top - sr.top + pr.height / 2
+      setAnchor((prev) => {
+        if (
+          prev.ready &&
+          Math.abs(prev.left - left) < 0.5 &&
+          Math.abs(prev.top - top) < 0.5 &&
+          prev.spill === spill
+        ) {
+          return prev
+        }
+        return { left, top, spill, ready: true }
+      })
+    }
+
+    sync()
+    const raf = requestAnimationFrame(sync)
+    void document.fonts?.ready?.then(sync)
+    window.addEventListener('resize', sync)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', sync)
+    }
+  }, [w])
+
+  const stage = stageRef.current
+
   return (
-    <span ref={root} className="relative z-10 inline-block align-baseline leading-[1.05]">
-      <em className="relative z-0 text-cream">take on.</em>
-      <span
-        className="pointer-events-auto absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-[48%]"
-        style={{ width: w, height: h }}
-        aria-hidden
-      >
-        <FoldingBill key={w} print="Plain" stiffness={40} settle={0} width={w} height={h} />
+    <>
+      <span ref={root} className="relative z-0 inline-block align-baseline leading-[1.05]">
+        <em className="text-cream">take on.</em>
       </span>
-    </span>
+      {stage &&
+        anchor.ready &&
+        createPortal(
+          <div
+            className="pointer-events-none absolute z-30"
+            style={{
+              left: anchor.left,
+              top: anchor.top,
+              width: w,
+              height: h,
+              transform: 'translate(-50%, -48%)',
+            }}
+            aria-hidden
+          >
+            {/* Hits live on the resting box; the spill canvas is paint-only. */}
+            <div className="pointer-events-auto size-full">
+              <FoldingBill
+                key={w}
+                print="Plain"
+                stiffness={40}
+                settle={0}
+                width={w}
+                height={h}
+                spill={anchor.spill}
+                reach={3.8}
+              />
+            </div>
+          </div>,
+          stage,
+        )}
+    </>
   )
 }

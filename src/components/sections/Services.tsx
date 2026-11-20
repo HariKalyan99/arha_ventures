@@ -32,8 +32,9 @@ export function Services({ index, heading = DEFAULT_HEADING, intro, footer }: Se
   return (
     <section
       ref={ref}
+      data-bill-stage={interactiveTakeOn ? '' : undefined}
       aria-labelledby="services-title"
-      className={`relative surface-espresso section-y ${interactiveTakeOn ? 'overflow-visible' : ''}`}
+      className={`relative isolate surface-espresso section-y ${interactiveTakeOn ? 'overflow-visible' : ''}`}
     >
       <div className={`shell ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
         <div className={`grid gap-10 lg:grid-cols-12 lg:items-end ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
@@ -41,20 +42,20 @@ export function Services({ index, heading = DEFAULT_HEADING, intro, footer }: Se
             <SectionLabel index={index} label="Services" />
             <h2
               id="services-title"
-              className={`display mt-8 text-display-xl text-cream ${interactiveTakeOn ? 'relative z-20 overflow-visible' : ''}`}
+              className={`display mt-8 text-display-xl text-cream ${interactiveTakeOn ? 'relative z-10 overflow-visible' : ''}`}
             >
               {interactiveTakeOn ? (
-                <span data-reveal="lines" className="overflow-visible">
-                  <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
-                    <span data-line className="block">
-                      What we
+                <span className="overflow-visible">
+                  <span data-reveal="lines" className="overflow-visible">
+                    <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+                      <span data-line className="block">
+                        What we
+                      </span>
                     </span>
                   </span>{' '}
-                  {/* No extra padding — bill overlays the line so the intro stays beside the headline */}
-                  <span className="relative z-20 block overflow-visible pb-[0.1em] -mb-[0.1em]">
-                    <span data-line className="relative block overflow-visible">
-                      <TakeOnBill />
-                    </span>
+                  {/* Phrase only — bill WebGL is portaled onto the section stage. */}
+                  <span className="relative inline overflow-visible">
+                    <TakeOnBill />
                   </span>
                 </span>
               ) : (
