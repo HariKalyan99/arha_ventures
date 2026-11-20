@@ -55,6 +55,7 @@ const ICE = 0x934236;
    The sheet is cut to a rounded rectangle: CORNER is the radius as
    a share of the bill's height. `inset` is how far a point is in
    from that outline (negative outside it), in pixels of a W×H map. */
+   
 const CORNER = 0.09;
 function inset(x: number, y: number, W: number, H: number) {
   const r = CORNER * H;
