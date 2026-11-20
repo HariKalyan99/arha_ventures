@@ -1,12 +1,21 @@
-import { useRef } from 'react'
+import { useRef, type PointerEvent as ReactPointerEvent } from 'react'
 import { Link, useLocation } from 'react-router'
 import { ArrowUp } from 'lucide-react'
 import { legalNavigation, navigation, studio } from '../../data/site'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { useReveal } from '../../animations/reveal'
+import { play } from '../bencho/sounds/sounds'
 import { Particles } from '../bencho/particles/Particles'
 import { ArrowLink } from '../ui/ArrowButton'
 import { Lines } from '../ui/Text'
+
+/** Glide on desktop hover; touch/pen use pointerdown (no reliable hover). */
+function onMarkEnter(e: ReactPointerEvent<HTMLSpanElement>) {
+  if (e.pointerType === 'mouse') play('glide')
+}
+function onMarkDown(e: ReactPointerEvent<HTMLSpanElement>) {
+  if (e.pointerType !== 'mouse') play('glide')
+}
 
 export function Footer() {
   const ref = useRef<HTMLElement>(null)
@@ -69,7 +78,7 @@ export function Footer() {
           <p className="eyebrow mb-5 text-gold">Contact</p>
           <ul className="flex flex-col gap-3 text-sm text-cream/80">
             <li>
-              <a href={`mailto:${studio.email}`} className="link-line break-all hover:text-cream">
+              <a href={`mailto:${studio.email}`} className="link-line break-words hover:text-cream">
                 {studio.email}
               </a>
             </li>
@@ -92,11 +101,17 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark — each letter grows / shrinks once on hover */}
+      {/* Oversized wordmark — each letter grows / shrinks once on hover; Glide on hover / touch */}
       <div className="select-none px-[var(--gutter)]" aria-hidden>
         <p className="footer-mark font-display cursor-default text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.07]">
           {studio.name.split('').map((char, i) => (
-            <span key={`${char}-${i}`} className="footer-mark-letter">
+            <span
+              key={`${char}-${i}`}
+              className="footer-mark-letter"
+              data-bencho-sound="glide"
+              onPointerEnter={onMarkEnter}
+              onPointerDown={onMarkDown}
+            >
               {char}
             </span>
           ))}

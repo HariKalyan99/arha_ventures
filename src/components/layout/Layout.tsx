@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react'
+import { Suspense, useLayoutEffect, useState } from 'react'
 import { useLocation, useOutlet } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ScrollTrigger } from '../../lib/gsap'
@@ -6,6 +6,7 @@ import { EASE_CURTAIN, EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
+import { SoundFeedback } from '../bencho/sounds/SoundFeedback'
 import { CustomCursor } from '../ui/CustomCursor'
 import { PageLoader } from '../ui/PageLoader'
 
@@ -14,12 +15,34 @@ function PageFallback() {
   return <div className="min-h-svh bg-obsidian" role="status" aria-label="Loading" />
 }
 
-/** Resets scroll and re-measures scroll-linked animations once a new page has mounted. */
+/** Wipe ScrollTriggers left by the previous route (pins / reveals). */
+function killScrollTriggers() {
+  ScrollTrigger.getAll().forEach((st) => {
+    try {
+      st.kill()
+    } catch {
+      /* already dead */
+    }
+  })
+}
+
+/** Resets scroll after the new page has mounted and re-measures triggers. */
 function PageReady() {
   const { scrollTo } = useSmoothScroll()
-  useEffect(() => {
+  useLayoutEffect(() => {
     scrollTo(0, { immediate: true })
-    const id = requestAnimationFrame(() => ScrollTrigger.refresh())
+    const id = requestAnimationFrame(() => {
+      try {
+        ScrollTrigger.refresh()
+        const y = ScrollTrigger.scroll()
+        ScrollTrigger.getAll().forEach((st) => {
+          if (!st.vars.once || !st.animation) return
+          if (st.start <= y + 1) st.animation.progress(1)
+        })
+      } catch {
+        /* page content stays; skip a corrupt refresh */
+      }
+    })
     return () => cancelAnimationFrame(id)
   }, [scrollTo])
   return null
@@ -27,13 +50,25 @@ function PageReady() {
 
 export function Layout() {
   const location = useLocation()
-  // Captured per render so the outgoing page keeps its content during the exit transition.
   const outlet = useOutlet()
+  const { scrollTo } = useSmoothScroll()
+  /* Survives AnimatePresence remounts — gate scroll kill before the next page mounts. */
+  const [scrollReadyPath, setScrollReadyPath] = useState(location.pathname)
+  const scrollReady = scrollReadyPath === location.pathname
+
+  useLayoutEffect(() => {
+    if (scrollReady) return
+    killScrollTriggers()
+    /* Reset scroll before mounting the next page so reveal triggers measure correctly. */
+    scrollTo(0, { immediate: true })
+    setScrollReadyPath(location.pathname)
+  }, [location.pathname, scrollReady, scrollTo])
 
   return (
     <>
       <PageLoader />
       <CustomCursor />
+      <SoundFeedback />
       {/* Sticky terracotta wash at the bottom of the frame */}
       <div aria-hidden data-brand-vignette className="terracotta-vignette-bottom" />
       <a
@@ -52,8 +87,14 @@ export function Layout() {
           >
             <main id="main" tabIndex={-1} className="outline-none">
               <Suspense fallback={<PageFallback />}>
-                {outlet}
-                <PageReady />
+                {scrollReady ? (
+                  <>
+                    {outlet}
+                    <PageReady />
+                  </>
+                ) : (
+                  <PageFallback />
+                )}
               </Suspense>
             </main>
             <Footer />

@@ -3,11 +3,25 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
+/** Set when previewing via HTTPS tunnel so HMR uses wss:443 instead of :5173 */
+const tunnelHost = process.env.VITE_TUNNEL_HOST?.replace(/^https?:\/\//, '')
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    /* ngrok / LAN previews send a foreign Host header — allow tunnel domains */
-    allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app', '.ngrok.io'],
+    /* LAN + tablet/phone on the same Wi‑Fi */
+    host: true,
+    /* ngrok / cloudflare / LAN Host headers */
+    allowedHosts: ['.ngrok-free.dev', '.ngrok-free.app', '.ngrok.app', '.ngrok.io', '.trycloudflare.com'],
+    ...(tunnelHost
+      ? {
+          hmr: {
+            protocol: 'wss' as const,
+            host: tunnelHost,
+            clientPort: 443,
+          },
+        }
+      : {}),
   },
   build: {
     target: 'es2022',

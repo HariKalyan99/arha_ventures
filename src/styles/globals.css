@@ -3,6 +3,9 @@
 @import '@fontsource-variable/manrope/wght.css';
 @import 'tailwindcss';
 
+/* Short viewports (phone landscape, short browser chrome) — hero density */
+@custom-variant short (@media (max-height: 520px));
+
 /* ------------------------------------------------------------------
    Design tokens — Light Opulent Luxury · Terracotta Edition
    Same brand pigments; surfaces inverted to warm paper.
@@ -120,6 +123,10 @@
   }
   .lenis.lenis-smooth [data-lenis-prevent] {
     overscroll-behavior: contain;
+  }
+
+  html {
+    overflow-x: clip;
   }
 
   body {

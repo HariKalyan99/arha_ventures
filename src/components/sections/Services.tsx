@@ -34,11 +34,13 @@ export function Services({ index, heading = DEFAULT_HEADING, intro, footer }: Se
       ref={ref}
       data-bill-stage={interactiveTakeOn ? '' : undefined}
       aria-labelledby="services-title"
-      className={`relative isolate surface-espresso section-y ${interactiveTakeOn ? 'overflow-visible' : ''}`}
+      className={`relative isolate surface-espresso section-y ${
+        interactiveTakeOn ? 'max-lg:overflow-x-clip lg:overflow-visible' : ''
+      }`}
     >
-      <div className={`shell ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
-        <div className={`grid gap-10 lg:grid-cols-12 lg:items-end ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
-          <div className={`lg:col-span-7 ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
+      <div className={`shell ${interactiveTakeOn ? 'max-lg:overflow-x-clip lg:overflow-visible' : ''}`}>
+        <div className={`grid gap-10 lg:grid-cols-12 lg:items-end ${interactiveTakeOn ? 'max-lg:overflow-x-clip lg:overflow-visible' : ''}`}>
+          <div className={`lg:col-span-7 ${interactiveTakeOn ? 'max-lg:overflow-x-clip lg:overflow-visible' : ''}`}>
             <SectionLabel index={index} label="Services" />
             <h2
               id="services-title"

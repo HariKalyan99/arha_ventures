@@ -28,7 +28,6 @@ export function ProjectsShowcase() {
       mm.add(DESKTOP_MOTION, () => {
         const el = track.current!
         const distance = () => el.scrollWidth - window.innerWidth
-        const panels = gsap.utils.toArray<HTMLElement>('[data-panel]', el)
 
         // Vertical scroll drives the horizontal track while the viewport is pinned.
         const tween = gsap.to(el, {
@@ -52,23 +51,13 @@ export function ProjectsShowcase() {
         })
         horizontal.current = tween.scrollTrigger ?? null
 
-        // Images drift inside their frames as panels travel across the viewport.
-        panels.forEach((panel) => {
-          panel.querySelectorAll<HTMLElement>('[data-hparallax]').forEach((layer) => {
-            gsap.fromTo(
-              layer,
-              { xPercent: -7 },
-              {
-                xPercent: 7,
-                ease: 'none',
-                scrollTrigger: { trigger: panel, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true },
-              },
-            )
-          })
-        })
+        /* No containerAnimation parallax — nested STs orphan on route change and
+           crash ScrollTrigger.refresh() (blank page). CSS handles the drift. */
 
         return () => {
           horizontal.current = null
+          tween.scrollTrigger?.kill()
+          tween.kill()
         }
       })
     },
@@ -86,7 +75,7 @@ export function ProjectsShowcase() {
   }
 
   return (
-    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative surface-ink">
+    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative z-10 surface-ink">
       <div className="shell section-y pb-[clamp(3rem,6vw,6rem)]">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
@@ -168,7 +157,7 @@ function ShowcasePanel({ project, index }: { project: Project; index: number }) 
   const frame = (asset: Project['cover'], aspect: string, sizes: string, extra = '') => (
     <div className={`media-grade overflow-hidden bg-espresso ${aspect} ${extra}`}>
       <div className="size-full transition-transform duration-[1600ms] ease-[var(--ease-luxe)] group-hover:scale-[1.04]">
-        <div data-hparallax className="size-full scale-[1.16]">
+        <div className="size-full scale-[1.16] transition-transform duration-[1600ms] ease-[var(--ease-luxe)] will-change-transform group-hover:translate-x-[2%]">
           <Img media={asset} className="size-full object-cover" sizes={sizes} />
         </div>
       </div>

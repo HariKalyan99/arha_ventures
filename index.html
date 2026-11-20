@@ -178,17 +178,41 @@
         ARHA — Architecture &amp; Interiors. This experience requires JavaScript.
       </p>
     </noscript>
-    <!-- Failsafe: never leave visitors on the boot screen if JS stalls -->
+    <!--
+      Failsafe: only dismiss boot once React has mounted (#root has children).
+      Dev-over-tunnel used to hit 7s before modules arrived → blank page after splash.
+    -->
     <script>
-      setTimeout(function () {
-        var boot = document.getElementById('boot')
-        if (!boot || boot.classList.contains('is-done')) return
-        boot.classList.add('is-done')
-        document.documentElement.classList.remove('is-booting')
-        setTimeout(function () {
-          boot.remove()
-        }, 800)
-      }, 7000)
+      (function () {
+        var started = Date.now()
+        var MAX_MS = 60000
+        function dismiss(boot) {
+          if (!boot || boot.classList.contains('is-done')) return
+          boot.classList.add('is-done')
+          document.documentElement.classList.remove('is-booting')
+          setTimeout(function () {
+            boot.remove()
+          }, 800)
+        }
+        function tick() {
+          var boot = document.getElementById('boot')
+          if (!boot || boot.classList.contains('is-done')) return
+          var root = document.getElementById('root')
+          var mounted = root && root.childNodes.length > 0
+          var elapsed = Date.now() - started
+          /* Prefer BootLoader dismiss; only force after mount + grace, or hard timeout */
+          if (mounted && elapsed > 12000) {
+            dismiss(boot)
+            return
+          }
+          if (!mounted && elapsed > MAX_MS) {
+            dismiss(boot)
+            return
+          }
+          setTimeout(tick, 400)
+        }
+        setTimeout(tick, 7000)
+      })()
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -3,6 +3,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { useNavigate } from 'react-router'
 import * as THREE from 'three'
+import { play } from '../bencho/sounds/sounds'
 
 const PHONE_GLB = '/models/vintage_telephone_toscano_pm1920.glb'
 
@@ -25,7 +26,8 @@ const HOVER_AMP = 0.055
 export function ContactPhone() {
   const group = useRef<THREE.Group>(null)
   const navigate = useNavigate()
-  const { scene } = useGLTF(PHONE_GLB)
+  /* Loaded only when the loft Suspense mounts — no eager preload (~0.8 MB meshopt). */
+  const { scene } = useGLTF(PHONE_GLB, false, true)
 
   const phone = useMemo(() => {
     const root = scene.clone(true)
@@ -66,6 +68,7 @@ export function ContactPhone() {
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
+    play('nib')
     navigate('/contact')
   }
 
@@ -98,4 +101,3 @@ export function ContactPhone() {
   )
 }
 
-useGLTF.preload(PHONE_GLB)
