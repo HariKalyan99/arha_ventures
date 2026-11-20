@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { houseTourStops, mapTourScrollProgress, TOUR_CAMERA_BOUNDS } from './tourStops'
+import {
+  houseTourStops,
+  mapTourScrollProgress,
+  TOUR_CAMERA_BOUNDS,
+  TOUR_MOBILE_MAX_WIDTH,
+  tourPoseFor,
+} from './tourStops'
 
 interface HeroTourCameraProps {
   progress: RefObject<number>
@@ -11,6 +17,7 @@ interface HeroTourCameraProps {
 /**
  * Scroll moves between interior stations; mouse gently steers look inside the loft.
  * Horizon stays level — no Dutch-angle lean.
+ * Below md, stations swap to mobile poses so portrait frames read the living plane, not the ceiling.
  */
 export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
@@ -37,14 +44,20 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     [],
   )
 
+  const mobile = size.width <= TOUR_MOBILE_MAX_WIDTH
+  const portrait = size.width / size.height < 0.9
+
   const stations = useMemo(
     () =>
-      houseTourStops.map((s) => ({
-        pos: new THREE.Vector3(...s.position),
-        look: new THREE.Vector3(...s.target),
-        fov: s.fov,
-      })),
-    [],
+      houseTourStops.map((s) => {
+        const pose = tourPoseFor(s, mobile)
+        return {
+          pos: new THREE.Vector3(...pose.position),
+          look: new THREE.Vector3(...pose.target),
+          fov: pose.fov,
+        }
+      }),
+    [mobile],
   )
 
   useEffect(() => {
@@ -103,7 +116,8 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     pos.lerpVectors(fromPos, toPos, e)
     look.lerpVectors(fromLook, toLook, e)
 
-    const portraitBoost = size.width / size.height < 0.9 ? 8 : 0
+    // Portrait already sees more vertical — keep the boost small on phones so the ceiling doesn’t dominate.
+    const portraitBoost = portrait ? (mobile ? 2 : 8) : 0
     const desiredFov = THREE.MathUtils.lerp(stations[i].fov, stations[i + 1].fov, e) + portraitBoost
     s.fov += (desiredFov - s.fov) * (1 - Math.exp(-dt * 3.5))
     if (Math.abs(camera.fov - s.fov) > 0.05) {
@@ -117,12 +131,12 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     else forward.normalize()
     right.crossVectors(forward, worldUp).normalize()
 
-    // Soft look / step — kept light so the horizon stays calm.
-    const lookYaw = 1.15
-    const lookPitch = 0.45
-    const walkSide = 0.38
-    const walkFwd = 0.22
-    const walkUp = 0.12
+    // Soft look / step — lighter on touch so the composed mobile frame stays put.
+    const lookYaw = mobile ? 0.55 : 1.15
+    const lookPitch = mobile ? 0.22 : 0.45
+    const walkSide = mobile ? 0.18 : 0.38
+    const walkFwd = mobile ? 0.1 : 0.22
+    const walkUp = mobile ? 0.06 : 0.12
 
     offset
       .set(0, 0, 0)

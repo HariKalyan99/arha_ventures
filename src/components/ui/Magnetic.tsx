@@ -40,7 +40,7 @@ export function Magnetic({
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className={`inline-block ${className}`}
+      className={`inline-flex leading-none ${className}`}
       style={{ willChange: 'transform' }}
     >
       {children}

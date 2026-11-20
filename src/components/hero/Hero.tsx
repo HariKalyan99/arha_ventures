@@ -124,14 +124,14 @@ export function Hero() {
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
 
         {/* Opening copy — optically centered between header and bottom chrome */}
-        <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(4.5rem,10vh,7.5rem)]">
+        <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(3.5rem,8vh,7.5rem)]">
           <div className="shell" data-hero-copy>
-            <p data-hero-fade className="eyebrow mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
+            <p data-hero-fade className="eyebrow mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
               <span>{studio.name}</span>
               <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block" />
               <span className="text-parchment/70">{studio.tagline}</span>
             </p>
-            <h1 id="hero-title" className="display display-on-media max-w-[16ch] text-display-md text-parchment sm:max-w-[22ch] md:max-w-none">
+            <h1 id="hero-title" className="display display-on-media max-w-[18ch] text-display-hero text-parchment sm:max-w-[22ch] md:max-w-none">
               <span className="block overflow-hidden pb-[0.05em]">
                 <span data-hero-line className="block md:whitespace-nowrap">
                   A room should know how you <em>live</em>
@@ -141,9 +141,9 @@ export function Hero() {
                 <span data-hero-line className="block md:whitespace-nowrap">before it asks you to stay.</span>
               </span>
             </h1>
-            <div data-hero-rule className="hairline mt-5 max-w-md bg-gold/40 sm:mt-7" />
-            <div className="mt-5 flex max-w-[36rem] flex-col gap-5 sm:mt-7 sm:gap-6">
-              <p data-hero-fade className="max-w-[28rem] text-[0.95rem] leading-relaxed text-parchment/75 sm:text-lead">
+            <div data-hero-rule className="hairline mt-4 max-w-md bg-gold/40 sm:mt-7" />
+            <div className="mt-4 flex max-w-[36rem] flex-col gap-4 sm:mt-7 sm:gap-6">
+              <p data-hero-fade className="max-w-[28rem] text-[0.875rem] leading-relaxed text-parchment/75 sm:text-[0.95rem] md:text-lead">
                 {isTour
                   ? 'Scroll the loft. Each pause is a thought about height, gathering, ritual — and what a room might ask of you.'
                   : 'An architecture and interior design studio shaping residences, villas and hospitality spaces with patience, precision and a reverence for material.'}
@@ -185,8 +185,8 @@ export function Hero() {
                   <p
                     className={`display display-on-media mt-3 text-pretty text-parchment sm:mt-4 ${
                       isConclusion
-                        ? 'text-[clamp(1.35rem,0.95rem+1.8vw,2.75rem)] leading-[1.15]'
-                        : 'text-[clamp(1.2rem,0.9rem+1.4vw,2.35rem)] leading-[1.18]'
+                        ? 'text-[clamp(1.15rem,0.75rem+1.9vw,2.75rem)] leading-[1.15]'
+                        : 'text-[clamp(1.05rem,0.72rem+1.5vw,2.35rem)] leading-[1.18]'
                     }`}
                   >
                     {isConclusion ? (
@@ -234,7 +234,7 @@ export function Hero() {
           >
             <div aria-hidden className="absolute -inset-y-24 right-0 w-full bg-[radial-gradient(60%_70%_at_85%_60%,rgba(16,16,15,0.7),transparent)] md:w-2/3" />
             <div className="shell relative flex justify-end">
-              <p className="display display-on-media max-w-[18ch] text-right text-display-md text-parchment">
+              <p className="display display-on-media max-w-[18ch] text-right text-display-hero text-parchment">
                 As evening falls, <em>the room</em> changes its voice.
               </p>
             </div>

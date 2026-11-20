@@ -116,7 +116,7 @@ export function ProjectsShowcase() {
           {featuredProjects.map((project, i) => (
             <ShowcasePanel key={project.slug} project={project} index={i} />
           ))}
-          <div data-panel className="flex flex-col justify-center gap-6 lg:w-[34vw] lg:pr-[8vw]">
+          <div data-panel className="flex flex-col justify-start gap-6 max-lg:pb-[clamp(2.75rem,7vw,4.5rem)] lg:w-[34vw] lg:justify-center lg:pr-[8vw]">
             <p className="eyebrow text-gold">Index</p>
             <p className="display text-display-md text-cream">
               {projects.length} projects, <em>one sensibility.</em>

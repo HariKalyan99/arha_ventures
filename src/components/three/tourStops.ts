@@ -1,24 +1,35 @@
 /**
  * Interior tour for free_loft_17 (fitted span 14m, floor y=0).
  * Copy advances with the camera — last stop is the shelf + curious close.
+ *
+ * `mobile` poses reframe for narrow / portrait viewports (md and below):
+ * less ceiling, more of the living plane, FOV kept calmer.
  */
-export interface TourStop {
+export interface TourPose {
+  position: [number, number, number]
+  target: [number, number, number]
+  fov: number
+}
+
+export interface TourStop extends TourPose {
   id: string
   short: string
   /** Small gold eyebrow above the line */
   eyebrow: string
   /** Display line shown while this station is active */
   line: string
-  position: [number, number, number]
-  target: [number, number, number]
-  fov: number
+  /** Optional override when viewport width < 768 */
+  mobile?: Partial<TourPose>
 }
 
 /** Eye stays inside the loft, with room to travel between zones. */
 export const TOUR_CAMERA_BOUNDS = {
-  min: [-4.8, 1.2, -5.0] as [number, number, number],
-  max: [5.2, 3.55, 5.8] as [number, number, number],
+  min: [-4.8, 1.15, -5.0] as [number, number, number],
+  max: [5.2, 3.55, 6.2] as [number, number, number],
 }
+
+/** Match Tailwind `md` — below this we use mobile tour framing. */
+export const TOUR_MOBILE_MAX_WIDTH = 767
 
 export const houseTourStops: TourStop[] = [
   {
@@ -29,6 +40,12 @@ export const houseTourStops: TourStop[] = [
     position: [-0.7, 1.7, 5.0],
     target: [-2.95, 1.42, 1.45],
     fov: 48,
+    mobile: {
+      // Same lounge beat as desktop, but pulled back and aimed lower so phones don’t see ceiling.
+      position: [-0.35, 1.64, 5.7],
+      target: [-2.55, 1.05, 1.4],
+      fov: 41,
+    },
   },
   {
     id: 'seating',
@@ -38,6 +55,11 @@ export const houseTourStops: TourStop[] = [
     position: [0.4, 1.48, 3.2],
     target: [-2.9, 1.0, 1.5],
     fov: 50,
+    mobile: {
+      position: [0.7, 1.55, 3.85],
+      target: [-2.35, 0.95, 1.35],
+      fov: 44,
+    },
   },
   {
     id: 'kitchen',
@@ -47,6 +69,11 @@ export const houseTourStops: TourStop[] = [
     position: [0.6, 1.55, 1.8],
     target: [-3.4, 1.05, -0.9],
     fov: 48,
+    mobile: {
+      position: [0.75, 1.58, 2.15],
+      target: [-3.15, 0.98, -0.75],
+      fov: 45,
+    },
   },
   {
     id: 'mezzanine',
@@ -56,6 +83,12 @@ export const houseTourStops: TourStop[] = [
     position: [2.2, 3.9, 2.8],
     target: [-2.4, 1.5, 0.6],
     fov: 48,
+    mobile: {
+      // From the lounge side of the mezz — plan below, spiral out of the phone frame.
+      position: [-0.35, 3.35, 2.35],
+      target: [-2.85, 0.95, 1.35],
+      fov: 42,
+    },
   },
   {
     id: 'overview',
@@ -65,18 +98,39 @@ export const houseTourStops: TourStop[] = [
     position: [1.8, 1.85, 4.8],
     target: [-2.4, 1.15, 0.2],
     fov: 50,
+    mobile: {
+      position: [1.65, 1.72, 5.15],
+      target: [-2.2, 1.0, 0.35],
+      fov: 46,
+    },
   },
   {
     id: 'shelf',
     short: 'Shelf',
     eyebrow: '06 — And then',
     line: 'If a room could keep only one truth about you — which would you leave on the shelf?',
-    // Move in on the right-wall shelf / art console.
     position: [0.9, 1.52, 1.9],
     target: [3.55, 1.35, -0.55],
     fov: 40,
+    mobile: {
+      position: [0.7, 1.48, 2.15],
+      target: [3.35, 1.28, -0.45],
+      fov: 38,
+    },
   },
 ]
+
+/** Resolve desktop or mobile pose for a stop. */
+export function tourPoseFor(stop: TourStop, mobile: boolean): TourPose {
+  if (!mobile || !stop.mobile) {
+    return { position: stop.position, target: stop.target, fov: stop.fov }
+  }
+  return {
+    position: stop.mobile.position ?? stop.position,
+    target: stop.mobile.target ?? stop.target,
+    fov: stop.mobile.fov ?? stop.fov,
+  }
+}
 
 /**
  * Raw sticky scroll → camera progress.

@@ -106,8 +106,8 @@ export function Testimonials({ index }: { index: string }) {
                 aria-label={`${current + 1} of ${testimonials.length}`}
               >
                 <blockquote className="display text-display-md text-balance text-cream">{item.quote}</blockquote>
-                <figcaption className="mt-10 flex items-center gap-4 text-sm">
-                  <span aria-hidden className="h-px w-10 bg-gold" />
+                <figcaption className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                  <span aria-hidden className="h-px w-10 shrink-0 bg-gold" />
                   <span className="text-cream">{item.attribution}</span>
                   <span className="text-cream/50">— {item.reference}</span>
                 </figcaption>

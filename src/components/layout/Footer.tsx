@@ -24,7 +24,7 @@ export function Footer() {
             <h2 className="display text-display-xl text-cream lg:col-span-8">
               <Lines lines={['Have a space', <>in <em>mind?</em></>]} />
             </h2>
-            <div data-reveal="fade" className="relative z-10 flex flex-col gap-6 overflow-visible lg:col-span-4">
+            <div data-reveal="fade" className="relative z-10 flex flex-col items-start gap-6 overflow-visible lg:col-span-4">
               <div className="w-full max-w-[min(100%,20rem)] self-start" aria-hidden>
                 <Particles shape="Circle" grain="Fine" reach={80} force={60} />
               </div>
@@ -108,7 +108,7 @@ export function Footer() {
         {studio.contactIsPlaceholder && (
           <p className="text-gold/80">Projects, journal entries and studio email are still sample content.</p>
         )}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {legalNavigation.map((item) => (
             <Link key={item.to} to={item.to} className="link-line hover:text-cream">
               {item.label}

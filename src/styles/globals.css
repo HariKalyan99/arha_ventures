@@ -47,6 +47,9 @@
   --text-display-lg--line-height: 0.98;
   --text-display-md: clamp(1.9rem, 1.25rem + 2.4vw, 4rem);
   --text-display-md--line-height: 1.04;
+  /* Hero title — steeper mobile ramp so the loft stays readable on small screens */
+  --text-display-hero: clamp(1.45rem, 0.72rem + 3.4vw, 4rem);
+  --text-display-hero--line-height: 1.08;
   --text-display-sm: clamp(1.5rem, 1.15rem + 1.2vw, 2.4rem);
   --text-display-sm--line-height: 1.12;
   --text-lead: clamp(1.05rem, 0.95rem + 0.35vw, 1.3rem);
