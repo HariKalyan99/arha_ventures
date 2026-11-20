@@ -146,7 +146,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       <pointLight ref={ceiling} position={[0.1, 3.7, 0.5]} color="#e8d4b8" distance={14} decay={2.3} />
 
       {noir ? (
-        <Environment frames={1} resolution={256} key="env-noir">
+        <Environment frames={1} resolution={384} key="env-noir">
           <Lightformer form="rect" intensity={2.2} position={[0, 3, -9]} scale={[14, 5, 1]} color="#2a3144" />
           <Lightformer form="rect" intensity={2.8} position={[-6, 3.5, 3]} scale={[2.5, 9, 1]} color="#d0d6e4" />
           <Lightformer form="rect" intensity={1.4} position={[7, 2.8, 2]} scale={[2.5, 7, 1]} color="#8a92a8" />
@@ -154,7 +154,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
           <Lightformer form="rect" intensity={0.3} position={[0, 1, 8]} scale={[12, 4, 1]} color="#1a1c24" />
         </Environment>
       ) : (
-        <Environment frames={1} resolution={256} key="env-day">
+        <Environment frames={1} resolution={384} key="env-day">
           <Lightformer form="rect" intensity={3.6} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
           <Lightformer form="rect" intensity={1.5} position={[-7, 2.5, 2]} scale={[3, 8, 1]} color="#b69b75" />
           <Lightformer form="rect" intensity={0.9} position={[7, 2.2, 1]} scale={[3, 7, 1]} color="#d4c0a8" />

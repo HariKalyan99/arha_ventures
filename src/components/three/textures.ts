@@ -378,7 +378,7 @@ export function getTexture(kind: TextureKind, size: number, repeat: [number, num
   texture.colorSpace = THREE.SRGBColorSpace
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping
   texture.repeat.set(repeat[0], repeat[1])
-  texture.anisotropy = 8
+  texture.anisotropy = 16
   cache.set(key, texture)
   return texture
 }
