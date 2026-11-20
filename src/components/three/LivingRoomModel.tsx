@@ -41,45 +41,44 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Opaque shell so cutaway openings never reveal the void — soft daylight beyond the glass. */
+/** Opaque shell so cutaway openings never reveal the void. */
 function InteriorEnclosure() {
   return (
     <group>
-      {/* Inverted box — only the inner faces render */}
       <mesh receiveShadow={false} castShadow={false}>
         <boxGeometry args={[28, 14, 28]} />
         <meshStandardMaterial
-          color="#e8e0d2"
+          color="#14100c"
           roughness={1}
           metalness={0}
           side={THREE.BackSide}
-          envMapIntensity={0.2}
+          envMapIntensity={0.12}
         />
       </mesh>
-      {/* Soft daylight beyond the openings */}
+      {/* Soft warm dusk beyond the glass */}
       <mesh position={[0, 3.2, -8.5]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#d4c8b8" toneMapped={false} />
+        <meshBasicMaterial color="#4a3528" toneMapped={false} />
       </mesh>
       <mesh position={[-8.5, 3.2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#cfc3b2" toneMapped={false} />
+        <meshBasicMaterial color="#2d2420" toneMapped={false} />
       </mesh>
       <mesh position={[8.5, 3.2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#c8bba8" toneMapped={false} />
+        <meshBasicMaterial color="#241c19" toneMapped={false} />
       </mesh>
       <mesh position={[0, 3.2, 8.5]} rotation={[0, Math.PI, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#e0d6c8" toneMapped={false} />
+        <meshBasicMaterial color="#171717" toneMapped={false} />
       </mesh>
     </group>
   )
 }
 
 /**
- * Imported loft GLB, recentred and scaled to the interior only.
- * City / exterior meshes are hidden; an enclosure keeps the void out of frame.
+ * Imported loft GLB — kept as a dark cinematic media plate.
+ * Light site chrome begins below the fold; materials stay native.
  */
 export function LivingRoomModel() {
   const { scene, animations } = useGLTF(LIVING_ROOM_GLB)
@@ -100,22 +99,47 @@ export function LivingRoomModel() {
 
       obj.castShadow = true
       obj.receiveShadow = true
-      const materials = Array.isArray(obj.material) ? obj.material : [obj.material]
-      for (const mat of materials) {
-        if (!mat) continue
-        if ('envMapIntensity' in mat) (mat as THREE.MeshStandardMaterial).envMapIntensity = 1.1
-        if ('roughness' in mat && typeof (mat as THREE.MeshStandardMaterial).roughness === 'number') {
-          const std = mat as THREE.MeshStandardMaterial
-          std.roughness = Math.min(1, Math.max(0.2, std.roughness * 0.94))
+
+      const source = Array.isArray(obj.material) ? obj.material : [obj.material]
+      const next = source.map((mat) => {
+        if (!(mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial)) return mat
+        const std = mat.clone() as THREE.MeshStandardMaterial
+
+        /* Keep native look + soft sheen — don’t crush metalness into matte */
+        std.envMapIntensity = Math.min(std.envMapIntensity ?? 1, 0.95)
+        if (typeof std.roughness === 'number') {
+          std.roughness = Math.min(1, Math.max(0.22, std.roughness * 0.96))
         }
-        mat.needsUpdate = true
-      }
+
+        /* Soften only loud gilt props — leave leather / brass accents with sheen */
+        if (std.metalness > 0.55) {
+          const goldish = std.color.r > 0.4 && std.color.g > 0.28 && std.color.b < 0.26
+          if (goldish) {
+            std.metalness = Math.min(std.metalness, 0.72)
+            std.roughness = Math.max(std.roughness, 0.32)
+            std.color.multiplyScalar(0.88)
+            std.envMapIntensity = Math.min(std.envMapIntensity, 0.75)
+          }
+        }
+
+        /* Pale floor — warm mid tone (not flood-white, not charcoal) */
+        if (std.name === 'Material.001' || std.name === 'Material.006') {
+          std.color.set(std.map ? '#948c82' : '#a09890')
+          std.roughness = Math.max(std.roughness, 0.82)
+          std.metalness = 0
+          std.envMapIntensity = Math.min(std.envMapIntensity, 0.35)
+          if ('emissive' in std) std.emissive.set('#000000')
+        }
+
+        std.needsUpdate = true
+        return std
+      })
+      obj.material = next.length === 1 ? next[0]! : next
     })
 
     return clone
   }, [scene])
 
-  // Keep clips available but do not autoplay — looping scene clips read as a spin.
   useAnimations(animations, root)
 
   useLayoutEffect(() => {

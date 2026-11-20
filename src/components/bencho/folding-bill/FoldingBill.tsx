@@ -48,8 +48,8 @@ type Link = { a: number; b: number; len: number; k: number };
 const REACH = 1.5;
 const CREASE = 0.55;
 
-/* the glass: warm parchment on light paper */
-const ICE = 0xc4b49e;
+/* the glass: brand terracotta — clear on cream, matches site accent */
+const ICE = 0x934236;
 
 /* ── the corners ───────────────────────────────────────────
    The sheet is cut to a rounded rectangle: CORNER is the radius as
@@ -283,13 +283,13 @@ export function FoldingBill({
 
     const mat = new THREE.MeshPhysicalMaterial({
       color: ICE,
-      /* soft parchment — creamy, quiet reflections on espresso */
-      metalness: 0.12,
-      roughness: 0.32,
-      clearcoat: 0.28,
-      clearcoatRoughness: 0.22,
-      envMapIntensity: 0.55,
-      iridescence: 0.04,
+      /* terracotta glass — warm clay sheen, not metallic gilt */
+      metalness: 0.14,
+      roughness: 0.38,
+      clearcoat: 0.2,
+      clearcoatRoughness: 0.3,
+      envMapIntensity: 0.58,
+      iridescence: 0.015,
       iridescenceIOR: 1.3,
       bumpScale: 5,
       side: THREE.DoubleSide,

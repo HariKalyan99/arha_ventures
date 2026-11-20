@@ -117,11 +117,11 @@ export function Hero() {
           )}
         </div>
 
-        {/* Cinematic veils stay true-dark — never token `ink` (paper in light theme) */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.84)_0%,rgba(16,16,15,0.52)_30%,rgba(16,16,15,0.18)_52%,rgba(16,16,15,0)_72%)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#111111] via-[#111111]/60 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#111111]/70 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_35%,rgba(16,16,15,0.28)_100%)]" />
+        {/* Cinematic veils — light enough that the loft stays readable */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
 
         {/* Opening copy — optically centered between header and bottom chrome */}
         <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(4.5rem,10vh,7.5rem)]">
