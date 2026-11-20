@@ -77,7 +77,8 @@ function ProceduralHeroCamera({ progress, reducedMotion }: { progress: RefObject
 }
 
 export default function HeroScene({ progress, active, reducedMotion, tier, onReady }: HeroSceneProps) {
-  const blend = useMemo(() => ({ from: 'evening' as const, to: 'night' as const, progress }), [progress])
+  /* Soft daylight → gentle late afternoon — no night crush for the light site theme */
+  const blend = useMemo(() => ({ from: 'daylight' as const, to: 'evening' as const, progress }), [progress])
   return (
     <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0">
       {HERO_ROOM_SOURCE === 'glb' ? (
@@ -85,7 +86,7 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
       ) : (
         <ProceduralHeroCamera progress={progress} reducedMotion={reducedMotion} />
       )}
-      <RoomScene finishes={defaultFinishes} mood="evening" blend={blend} tier={tier} source={HERO_ROOM_SOURCE} />
+      <RoomScene finishes={defaultFinishes} mood="daylight" blend={blend} tier={tier} source={HERO_ROOM_SOURCE} />
     </SceneCanvas>
   )
 }

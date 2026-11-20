@@ -50,7 +50,7 @@ export function PageLoader() {
       role="status"
       aria-live="polite"
       aria-label="Loading"
-      className={`page-loader fixed inset-0 z-[10000] flex items-center justify-center bg-cream transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`page-loader fixed inset-0 z-[10000] flex items-center justify-center bg-parchment transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         leaving ? 'pointer-events-none invisible opacity-0' : 'visible opacity-100'
       }`}
     >

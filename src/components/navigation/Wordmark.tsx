@@ -5,13 +5,13 @@ import { Magnetic } from '../ui/Magnetic'
 
 /**
  * Brand mark for the header.
- * Transparent terracotta + black logo on a cream plate — readable on the dark nav.
+ * Black logo on a parchment plate — readable on light chrome and the hero.
  */
 export function Wordmark({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Magnetic strength={0.22}>
       <Link to="/" onClick={onNavigate} className="group inline-flex items-center" aria-label={`${studio.name} — home`}>
-        <span className="relative flex size-11 items-center justify-center overflow-hidden border border-terracotta/40 bg-cream transition-[border-color,box-shadow,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),5px_5px_12px_rgba(0,0,0,0.45),-4px_-4px_10px_rgba(255,248,235,0.35)] group-hover:border-terracotta group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),6px_6px_14px_rgba(0,0,0,0.4),-5px_-5px_12px_rgba(255,248,235,0.42)] group-active:translate-y-px group-active:shadow-[inset_4px_4px_10px_rgba(96,75,59,0.22),inset_-3px_-3px_8px_rgba(255,255,255,0.55)] sm:size-12">
+        <span className="relative flex size-11 items-center justify-center overflow-hidden border border-terracotta/40 bg-parchment transition-[border-color,box-shadow,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.75),4px_4px_12px_rgba(42,34,30,0.14),-3px_-3px_8px_rgba(255,255,255,0.8)] group-hover:border-terracotta group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.85),5px_5px_14px_rgba(42,34,30,0.16),-4px_-4px_10px_rgba(255,255,255,0.9)] group-active:translate-y-px group-active:shadow-[inset_4px_4px_10px_rgba(96,75,59,0.18),inset_-3px_-3px_8px_rgba(255,255,255,0.7)] sm:size-12">
           <img
             src={LOGO_SRC}
             alt=""

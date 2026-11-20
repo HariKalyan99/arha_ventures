@@ -11,7 +11,7 @@ import { CursorAtmosphere } from '../ui/CursorAtmosphere'
 import { PageLoader } from '../ui/PageLoader'
 
 function PageFallback() {
-  /* Obsidian hold — cream boot is reserved for #boot / PageLoader only */
+  /* Paper hold — parchment boot is reserved for #boot / PageLoader only */
   return <div className="min-h-svh bg-obsidian" role="status" aria-label="Loading" />
 }
 

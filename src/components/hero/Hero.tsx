@@ -97,7 +97,7 @@ export function Hero() {
       ref={section}
       id="top"
       aria-labelledby="hero-title"
-      className={`relative bg-ink motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'}`}
+      className={`relative bg-[#111111] motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'}`}
     >
       <div className="sticky top-0 h-svh overflow-hidden">
         <div className="absolute inset-0" aria-hidden>
@@ -117,9 +117,10 @@ export function Hero() {
           )}
         </div>
 
+        {/* Cinematic veils stay true-dark — never token `ink` (paper in light theme) */}
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.84)_0%,rgba(16,16,15,0.52)_30%,rgba(16,16,15,0.18)_52%,rgba(16,16,15,0)_72%)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-ink via-ink/60 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-ink/70 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-[#111111] via-[#111111]/60 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#111111]/70 to-transparent" />
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_35%,rgba(16,16,15,0.28)_100%)]" />
 
         {/* Opening copy — optically centered between header and bottom chrome */}
@@ -128,9 +129,9 @@ export function Hero() {
             <p data-hero-fade className="eyebrow mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
               <span>{studio.name}</span>
               <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block" />
-              <span className="text-cream/55">{studio.tagline}</span>
+              <span className="text-parchment/70">{studio.tagline}</span>
             </p>
-            <h1 id="hero-title" className="display display-on-media max-w-[16ch] text-display-md text-cream sm:max-w-[22ch] md:max-w-none">
+            <h1 id="hero-title" className="display display-on-media max-w-[16ch] text-display-md text-parchment sm:max-w-[22ch] md:max-w-none">
               <span className="block overflow-hidden pb-[0.05em]">
                 <span data-hero-line className="block md:whitespace-nowrap">
                   A room should know how you <em>live</em>
@@ -142,7 +143,7 @@ export function Hero() {
             </h1>
             <div data-hero-rule className="hairline mt-5 max-w-md bg-gold/40 sm:mt-7" />
             <div className="mt-5 flex max-w-[36rem] flex-col gap-5 sm:mt-7 sm:gap-6">
-              <p data-hero-fade className="max-w-[28rem] text-[0.95rem] leading-relaxed text-cream/65 sm:text-lead">
+              <p data-hero-fade className="max-w-[28rem] text-[0.95rem] leading-relaxed text-parchment/75 sm:text-lead">
                 {isTour
                   ? 'Scroll the loft. Each pause is a thought about height, gathering, ritual — and what a room might ask of you.'
                   : 'An architecture and interior design studio shaping residences, villas and hospitality spaces with patience, precision and a reverence for material.'}
@@ -176,13 +177,13 @@ export function Hero() {
                   transition={{ duration: 0.7, ease: EASE_LUXE }}
                   className={`relative max-w-[min(34rem,100%)] rounded-sm px-3 py-3 shadow-[inset_0_1px_0_rgba(232,223,208,0.06),0_24px_48px_-28px_rgba(0,0,0,0.7)] sm:px-4 sm:py-4 md:max-w-[36rem] ${
                     isConclusion
-                      ? 'bg-ink/75 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
-                      : 'bg-ink/60 backdrop-blur-sm'
+                      ? 'bg-[#171717]/80 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
+                      : 'bg-[#171717]/65 backdrop-blur-sm'
                   }`}
                 >
                   <p className={`eyebrow ${isConclusion || holding ? 'text-gold' : 'text-gold/80'}`}>{stop.eyebrow}</p>
                   <p
-                    className={`display display-on-media mt-3 text-pretty text-cream sm:mt-4 ${
+                    className={`display display-on-media mt-3 text-pretty text-parchment sm:mt-4 ${
                       isConclusion
                         ? 'text-[clamp(1.35rem,0.95rem+1.8vw,2.75rem)] leading-[1.15]'
                         : 'text-[clamp(1.2rem,0.9rem+1.4vw,2.35rem)] leading-[1.18]'
@@ -217,7 +218,7 @@ export function Hero() {
                       }}
                       aria-hidden={holdReveal < 0.08}
                     >
-                      <p className="eyebrow mt-5 text-cream/55 sm:mt-6">Hold — then continue down</p>
+                      <p className="eyebrow mt-5 text-parchment/55 sm:mt-6">Hold — then continue down</p>
                     </div>
                   )}
                 </motion.div>
@@ -233,7 +234,7 @@ export function Hero() {
           >
             <div aria-hidden className="absolute -inset-y-24 right-0 w-full bg-[radial-gradient(60%_70%_at_85%_60%,rgba(16,16,15,0.7),transparent)] md:w-2/3" />
             <div className="shell relative flex justify-end">
-              <p className="display display-on-media max-w-[18ch] text-right text-display-md text-cream">
+              <p className="display display-on-media max-w-[18ch] text-right text-display-md text-parchment">
                 As evening falls, <em>the room</em> changes its voice.
               </p>
             </div>
@@ -246,16 +247,16 @@ export function Hero() {
           }`}
         >
           <div className="shell relative flex items-end justify-between pb-5 sm:pb-6">
-            <p data-hero-fade className="eyebrow hidden text-cream/45 lg:block">
+            <p data-hero-fade className="eyebrow hidden text-parchment/55 lg:block">
               {webgl ? (isTour ? 'Live 3D tour · Loft interior' : 'Live 3D render · A living room at dusk') : 'A living room in stone and timber'}
             </p>
-            <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-cream/55 sm:bottom-6">
+            <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-parchment/60 sm:bottom-6">
               <span className="eyebrow">{holding ? 'Continue' : touring ? 'Continue' : 'Scroll'}</span>
-              <span aria-hidden className="relative block h-9 w-px overflow-hidden bg-cream/15 sm:h-10">
+              <span aria-hidden className="relative block h-9 w-px overflow-hidden bg-parchment/25 sm:h-10">
                 <span className="animate-scroll-cue absolute inset-0 bg-gold" />
               </span>
             </div>
-            <p data-hero-fade className="eyebrow hidden text-cream/45 sm:block">
+            <p data-hero-fade className="eyebrow hidden text-parchment/55 sm:block">
               {isTour ? `${String(stopIndex + 1).padStart(2, '0')} / ${String(houseTourStops.length).padStart(2, '0')}` : 'N° 01 — Residence study'}
             </p>
           </div>

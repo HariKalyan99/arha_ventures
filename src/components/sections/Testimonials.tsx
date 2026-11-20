@@ -22,8 +22,8 @@ function GoogleStars({ rating }: { rating: number }) {
           >
             <defs>
               <linearGradient id={`star-fill-${i}`}>
-                <stop offset={`${fill * 100}%`} stopColor="#b69b75" />
-                <stop offset={`${fill * 100}%`} stopColor="rgb(232 224 210 / 0.18)" />
+                <stop offset={`${fill * 100}%`} stopColor="#9a7d58" />
+                <stop offset={`${fill * 100}%`} stopColor="rgb(42 34 30 / 0.14)" />
               </linearGradient>
             </defs>
             <path

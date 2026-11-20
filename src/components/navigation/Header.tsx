@@ -5,7 +5,9 @@ import { EASE_LUXE } from '../../lib/motion'
 import { SiteMenu } from './SiteMenu'
 import { Wordmark } from './Wordmark'
 
-function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
+function MenuToggle({ open, onClick, onMedia }: { open: boolean; onClick: () => void; onMedia?: boolean }) {
+  const ink = onMedia ? 'text-parchment' : 'text-cream'
+  const bar = onMedia ? 'bg-parchment' : 'bg-cream'
   return (
     <button
       id="menu-toggle"
@@ -14,12 +16,12 @@ function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
       aria-haspopup="dialog"
       aria-expanded={open}
       aria-controls="site-menu"
-      className="group relative z-[70] flex min-h-11 min-w-11 items-center justify-center gap-3 px-1 eyebrow text-cream"
+      className={`group relative z-[70] flex min-h-11 min-w-11 items-center justify-center gap-3 px-1 eyebrow ${ink}`}
     >
       <span className="max-sm:sr-only">{open ? 'Close' : 'Menu'}</span>
       <span aria-hidden className="relative flex h-[14px] w-7 items-center justify-center">
         <span
-          className={`absolute h-px w-7 origin-center bg-cream transition-[transform,width,background-color] duration-500 ease-[var(--ease-luxe)] motion-reduce:transition-none ${
+          className={`absolute h-px w-7 origin-center ${bar} transition-[transform,width,background-color] duration-500 ease-[var(--ease-luxe)] motion-reduce:transition-none ${
             open ? 'translate-y-0 rotate-45 bg-gold' : '-translate-y-[3.5px] group-hover:w-5'
           }`}
         />
@@ -83,7 +85,7 @@ export function Header() {
         />
         <div className="shell relative flex h-[var(--header-h)] items-center justify-between gap-6">
           <Wordmark onNavigate={menuOpen ? closeMenu : undefined} />
-          <MenuToggle open={menuOpen} onClick={toggleMenu} />
+          <MenuToggle open={menuOpen} onClick={toggleMenu} onMedia={pathname === '/' && !solid && !menuOpen} />
         </div>
       </motion.header>
       <SiteMenu open={menuOpen} onClose={closeMenu} />

@@ -48,8 +48,8 @@ type Link = { a: number; b: number; len: number; k: number };
 const REACH = 1.5;
 const CREASE = 0.55;
 
-/* the glass: warm cream parchment on espresso */
-const ICE = 0xd4c4b0;
+/* the glass: warm parchment on light paper */
+const ICE = 0xc4b49e;
 
 /* ── the corners ───────────────────────────────────────────
    The sheet is cut to a rounded rectangle: CORNER is the radius as
@@ -165,7 +165,7 @@ function engraving(img: HTMLImageElement | null): HTMLCanvasElement {
 function studio(THREE: Three, pmrem: InstanceType<Three["PMREMGenerator"]>) {
   const room = new THREE.Scene();
   room.add(new THREE.Mesh(new THREE.BoxGeometry(40, 40, 40),
-    new THREE.MeshBasicMaterial({ color: 0x2d2420, side: THREE.BackSide })));
+    new THREE.MeshBasicMaterial({ color: 0xe8e0d2, side: THREE.BackSide })));
   const panel = (w: number, h: number, x: number, y: number, z: number, glow: number) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
       new THREE.MeshBasicMaterial({ color: new THREE.Color().setScalar(glow), side: THREE.DoubleSide }));

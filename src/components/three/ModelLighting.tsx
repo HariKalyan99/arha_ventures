@@ -12,20 +12,17 @@ interface ModelLightingProps {
 }
 
 /**
- * Natural warm interior lighting for the loft GLB.
- * Soft window wash + gentle practicals — no hard keys, no blown whites.
+ * Soft daylight interior for the loft GLB.
+ * Broad fill + gentle window wash — no hard keys, no lamp hotspots.
  */
 export function ModelLighting({ mood, blend }: ModelLightingProps) {
   const { gl, scene } = useThree()
   const sun = useRef<THREE.DirectionalLight>(null)
   const hemi = useRef<THREE.HemisphereLight>(null)
   const windowKey = useRef<THREE.DirectionalLight>(null)
-  const lampA = useRef<THREE.PointLight>(null)
-  const lampB = useRef<THREE.PointLight>(null)
-  const lampC = useRef<THREE.PointLight>(null)
   const current = useRef(cloneMood(moods[mood]))
   const target = useRef(cloneMood(moods[mood]))
-  const warmFill = useRef(new THREE.Color('#f0e0c8'))
+  const warmFill = useRef(new THREE.Color('#f2e6d4'))
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1)
@@ -39,30 +36,28 @@ export function ModelLighting({ mood, blend }: ModelLightingProps) {
 
     if (sun.current) {
       sun.current.color.copy(m.sunColor)
-      sun.current.intensity = m.sunIntensity * 0.92
-      sun.current.position.copy(m.sunPosition).multiplyScalar(1.1)
+      /* Soft key — enough form, not a spotlight punch */
+      sun.current.intensity = m.sunIntensity * 0.75
+      sun.current.position.copy(m.sunPosition).multiplyScalar(1.05)
     }
     if (windowKey.current) {
-      windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.55)
-      windowKey.current.intensity = THREE.MathUtils.lerp(2.2, 0.55, m.lamp)
+      windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.4)
+      windowKey.current.intensity = THREE.MathUtils.lerp(1.35, 0.7, m.lamp)
     }
     if (hemi.current) {
       hemi.current.color.copy(m.hemiSky)
       hemi.current.groundColor.copy(m.hemiGround)
-      hemi.current.intensity = m.hemiIntensity * 1.15
+      hemi.current.intensity = m.hemiIntensity * 1.05
     }
-    if (lampA.current) lampA.current.intensity = 0.35 + m.lamp * 3.2
-    if (lampB.current) lampB.current.intensity = 0.28 + m.lamp * 2.6
-    if (lampC.current) lampC.current.intensity = 0.24 + m.lamp * 2.8
 
-    scene.environmentIntensity = Math.max(0.45, m.envIntensity * 1.25)
-    gl.toneMappingExposure = m.exposure * 1.08
+    scene.environmentIntensity = Math.max(0.7, m.envIntensity * 1.1)
+    gl.toneMappingExposure = m.exposure
   })
 
   return (
     <>
-      <hemisphereLight ref={hemi} intensity={0.6} />
-      <ambientLight intensity={0.28} color="#e0d0bc" />
+      <hemisphereLight ref={hemi} intensity={0.9} />
+      <ambientLight intensity={0.55} color="#efe6d8" />
 
       <directionalLight
         ref={sun}
@@ -78,21 +73,19 @@ export function ModelLighting({ mood, blend }: ModelLightingProps) {
         shadow-normalBias={0.035}
       />
 
-      {/* Soft exterior wash through the openings */}
-      <directionalLight ref={windowKey} position={[1.4, 3.6, -6]} intensity={1.8} color="#e8d2b0" />
+      {/* Soft exterior wash through the openings — even, not a beam */}
+      <directionalLight ref={windowKey} position={[1.2, 4.2, -5.5]} intensity={1.2} color="#f0e4d0" />
 
-      {/* Warm practicals — gentle pools, natural falloff */}
-      <pointLight ref={lampA} position={[-2.2, 2.1, 1.4]} color="#ffc089" distance={11} decay={2} />
-      <pointLight ref={lampB} position={[2.6, 1.4, -1.2]} color="#ffb36b" distance={9} decay={2} />
-      <pointLight ref={lampC} position={[0.4, 3.4, 0.6]} color="#e8c9a0" distance={12} decay={2} />
-      <pointLight position={[1.2, 1.9, 2.4]} color="#f0d2a8" intensity={1.15} distance={8} decay={2} />
+      {/* Quiet bounce only — no focused practical hotspots */}
+      <pointLight position={[-1.8, 2.4, 1.2]} color="#f0e0c8" intensity={0.55} distance={14} decay={2} />
+      <pointLight position={[2.2, 2.2, -0.8]} color="#ebe0d0" intensity={0.45} distance={12} decay={2} />
 
       <Environment frames={1} resolution={256}>
-        <Lightformer form="rect" intensity={3.4} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
-        <Lightformer form="rect" intensity={1.5} position={[-7, 2.5, 2]} scale={[3, 8, 1]} color="#b69b75" />
-        <Lightformer form="rect" intensity={0.95} position={[7, 2, 1]} scale={[3, 7, 1]} color="#d4c0a8" />
-        <Lightformer form="ring" intensity={0.6} position={[0, 7, 0]} scale={10} color="#e8e0d2" />
-        <Lightformer form="rect" intensity={0.4} position={[0, 1, 8]} scale={[12, 4, 1]} color="#604a3b" />
+        <Lightformer form="rect" intensity={4.2} position={[0, 4, -9]} scale={[16, 6, 1]} color="#f5ebe0" />
+        <Lightformer form="rect" intensity={1.8} position={[-7, 3, 2]} scale={[3.5, 9, 1]} color="#d8c8b0" />
+        <Lightformer form="rect" intensity={1.4} position={[7, 2.5, 1]} scale={[3.5, 8, 1]} color="#e8dcc8" />
+        <Lightformer form="ring" intensity={1.1} position={[0, 8, 0]} scale={12} color="#faf7f2" />
+        <Lightformer form="rect" intensity={0.55} position={[0, 1, 8]} scale={[14, 5, 1]} color="#c4b49e" />
       </Environment>
     </>
   )

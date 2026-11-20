@@ -103,7 +103,7 @@ export function ContactPhone() {
         distanceFactor={6.5}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
-        <p className="whitespace-nowrap text-[0.62rem] font-medium tracking-[0.04em] text-cream/70 normal-case">
+        <p className="whitespace-nowrap text-[0.62rem] font-medium tracking-[0.04em] text-parchment/85 normal-case">
           Call Us
         </p>
       </Html>

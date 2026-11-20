@@ -41,7 +41,7 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Opaque shell so cutaway openings never reveal the void. */
+/** Opaque shell so cutaway openings never reveal the void — soft daylight beyond the glass. */
 function InteriorEnclosure() {
   return (
     <group>
@@ -49,29 +49,29 @@ function InteriorEnclosure() {
       <mesh receiveShadow={false} castShadow={false}>
         <boxGeometry args={[28, 14, 28]} />
         <meshStandardMaterial
-          color="#14100c"
+          color="#e8e0d2"
           roughness={1}
           metalness={0}
           side={THREE.BackSide}
-          envMapIntensity={0.12}
+          envMapIntensity={0.2}
         />
       </mesh>
-      {/* Soft warm dusk beyond the glass */}
+      {/* Soft daylight beyond the openings */}
       <mesh position={[0, 3.2, -8.5]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#4a3528" toneMapped={false} />
+        <meshBasicMaterial color="#d4c8b8" toneMapped={false} />
       </mesh>
       <mesh position={[-8.5, 3.2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#2d2420" toneMapped={false} />
+        <meshBasicMaterial color="#cfc3b2" toneMapped={false} />
       </mesh>
       <mesh position={[8.5, 3.2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#241c19" toneMapped={false} />
+        <meshBasicMaterial color="#c8bba8" toneMapped={false} />
       </mesh>
       <mesh position={[0, 3.2, 8.5]} rotation={[0, Math.PI, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#171717" toneMapped={false} />
+        <meshBasicMaterial color="#e0d6c8" toneMapped={false} />
       </mesh>
     </group>
   )

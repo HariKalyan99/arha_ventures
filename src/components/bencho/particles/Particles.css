@@ -1,6 +1,5 @@
 /* ══ Particles ═════════════════════════════════════════════
-   Dots draw in the canvas `color` — cream on ARHA dark surfaces.
-   Width is fluid; height follows the native 480×400 aspect. */
+   Dots draw in the canvas `color` — espresso ink on light paper. */
 .ptc {
   position: relative;
   display: grid;
@@ -17,6 +16,7 @@
   color: var(--color-cream);
   cursor: crosshair;
   touch-action: none;
+  max-width: 100%;
 }
 
 /* Slightly tighter for inline headline overlays */
