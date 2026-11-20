@@ -157,7 +157,7 @@ export function Services({ index, heading = DEFAULT_HEADING, intro, footer }: Se
             })}
           </ul>
         </div>
-        {footer && <div className="mt-12 flex justify-end">{footer}</div>}
+        {footer && <div className="mt-8 flex justify-end lg:mt-10">{footer}</div>}
       </div>
     </section>
   )

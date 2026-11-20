@@ -79,12 +79,12 @@ function ProceduralHeroCamera({ progress, reducedMotion }: { progress: RefObject
 
 export default function HeroScene({ progress, active, reducedMotion, tier, onReady }: HeroSceneProps) {
   const { isDark } = useTheme()
-  /* Day: evening → night on scroll. Night theme: full ink plate from the start. */
+  /* Day: bright daylight easing toward soft evening. Night: full ink plate. */
   const blend = useMemo(
     () =>
       isDark
         ? { from: 'night' as const, to: 'night' as const, progress }
-        : { from: 'evening' as const, to: 'night' as const, progress },
+        : { from: 'daylight' as const, to: 'evening' as const, progress },
     [progress, isDark],
   )
   return (
@@ -105,7 +105,7 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
       )}
       <RoomScene
         finishes={defaultFinishes}
-        mood={isDark ? 'night' : 'evening'}
+        mood={isDark ? 'night' : 'daylight'}
         blend={blend}
         tier={tier}
         source={HERO_ROOM_SOURCE}

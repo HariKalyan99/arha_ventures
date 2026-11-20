@@ -18,17 +18,19 @@ export function Footer() {
   return (
     <footer ref={ref} className="relative overflow-hidden surface-ink">
       {pathname !== '/contact' && !pathname.startsWith('/projects/') && (
-        <div className="shell section-y overflow-visible border-b border-line">
-          <div className="grid gap-10 overflow-visible lg:grid-cols-12 lg:items-end">
-            <p className="eyebrow text-gold lg:col-span-12">Begin</p>
-            <h2 className="display text-display-xl text-cream lg:col-span-8">
-              <Lines lines={['Have a space', <>in <em>mind?</em></>]} />
-            </h2>
-            <div data-reveal="fade" className="relative z-10 flex flex-col items-start gap-6 overflow-visible lg:col-span-4">
-              <div className="w-full max-w-[min(100%,20rem)] self-start" aria-hidden>
-                <Particles shape="Circle" grain="Fine" reach={80} force={60} />
+        <div className="shell overflow-visible border-b border-line py-[clamp(3rem,5vw,5rem)]">
+          <div className="grid gap-8 overflow-visible lg:grid-cols-12 lg:items-end lg:gap-10">
+            <div className="lg:col-span-7">
+              <p className="eyebrow text-gold">Begin</p>
+              <h2 className="display mt-4 text-display-xl text-cream sm:mt-5">
+                <Lines lines={['Have a space', <>in <em>mind?</em></>]} />
+              </h2>
+            </div>
+            <div data-reveal="fade" className="relative z-10 flex flex-col items-start gap-5 overflow-visible lg:col-span-4 lg:col-start-9">
+              <div className="w-full max-w-[13rem] self-start" aria-hidden>
+                <Particles className="ptc--inline" shape="Circle" grain="Fine" reach={80} force={60} />
               </div>
-              <p className="text-cream/60">
+              <p className="max-w-sm text-cream/60">
                 Tell us about the place, the people who will live in it, and what you hope it will feel like. We reply to every enquiry personally.
               </p>
               <ArrowLink to="/contact" variant="solid" className="self-start">
@@ -39,7 +41,7 @@ export function Footer() {
         </div>
       )}
 
-      <div className="shell grid gap-12 py-[clamp(4rem,8vw,7rem)] sm:grid-cols-2 lg:grid-cols-12">
+      <div className="shell grid gap-10 py-[clamp(3rem,5vw,5rem)] sm:grid-cols-2 lg:grid-cols-12">
         <div className="flex flex-col gap-4 lg:col-span-4">
           <p className="display text-display-sm text-cream">{studio.descriptor}</p>
           <p className="text-sm text-cream/60">{studio.hours}</p>

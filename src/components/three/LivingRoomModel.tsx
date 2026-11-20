@@ -41,13 +41,13 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Soft dusk beyond the glass — warm for Day, cooler ink for Night. */
+/** Beyond the glass — warm day bounce (not white), cooler ink for Night. */
 function InteriorEnclosure({ noir }: { noir: boolean }) {
-  const shell = noir ? '#0a0a0e' : '#14100c'
-  const far = noir ? '#12151e' : '#4a3528'
-  const left = noir ? '#0e1016' : '#2d2420'
-  const right = noir ? '#0c0e14' : '#241c19'
-  const near = noir ? '#08090c' : '#171717'
+  const shell = noir ? '#0a0a0e' : '#2a2420'
+  const far = noir ? '#12151e' : '#6a7a8c'
+  const left = noir ? '#0e1016' : '#3d342c'
+  const right = noir ? '#0c0e14' : '#352e28'
+  const near = noir ? '#08090c' : '#221e1a'
 
   return (
     <group>
@@ -58,7 +58,7 @@ function InteriorEnclosure({ noir }: { noir: boolean }) {
           roughness={1}
           metalness={0}
           side={THREE.BackSide}
-          envMapIntensity={noir ? 0.22 : 0.12}
+          envMapIntensity={noir ? 0.22 : 0.18}
         />
       </mesh>
       <mesh position={[0, 3.2, -8.5]} receiveShadow={false} castShadow={false}>
@@ -126,9 +126,13 @@ function applyNoirLook(std: THREE.MeshStandardMaterial) {
 
 function applyDayLook(std: THREE.MeshStandardMaterial) {
   const next = std.clone() as THREE.MeshStandardMaterial
-  next.envMapIntensity = Math.min(next.envMapIntensity ?? 1, 0.95)
+  /* Keep albedo honest — dull hot speculars so daylight doesn’t clip white. */
+  next.envMapIntensity = Math.min(0.85, Math.max(0.55, (next.envMapIntensity ?? 1) * 0.82))
   if (typeof next.roughness === 'number') {
-    next.roughness = Math.min(1, Math.max(0.22, next.roughness * 0.96))
+    next.roughness = Math.min(1, Math.max(0.28, next.roughness * 1.04))
+  }
+  if (next.metalness < 0.35 && typeof next.roughness === 'number' && next.roughness < 0.45) {
+    next.roughness = Math.min(0.62, next.roughness + 0.12)
   }
 
   if (next.metalness > 0.55) {
@@ -136,8 +140,8 @@ function applyDayLook(std: THREE.MeshStandardMaterial) {
     if (goldish) {
       next.metalness = Math.min(next.metalness, 0.72)
       next.roughness = Math.max(next.roughness, 0.32)
-      next.color.multiplyScalar(0.88)
-      next.envMapIntensity = Math.min(next.envMapIntensity, 0.75)
+      next.color.multiplyScalar(0.9)
+      next.envMapIntensity = Math.min(next.envMapIntensity, 0.8)
     }
   }
 

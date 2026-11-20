@@ -1,9 +1,10 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from '../../lib/gsap'
 import { getQualityTier, hasWebGL } from '../../lib/device'
 import { useInViewport } from '../../hooks/useInViewport'
 import { usePrefersReducedMotion } from '../../hooks/useMediaQuery'
+import { useTheme } from '../../hooks/useTheme'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { EASE_LUXE } from '../../lib/motion'
 import { media } from '../../data/media'
@@ -27,6 +28,7 @@ function StaticHeroImage() {
 
 export function Hero() {
   const section = useRef<HTMLElement>(null)
+  const pin = useRef<HTMLDivElement>(null)
   const progress = useRef(0)
   const [ready, setReady] = useState(false)
   const [stopIndex, setStopIndex] = useState(0)
@@ -34,12 +36,39 @@ export function Hero() {
   const [holding, setHolding] = useState(false)
   const [holdReveal, setHoldReveal] = useState(0)
   const reducedMotion = usePrefersReducedMotion()
+  const { isDark } = useTheme()
   const visible = useInViewport(section, '0px')
   const webgl = useMemo(() => hasWebGL(), [])
   const tier = useMemo(() => getQualityTier(), [])
   const { scrollTo } = useSmoothScroll()
   const stop = houseTourStops[stopIndex]
   const isConclusion = isTour && stopIndex === houseTourStops.length - 1
+
+  /*
+    iOS / Android chrome show-hide changes the visual viewport while `100svh` stays
+    fixed — the sticky tour pane then leaves a strip of section background (the
+    “blank” under the loft). Track visualViewport so the pin always fills the screen.
+  */
+  useEffect(() => {
+    const el = pin.current
+    if (!el) return
+
+    const sync = () => {
+      const h = Math.round(window.visualViewport?.height ?? window.innerHeight)
+      el.style.height = `${h}px`
+    }
+
+    sync()
+    const vv = window.visualViewport
+    vv?.addEventListener('resize', sync)
+    vv?.addEventListener('scroll', sync)
+    window.addEventListener('resize', sync)
+    return () => {
+      vv?.removeEventListener('resize', sync)
+      vv?.removeEventListener('scroll', sync)
+      window.removeEventListener('resize', sync)
+    }
+  }, [])
 
   useGSAP(
     () => {
@@ -100,13 +129,22 @@ export function Hero() {
       ref={section}
       id="top"
       aria-labelledby="hero-title"
-      className={`relative bg-[#111111] motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'}`}
+      className={`relative motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'} ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
     >
-      <div className="sticky top-0 h-svh overflow-hidden">
+      <div
+        ref={pin}
+        className={`sticky top-0 h-dvh min-h-svh overflow-hidden ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
+      >
         <div className="absolute inset-0" aria-hidden>
           {webgl ? (
             <>
-              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]" />
+              <div
+                className={`absolute inset-0 ${
+                  isDark
+                    ? 'bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]'
+                    : 'bg-[radial-gradient(120%_80%_at_70%_40%,#e8dfd2_0%,#d2c4b4_55%,#c8bdb0_100%)]'
+                }`}
+              />
               <SceneErrorBoundary fallback={<StaticHeroImage />}>
                 <Suspense fallback={null}>
                   <div className={`absolute inset-0 transition-opacity duration-[2400ms] ease-[var(--ease-luxe)] ${ready ? 'opacity-100' : 'opacity-0'}`}>
@@ -120,11 +158,21 @@ export function Hero() {
           )}
         </div>
 
-        {/* Cinematic veils — stronger left plate on phones so copy clears the bright teapoy */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.72)_0%,rgba(16,16,15,0.42)_28%,rgba(16,16,15,0.12)_48%,rgba(16,16,15,0)_62%)] md:bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
+        {/* Cinematic veils — lighter in Day so the loft can read as daylight */}
+        {isDark ? (
+          <>
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.72)_0%,rgba(16,16,15,0.42)_28%,rgba(16,16,15,0.12)_48%,rgba(16,16,15,0)_62%)] md:bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
+          </>
+        ) : (
+          <>
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(28,22,18,0.42)_0%,rgba(28,22,18,0.18)_30%,rgba(28,22,18,0.04)_52%,rgba(28,22,18,0)_68%)] md:bg-[linear-gradient(90deg,rgba(28,22,18,0.28)_0%,rgba(28,22,18,0.1)_24%,rgba(28,22,18,0)_50%)]" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[22%] bg-gradient-to-t from-[#2a221e]/35 via-[#2a221e]/12 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#2a221e]/22 to-transparent" />
+          </>
+        )}
 
         {/* Opening copy — optically centered between header and bottom chrome */}
         <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(3.5rem,8vh,7.5rem)]">

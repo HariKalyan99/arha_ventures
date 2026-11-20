@@ -34,11 +34,11 @@ export function RoomScene({ finishes, mood, blend, tier, source = HERO_ROOM_SOUR
           position={[0, 0.01, 0]}
           scale={14}
           far={2.2}
-          blur={noir ? 3.2 : 2.8}
-          opacity={noir ? 0.55 : 0.38}
+          blur={noir ? 3.2 : 2.6}
+          opacity={noir ? 0.55 : 0.36}
           resolution={512}
           frames={1}
-          color={noir ? '#020204' : '#140d08'}
+          color={noir ? '#020204' : '#1a120c'}
         />
       </>
     )
