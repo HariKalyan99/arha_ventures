@@ -88,7 +88,7 @@ function ViewController({ view, viewRequest, interactive, controlsRef }: Pick<Co
 
 export default function ConfiguratorScene({ finishes, mood, view, viewRequest, tier, active, interactive, controlsRef, onReady }: ConfiguratorSceneProps) {
   return (
-    <SceneCanvas tier={tier} active={active} onReady={onReady}>
+    <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0 h-full w-full">
       <ViewController view={view} viewRequest={viewRequest} interactive={interactive} controlsRef={controlsRef} />
       <RoomScene finishes={finishes} mood={mood} tier={tier} source={ATELIER_ROOM_SOURCE} />
     </SceneCanvas>

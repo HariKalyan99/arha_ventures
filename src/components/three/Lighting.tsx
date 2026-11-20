@@ -28,7 +28,12 @@ export function Lighting({ mood, blend }: LightingProps) {
   const washes = useRef<(THREE.SpotLight | null)[]>([])
   const current = useRef(cloneMood(moods[mood]))
   const target = useRef(cloneMood(moods[mood]))
-  const settings = tier === 'low' ? { shadow: 512, washes: false } : tier === 'medium' ? { shadow: 1024, washes: true } : { shadow: 2048, washes: true }
+  const settings =
+    tier === 'low'
+      ? { shadow: 512, washes: false, env: 256 }
+      : tier === 'medium'
+        ? { shadow: 1536, washes: true, env: 384 }
+        : { shadow: 2048, washes: true, env: 512 }
 
   useLayoutEffect(() => {
     const light = sun.current
@@ -123,8 +128,8 @@ export function Lighting({ mood, blend }: LightingProps) {
             color="#ffd2a0"
           />
         ))}
-      {/* Static studio-style reflections; brightness is scaled per mood via scene.environmentIntensity */}
-      <Environment frames={1} resolution={128}>
+      {/* Studio reflections — resolution scales with tier so phones stay crisp */}
+      <Environment frames={1} resolution={settings.env}>
         <Lightformer form="rect" intensity={3} color="#f2e6d6" position={[1, 1.8, -9]} scale={[14, 5, 1]} />
         <Lightformer form="rect" intensity={0.8} color="#ffdcb0" position={[0, 6, 0]} rotation-x={Math.PI / 2} scale={[9, 9, 1]} />
         <Lightformer form="rect" intensity={0.5} color="#a07a5a" position={[-7, 1.5, 0]} rotation-y={Math.PI / 2} scale={[9, 3, 1]} />

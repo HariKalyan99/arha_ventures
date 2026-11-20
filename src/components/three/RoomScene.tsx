@@ -61,7 +61,16 @@ function ProceduralRoom({ finishes, mood, blend, tier }: Omit<RoomSceneProps, 's
       <Lighting mood={mood} blend={blend} />
       <Architecture />
       <Furniture />
-      <ContactShadows position={[0, 0.009, 0.5]} scale={[10, 9]} far={1.2} blur={2.6} opacity={0.55} resolution={tier === 'low' ? 512 : 1024} frames={1} color="#140d08" />
+      <ContactShadows
+        position={[0, 0.009, 0.5]}
+        scale={[10, 9]}
+        far={1.2}
+        blur={2.4}
+        opacity={0.55}
+        resolution={tier === 'low' ? 512 : 1024}
+        frames={1}
+        color="#140d08"
+      />
     </RoomContext.Provider>
   )
 }

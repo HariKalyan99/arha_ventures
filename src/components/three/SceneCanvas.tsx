@@ -28,9 +28,15 @@ function ReadySignal({ onReady }: { onReady?: () => void }) {
   return null
 }
 
+function initialDpr(tier: QualityTier) {
+  const [min, max] = tierSettings[tier].dpr
+  const device = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : max
+  return Math.min(max, Math.max(min, device))
+}
+
 export function SceneCanvas({ tier, active, onReady, className, children }: SceneCanvasProps) {
   const settings = tierSettings[tier]
-  const [dpr, setDpr] = useState(settings.dpr[1])
+  const [dpr, setDpr] = useState(() => initialDpr(tier))
 
   return (
     <Canvas
@@ -40,15 +46,20 @@ export function SceneCanvas({ tier, active, onReady, className, children }: Scen
       dpr={dpr}
       frameloop={active ? 'always' : 'never'}
       camera={{ fov: 40, near: 0.1, far: 800, position: [4, 1.6, 4.5] }}
-      gl={{ antialias: tier !== 'low', powerPreference: 'high-performance', stencil: false }}
+      gl={{
+        antialias: true,
+        powerPreference: 'high-performance',
+        stencil: false,
+      }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping
+        gl.outputColorSpace = THREE.SRGBColorSpace
       }}
     >
-      {/* Drops resolution on devices that can't hold a steady frame rate */}
+      {/* Soften under load, but never drop below the tier floor (keeps phones readable). */}
       <PerformanceMonitor
-        onDecline={() => setDpr((d) => Math.max(settings.dpr[0], d - 0.25))}
-        onIncline={() => setDpr((d) => Math.min(settings.dpr[1], d + 0.25))}
+        onDecline={() => setDpr((d) => Math.max(settings.dpr[0], Math.round((d - 0.15) * 100) / 100))}
+        onIncline={() => setDpr((d) => Math.min(settings.dpr[1], Math.round((d + 0.15) * 100) / 100))}
       />
       <Suspense fallback={null}>
         {children}
