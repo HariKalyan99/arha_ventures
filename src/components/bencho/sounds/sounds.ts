@@ -32,6 +32,8 @@ export const SOUNDS = {
   ],
   /* Latch · Selection — https://bencho.dev/sounds/latch */
   latch: [{ hz: 256, ms: 90, gain: 0.058, wave: 'square' as const, cut: 2400, atk: 10 }],
+  /* Glide · Navigation — https://bencho.dev/sounds/glide — footer ARHA mark */
+  glide: [{ hz: 397, to: 276, ms: 205, gain: 0.065, wave: 'sine' as const, cut: 820, atk: 90 }],
   /* Clack · Selection — https://bencho.dev/sounds/clack */
   clack: [
     { hz: 2600, ms: 5, gain: 0.19, noise: 'bandpass' as const, q: 0.5, atk: 0.5 },

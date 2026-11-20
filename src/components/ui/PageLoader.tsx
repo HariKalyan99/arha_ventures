@@ -40,6 +40,8 @@ export function PageLoader() {
     return () => {
       window.clearTimeout(fadeTimer)
       window.clearTimeout(removeTimer)
+      /* If a route change interrupts the hold, never leave overflow locked. */
+      document.documentElement.classList.remove('is-booting')
     }
   }, [pathname])
 
