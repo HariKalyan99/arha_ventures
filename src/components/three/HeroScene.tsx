@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { defaultFinishes } from '../../data/configurator'
+import { useTheme } from '../../hooks/useTheme'
 import type { QualityTier } from '../../lib/device'
 import { HeroTourCamera } from './HeroTourCamera'
 import { RoomScene } from './RoomScene'
@@ -77,8 +78,15 @@ function ProceduralHeroCamera({ progress, reducedMotion }: { progress: RefObject
 }
 
 export default function HeroScene({ progress, active, reducedMotion, tier, onReady }: HeroSceneProps) {
-  /* Dark cinematic plate: evening → night. Light site chrome starts below the fold. */
-  const blend = useMemo(() => ({ from: 'evening' as const, to: 'night' as const, progress }), [progress])
+  const { isDark } = useTheme()
+  /* Day: evening → night on scroll. Night theme: full ink plate from the start. */
+  const blend = useMemo(
+    () =>
+      isDark
+        ? { from: 'night' as const, to: 'night' as const, progress }
+        : { from: 'evening' as const, to: 'night' as const, progress },
+    [progress, isDark],
+  )
   return (
     <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0">
       {HERO_ROOM_SOURCE === 'glb' ? (
@@ -86,7 +94,14 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
       ) : (
         <ProceduralHeroCamera progress={progress} reducedMotion={reducedMotion} />
       )}
-      <RoomScene finishes={defaultFinishes} mood="evening" blend={blend} tier={tier} source={HERO_ROOM_SOURCE} />
+      <RoomScene
+        finishes={defaultFinishes}
+        mood={isDark ? 'night' : 'evening'}
+        blend={blend}
+        tier={tier}
+        source={HERO_ROOM_SOURCE}
+        noir={isDark}
+      />
     </SceneCanvas>
   )
 }

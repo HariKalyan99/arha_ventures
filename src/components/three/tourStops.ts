@@ -2,8 +2,8 @@
  * Interior tour for free_loft_17 (fitted span 14m, floor y=0).
  * Copy advances with the camera — last stop is the shelf + curious close.
  *
- * `mobile` poses reframe for narrow / portrait viewports (md and below):
- * less ceiling, more of the living plane, FOV kept calmer.
+ * `mobile` poses reframe for phone + md tablet (below lg):
+ * less ceiling, teapoy/plaque framing, FOV kept calmer.
  */
 export interface TourPose {
   position: [number, number, number]
@@ -18,18 +18,21 @@ export interface TourStop extends TourPose {
   eyebrow: string
   /** Display line shown while this station is active */
   line: string
-  /** Optional override when viewport width < 768 */
+  /** Optional override when viewport width < lg (1024) — phone + md tablet */
   mobile?: Partial<TourPose>
 }
 
 /** Eye stays inside the loft, with room to travel between zones. */
 export const TOUR_CAMERA_BOUNDS = {
   min: [-4.8, 1.15, -5.0] as [number, number, number],
-  max: [5.2, 3.55, 6.2] as [number, number, number],
+  max: [5.2, 3.85, 6.2] as [number, number, number],
 }
 
-/** Match Tailwind `md` — below this we use mobile tour framing. */
-export const TOUR_MOBILE_MAX_WIDTH = 767
+/** Below Tailwind `lg` — phone and md tablet use compact tour framing. */
+export const TOUR_MOBILE_MAX_WIDTH = 1023
+
+/** Tailwind `md` floor — same teapoy targets as phone, slightly wider FOV. */
+export const TOUR_MD_MIN_WIDTH = 768
 
 export const houseTourStops: TourStop[] = [
   {
@@ -84,10 +87,11 @@ export const houseTourStops: TourStop[] = [
     target: [-2.4, 1.5, 0.6],
     fov: 48,
     mobile: {
-      // From the lounge side of the mezz — plan below, spiral out of the phone frame.
-      position: [-0.35, 3.35, 2.35],
-      target: [-2.85, 0.95, 1.35],
-      fov: 42,
+      // Same stairs-top plan as desktop — spiral right, lounge + plaque below.
+      // Slight look bias toward the plaque so it stays in a narrow/md frame.
+      position: [2.2, 3.9, 2.8],
+      target: [-2.55, 1.25, 1.05],
+      fov: 46,
     },
   },
   {
@@ -99,9 +103,11 @@ export const houseTourStops: TourStop[] = [
     target: [-2.4, 1.15, 0.2],
     fov: 50,
     mobile: {
-      position: [1.65, 1.72, 5.15],
-      target: [-2.2, 1.0, 0.35],
-      fov: 46,
+      // Close 3/4 on the telephone teapoy — Call Us handset readable + tappable.
+      // Phone world ≈ (1.77, 0.45, 0.76)
+      position: [3.35, 1.55, 2.85],
+      target: [1.77, 0.55, 0.76],
+      fov: 40,
     },
   },
   {
@@ -120,15 +126,18 @@ export const houseTourStops: TourStop[] = [
   },
 ]
 
-/** Resolve desktop or mobile pose for a stop. */
-export function tourPoseFor(stop: TourStop, mobile: boolean): TourPose {
-  if (!mobile || !stop.mobile) {
+/** Resolve desktop or compact (phone / md) pose for a stop. */
+export function tourPoseFor(stop: TourStop, compact: boolean, width = 0): TourPose {
+  if (!compact || !stop.mobile) {
     return { position: stop.position, target: stop.target, fov: stop.fov }
   }
+  const baseFov = stop.mobile.fov ?? stop.fov
+  /* md tablets share phone look-ats; open FOV a touch so the frame isn’t pinched. */
+  const fov = width >= TOUR_MD_MIN_WIDTH ? Math.min(baseFov + 4, 48) : baseFov
   return {
     position: stop.mobile.position ?? stop.position,
     target: stop.mobile.target ?? stop.target,
-    fov: stop.mobile.fov ?? stop.fov,
+    fov,
   }
 }
 

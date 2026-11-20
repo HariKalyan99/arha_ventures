@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { useFrame, type ThreeEvent } from '@react-three/fiber'
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Html, useGLTF } from '@react-three/drei'
 import { useNavigate } from 'react-router'
 import * as THREE from 'three'
@@ -18,6 +18,19 @@ const TARGET_SPAN = 0.38
 const HOVER_BASE = 0.14
 const HOVER_AMP = 0.055
 
+/** “Call Us” label — eases down as the canvas narrows. 320→small · 768+→full */
+function labelScale(width: number) {
+  if (width >= 768) return { rem: 0.62, distanceFactor: 6.5, tracking: '0.04em' }
+  if (width <= 320) return { rem: 0.4, distanceFactor: 10.5, tracking: '0.02em' }
+  const t = (width - 320) / (768 - 320)
+  const e = 1 - (1 - t) * (1 - t)
+  return {
+    rem: 0.4 + e * (0.62 - 0.4),
+    distanceFactor: 10.5 - e * (10.5 - 6.5),
+    tracking: `${0.02 + e * 0.02}em`,
+  }
+}
+
 /**
  * Toscano vintage telephone on the lounge teapoy — floats and spins like the logo plaque.
  * Quiet label sits above the handset. Click → /contact.
@@ -26,6 +39,8 @@ export function ContactPhone() {
   const group = useRef<THREE.Group>(null)
   const navigate = useNavigate()
   const { scene } = useGLTF(PHONE_GLB)
+  const width = useThree((s) => s.size.width)
+  const label = useMemo(() => labelScale(width), [width])
 
   const phone = useMemo(() => {
     const root = scene.clone(true)
@@ -100,10 +115,16 @@ export function ContactPhone() {
         position={[0, phone.height + 0.06, 0]}
         center
         sprite
-        distanceFactor={6.5}
+        distanceFactor={label.distanceFactor}
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       >
-        <p className="whitespace-nowrap text-[0.62rem] font-medium tracking-[0.04em] text-parchment/85 normal-case">
+        <p
+          className="whitespace-nowrap font-medium text-parchment/85 normal-case"
+          style={{
+            fontSize: `${label.rem}rem`,
+            letterSpacing: label.tracking,
+          }}
+        >
           Call Us
         </p>
       </Html>

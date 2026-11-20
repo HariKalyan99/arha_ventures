@@ -17,7 +17,7 @@ interface HeroTourCameraProps {
 /**
  * Scroll moves between interior stations; mouse gently steers look inside the loft.
  * Horizon stays level — no Dutch-angle lean.
- * Below md, stations swap to mobile poses so portrait frames read the living plane, not the ceiling.
+ * Below lg (phone + md tablet), stations swap to compact poses — teapoys / plaque in frame.
  */
 export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
@@ -50,14 +50,14 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
   const stations = useMemo(
     () =>
       houseTourStops.map((s) => {
-        const pose = tourPoseFor(s, mobile)
+        const pose = tourPoseFor(s, mobile, size.width)
         return {
           pos: new THREE.Vector3(...pose.position),
           look: new THREE.Vector3(...pose.target),
           fov: pose.fov,
         }
       }),
-    [mobile],
+    [mobile, size.width],
   )
 
   useEffect(() => {

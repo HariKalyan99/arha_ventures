@@ -41,46 +41,128 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Opaque shell so cutaway openings never reveal the void. */
-function InteriorEnclosure() {
+/** Soft dusk beyond the glass — warm for Day, cooler ink for Night. */
+function InteriorEnclosure({ noir }: { noir: boolean }) {
+  const shell = noir ? '#0a0a0e' : '#14100c'
+  const far = noir ? '#12151e' : '#4a3528'
+  const left = noir ? '#0e1016' : '#2d2420'
+  const right = noir ? '#0c0e14' : '#241c19'
+  const near = noir ? '#08090c' : '#171717'
+
   return (
     <group>
       <mesh receiveShadow={false} castShadow={false}>
         <boxGeometry args={[28, 14, 28]} />
         <meshStandardMaterial
-          color="#14100c"
+          color={shell}
           roughness={1}
           metalness={0}
           side={THREE.BackSide}
-          envMapIntensity={0.12}
+          envMapIntensity={noir ? 0.22 : 0.12}
         />
       </mesh>
-      {/* Soft warm dusk beyond the glass */}
       <mesh position={[0, 3.2, -8.5]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#4a3528" toneMapped={false} />
+        <meshBasicMaterial color={far} toneMapped={false} />
       </mesh>
       <mesh position={[-8.5, 3.2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#2d2420" toneMapped={false} />
+        <meshBasicMaterial color={left} toneMapped={false} />
       </mesh>
       <mesh position={[8.5, 3.2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color="#241c19" toneMapped={false} />
+        <meshBasicMaterial color={right} toneMapped={false} />
       </mesh>
       <mesh position={[0, 3.2, 8.5]} rotation={[0, Math.PI, 0]} receiveShadow={false} castShadow={false}>
         <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color="#171717" toneMapped={false} />
+        <meshBasicMaterial color={near} toneMapped={false} />
       </mesh>
     </group>
   )
 }
 
+/** Night: deepen toward charcoal + soft sheen — keep maps readable. */
+function applyNoirLook(std: THREE.MeshStandardMaterial) {
+  const next = std.clone() as THREE.MeshStandardMaterial
+
+  next.color.lerp(new THREE.Color('#121216'), 0.28)
+  next.color.multiplyScalar(0.78)
+
+  if (typeof next.roughness === 'number') {
+    next.roughness = Math.max(0.22, Math.min(0.85, next.roughness * 0.78))
+  }
+  next.metalness = Math.min(0.55, next.metalness + 0.06)
+  next.envMapIntensity = Math.min(1.15, Math.max(0.7, (next.envMapIntensity ?? 1) * 1.15))
+
+  if (next instanceof THREE.MeshPhysicalMaterial) {
+    next.sheen = 0.65
+    next.sheenColor.set('#d8d4cc')
+    next.sheenRoughness = 0.32
+    next.clearcoat = Math.min(0.2, next.clearcoat + 0.08)
+    next.clearcoatRoughness = 0.35
+  }
+
+  if (next.name === 'Material.001' || next.name === 'Material.006') {
+    next.color.set('#2a2622')
+    next.roughness = 0.55
+    next.metalness = 0.08
+    next.envMapIntensity = 0.55
+    if ('emissive' in next) next.emissive.set('#000000')
+  }
+
+  if (next.metalness > 0.55) {
+    const goldish = next.color.r > 0.35 && next.color.g > 0.22 && next.color.b < 0.24
+    if (goldish) {
+      next.color.multiplyScalar(0.55)
+      next.metalness = Math.min(next.metalness, 0.8)
+      next.roughness = Math.max(0.28, next.roughness * 0.85)
+      next.envMapIntensity = Math.min(1.1, next.envMapIntensity * 1.1)
+    }
+  }
+
+  next.needsUpdate = true
+  return next
+}
+
+function applyDayLook(std: THREE.MeshStandardMaterial) {
+  const next = std.clone() as THREE.MeshStandardMaterial
+  next.envMapIntensity = Math.min(next.envMapIntensity ?? 1, 0.95)
+  if (typeof next.roughness === 'number') {
+    next.roughness = Math.min(1, Math.max(0.22, next.roughness * 0.96))
+  }
+
+  if (next.metalness > 0.55) {
+    const goldish = next.color.r > 0.4 && next.color.g > 0.28 && next.color.b < 0.26
+    if (goldish) {
+      next.metalness = Math.min(next.metalness, 0.72)
+      next.roughness = Math.max(next.roughness, 0.32)
+      next.color.multiplyScalar(0.88)
+      next.envMapIntensity = Math.min(next.envMapIntensity, 0.75)
+    }
+  }
+
+  if (next.name === 'Material.001' || next.name === 'Material.006') {
+    next.color.set(next.map ? '#948c82' : '#a09890')
+    next.roughness = Math.max(next.roughness, 0.82)
+    next.metalness = 0
+    next.envMapIntensity = Math.min(next.envMapIntensity, 0.35)
+    if ('emissive' in next) next.emissive.set('#000000')
+  }
+
+  next.needsUpdate = true
+  return next
+}
+
+interface LivingRoomModelProps {
+  /** Site Night theme — darker plate + soft sheen */
+  noir?: boolean
+}
+
 /**
- * Imported loft GLB — kept as a dark cinematic media plate.
- * Light site chrome begins below the fold; materials stay native.
+ * Imported loft GLB — Day keeps a warm cinematic plate;
+ * Night deepens toward black with a quiet sheen (still fully readable).
  */
-export function LivingRoomModel() {
+export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
   const { scene, animations } = useGLTF(LIVING_ROOM_GLB)
   const root = useRef<THREE.Group>(null)
 
@@ -103,42 +185,13 @@ export function LivingRoomModel() {
       const source = Array.isArray(obj.material) ? obj.material : [obj.material]
       const next = source.map((mat) => {
         if (!(mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial)) return mat
-        const std = mat.clone() as THREE.MeshStandardMaterial
-
-        /* Keep native look + soft sheen — don’t crush metalness into matte */
-        std.envMapIntensity = Math.min(std.envMapIntensity ?? 1, 0.95)
-        if (typeof std.roughness === 'number') {
-          std.roughness = Math.min(1, Math.max(0.22, std.roughness * 0.96))
-        }
-
-        /* Soften only loud gilt props — leave leather / brass accents with sheen */
-        if (std.metalness > 0.55) {
-          const goldish = std.color.r > 0.4 && std.color.g > 0.28 && std.color.b < 0.26
-          if (goldish) {
-            std.metalness = Math.min(std.metalness, 0.72)
-            std.roughness = Math.max(std.roughness, 0.32)
-            std.color.multiplyScalar(0.88)
-            std.envMapIntensity = Math.min(std.envMapIntensity, 0.75)
-          }
-        }
-
-        /* Pale floor — warm mid tone (not flood-white, not charcoal) */
-        if (std.name === 'Material.001' || std.name === 'Material.006') {
-          std.color.set(std.map ? '#948c82' : '#a09890')
-          std.roughness = Math.max(std.roughness, 0.82)
-          std.metalness = 0
-          std.envMapIntensity = Math.min(std.envMapIntensity, 0.35)
-          if ('emissive' in std) std.emissive.set('#000000')
-        }
-
-        std.needsUpdate = true
-        return std
+        return noir ? applyNoirLook(mat) : applyDayLook(mat)
       })
       obj.material = next.length === 1 ? next[0]! : next
     })
 
     return clone
-  }, [scene])
+  }, [scene, noir])
 
   useAnimations(animations, root)
 
@@ -170,7 +223,7 @@ export function LivingRoomModel() {
       <group ref={root}>
         <primitive object={prepared} />
       </group>
-      <InteriorEnclosure />
+      <InteriorEnclosure noir={noir} />
       <Suspense fallback={null}>
         <ContactPhone />
         <WallLogo />

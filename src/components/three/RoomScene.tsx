@@ -19,24 +19,26 @@ interface RoomSceneProps {
   tier: QualityTier
   /** Override which room to render. Defaults to the hero (GLB) source. */
   source?: RoomSource
+  /** Site Night theme — black aesthetics + sheen on the GLB loft */
+  noir?: boolean
 }
 
 /** Living room for hero (GLB tour) or atelier (procedural finishes). */
-export function RoomScene({ finishes, mood, blend, tier, source = HERO_ROOM_SOURCE }: RoomSceneProps) {
+export function RoomScene({ finishes, mood, blend, tier, source = HERO_ROOM_SOURCE, noir = false }: RoomSceneProps) {
   if (source === 'glb') {
     return (
       <>
-        <ModelLighting mood={mood} blend={blend} />
-        <LivingRoomModel />
+        <ModelLighting mood={mood} blend={blend} noir={noir} />
+        <LivingRoomModel noir={noir} />
         <ContactShadows
           position={[0, 0.01, 0]}
           scale={14}
           far={2.2}
-          blur={3.2}
-          opacity={0.42}
+          blur={noir ? 3.6 : 3.2}
+          opacity={noir ? 0.62 : 0.42}
           resolution={tier === 'low' ? 512 : 1024}
           frames={1}
-          color="#140d08"
+          color={noir ? '#020204' : '#140d08'}
         />
       </>
     )
