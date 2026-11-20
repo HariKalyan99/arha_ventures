@@ -15,8 +15,8 @@ const LEAN_MAX = 0.38
 const LEAN_SMOOTH = 7
 
 /**
- * Brand plaque on the lounge teapoy — Bencho “coin” energy:
- * leans toward the pointer, drag to fling-spin, click for a brass ring pulse.
+ * Brand plaque on the lounge teapoy — frosted glass coin:
+ * leans toward the pointer, drag to fling-spin, click for a glass ring pulse.
  */
 export function WallLogo() {
   const group = useRef<THREE.Group>(null)
@@ -37,33 +37,50 @@ export function WallLogo() {
     return new THREE.MeshBasicMaterial({
       map,
       transparent: true,
-      alphaTest: 0.2,
+      alphaTest: 0.15,
       depthWrite: false,
       side: THREE.FrontSide,
       toneMapped: false,
     })
   }, [map])
 
+  /* Frosted glass slab — transmission + roughness reads as glassmorphism in the loft. */
   const plateMat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
-        color: '#e8e0d2',
-        roughness: 0.42,
-        metalness: 0.18,
-        clearcoat: 0.55,
-        clearcoatRoughness: 0.28,
-        envMapIntensity: 0.55,
+        color: '#f4efe8',
+        metalness: 0,
+        roughness: 0.22,
+        transmission: 0.78,
+        thickness: 0.42,
+        ior: 1.42,
+        transparent: true,
+        opacity: 1,
+        clearcoat: 1,
+        clearcoatRoughness: 0.08,
+        envMapIntensity: 1.15,
+        attenuationColor: new THREE.Color('#e8dfd2'),
+        attenuationDistance: 0.55,
+        specularIntensity: 1,
+        side: THREE.FrontSide,
       }),
     [],
   )
 
+  /* Slim luminous rim — glass edge, not a heavy brass bevel. */
   const rimMat = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
-        color: '#b69b75',
-        roughness: 0.35,
-        metalness: 0.65,
-        envMapIntensity: 0.7,
+      new THREE.MeshPhysicalMaterial({
+        color: '#d8cfc3',
+        metalness: 0.08,
+        roughness: 0.18,
+        transmission: 0.55,
+        thickness: 0.2,
+        ior: 1.4,
+        transparent: true,
+        clearcoat: 0.9,
+        clearcoatRoughness: 0.12,
+        envMapIntensity: 1.05,
       }),
     [],
   )
@@ -71,7 +88,7 @@ export function WallLogo() {
   const ringMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
-        color: '#c9b28f',
+        color: '#e8e0d2',
         transparent: true,
         opacity: 0,
         depthWrite: false,
@@ -85,7 +102,7 @@ export function WallLogo() {
   const height = width * (661 / 891)
   const plateW = width + 0.07
   const plateH = height + 0.07
-  const depth = 0.026
+  const depth = 0.018
   const base = useMemo(() => ({ x: -2.84, y: 0.82, z: 2.38 }), [])
 
   const firePulse = () => {
@@ -180,10 +197,12 @@ export function WallLogo() {
       ringMat.opacity = 0
     }
 
-    /* Clearcoat breathes slightly when hovered (lean active) */
+    /* Glass sheen breathes when hovered (lean active) */
     const eng = Math.hypot(leanNow.current.x, leanNow.current.y) / LEAN_MAX
-    plateMat.clearcoat = 0.55 + eng * 0.25
-    plateMat.roughness = 0.42 - eng * 0.12
+    plateMat.clearcoat = 0.85 + eng * 0.15
+    plateMat.roughness = 0.22 - eng * 0.08
+    plateMat.transmission = 0.78 + eng * 0.08
+    plateMat.envMapIntensity = 1.15 + eng * 0.25
   })
 
   return (
@@ -201,11 +220,11 @@ export function WallLogo() {
       onPointerOut={onPointerOut}
     >
       <group ref={lean}>
-        {/* Brass edge bevel */}
-        <mesh material={rimMat} castShadow>
-          <boxGeometry args={[plateW + 0.012, plateH + 0.012, depth * 0.72]} />
+        {/* Frosted glass edge */}
+        <mesh material={rimMat}>
+          <boxGeometry args={[plateW + 0.01, plateH + 0.01, depth * 0.85]} />
         </mesh>
-        <mesh position={[0, 0, 0]} material={plateMat} castShadow receiveShadow>
+        <mesh position={[0, 0, 0]} material={plateMat}>
           <boxGeometry args={[plateW, plateH, depth]} />
         </mesh>
         <mesh position={[0, 0, depth / 2 + 0.001]} material={logoMat}>
