@@ -78,7 +78,7 @@ export function Footer() {
           <p className="eyebrow mb-5 text-gold">Contact</p>
           <ul className="flex flex-col gap-3 text-sm text-cream/80">
             <li>
-              <a href={`mailto:${studio.email}`} className="link-line break-all hover:text-cream">
+              <a href={`mailto:${studio.email}`} className="link-line break-words hover:text-cream">
                 {studio.email}
               </a>
             </li>

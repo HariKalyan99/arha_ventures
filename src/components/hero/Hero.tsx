@@ -174,29 +174,29 @@ export function Hero() {
           </>
         )}
 
-        {/* Opening copy — optically centered between header and bottom chrome */}
-        <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(3.5rem,8vh,7.5rem)]">
+        {/* Opening copy — centered when tall; top-aligned on short / landscape phones so it clears the header + bottom chrome */}
+        <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(4.25rem,11vh,9rem)] short:justify-start short:pt-[calc(var(--header-h)+0.35rem)] short:pb-[4.75rem]">
           <div className="shell" data-hero-copy>
-            <p data-hero-fade className="eyebrow mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
+            <p data-hero-fade className="eyebrow mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5 short:mb-1.5">
               <span>{studio.name}</span>
-              <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block" />
-              <span className="text-parchment/80">{studio.tagline}</span>
+              <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block short:hidden" />
+              <span className="text-parchment/80 short:hidden">{studio.tagline}</span>
             </p>
-            <h1 id="hero-title" className="display display-on-media max-w-[18ch] text-display-hero text-parchment sm:max-w-[22ch] md:max-w-none">
+            <h1 id="hero-title" className="display display-on-media max-w-[18ch] text-display-hero text-parchment sm:max-w-[22ch] md:max-w-none short:max-w-[28ch]">
               <span className="block overflow-hidden pb-[0.05em]">
-                <span data-hero-line className="block md:whitespace-nowrap">
+                <span data-hero-line className="block md:whitespace-nowrap short:whitespace-normal">
                   A room should know how you <em>live</em>
                 </span>
               </span>
               <span className="block overflow-hidden pb-[0.05em]">
-                <span data-hero-line className="block md:whitespace-nowrap">before it asks you to stay.</span>
+                <span data-hero-line className="block md:whitespace-nowrap short:whitespace-normal">before it asks you to stay.</span>
               </span>
             </h1>
-            <div data-hero-rule className="hairline mt-4 max-w-md bg-gold/40 sm:mt-7" />
-            <div className="mt-4 flex max-w-[36rem] flex-col gap-4 sm:mt-7 sm:gap-6">
+            <div data-hero-rule className="hairline mt-4 max-w-md bg-gold/40 sm:mt-7 short:mt-2.5" />
+            <div className="mt-4 flex max-w-[36rem] flex-col gap-4 sm:mt-7 sm:gap-6 short:mt-2.5 short:gap-2.5">
               <p
                 data-hero-fade
-                className="hero-lead-on-media max-w-[28rem] text-[0.9375rem] font-medium leading-relaxed text-parchment sm:text-[0.95rem] md:text-lead md:font-normal md:text-parchment/80"
+                className="hero-lead-on-media max-w-[28rem] text-[0.9375rem] font-medium leading-relaxed text-parchment sm:text-[0.95rem] md:text-lead md:font-normal md:text-parchment/80 short:hidden"
               >
                 Architecture and interiors, shaped with patience and a reverence for material.
               </p>
@@ -302,13 +302,13 @@ export function Hero() {
             <p data-hero-fade className="eyebrow hidden text-parchment/55 lg:block">
               {webgl ? (isTour ? 'Live 3D tour · Loft interior' : 'Live 3D render · A living room at dusk') : 'A living room in stone and timber'}
             </p>
-            <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-parchment/60 sm:bottom-6">
+            <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-parchment/60 sm:bottom-6 short:hidden">
               <span className="eyebrow">{holding ? 'Continue' : touring ? 'Continue' : 'Scroll'}</span>
               <span aria-hidden className="relative block h-9 w-px overflow-hidden bg-parchment/25 sm:h-10">
                 <span className="animate-scroll-cue absolute inset-0 bg-gold" />
               </span>
             </div>
-            <p data-hero-fade className="eyebrow hidden text-parchment/55 sm:block">
+            <p data-hero-fade className="eyebrow ml-auto hidden text-parchment/55 sm:block short:!block">
               {isTour ? `${String(stopIndex + 1).padStart(2, '0')} / ${String(houseTourStops.length).padStart(2, '0')}` : 'N° 01 — Residence study'}
             </p>
           </div>
