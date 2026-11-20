@@ -6,6 +6,7 @@ import { EASE_CURTAIN, EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
+import { SoundFeedback } from '../bencho/sounds/SoundFeedback'
 import { CustomCursor } from '../ui/CustomCursor'
 import { PageLoader } from '../ui/PageLoader'
 
@@ -34,6 +35,7 @@ export function Layout() {
     <>
       <PageLoader />
       <CustomCursor />
+      <SoundFeedback />
       {/* Sticky terracotta wash at the bottom of the frame */}
       <div aria-hidden data-brand-vignette className="terracotta-vignette-bottom" />
       <a

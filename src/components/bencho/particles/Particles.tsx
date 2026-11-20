@@ -1,4 +1,5 @@
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { play } from "../sounds/sounds";
 import "./Particles.css";
 
 /* ══ Particles ════════════════════════════════════════════
@@ -259,6 +260,7 @@ export function Particles({
         ref={cv}
         className="ptc-canvas"
         role="img"
+        data-bencho-sound="clack"
         aria-label="A shape made of dots. Move over it; press to change the shape."
         onPointerMove={(e) => {
           if (still) return;
@@ -267,6 +269,7 @@ export function Particles({
         }}
         onPointerLeave={() => { hand.current = null; run(); }}
         onPointerDown={(e) => {
+          play("clack");
           /* the shockwave, then the next shape */
           const p = where(e);
           if (!still) {
