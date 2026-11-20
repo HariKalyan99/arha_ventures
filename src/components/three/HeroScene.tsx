@@ -77,6 +77,7 @@ function ProceduralHeroCamera({ progress, reducedMotion }: { progress: RefObject
 }
 
 export default function HeroScene({ progress, active, reducedMotion, tier, onReady }: HeroSceneProps) {
+  /* Dark cinematic plate: evening → night. Light site chrome starts below the fold. */
   const blend = useMemo(() => ({ from: 'evening' as const, to: 'night' as const, progress }), [progress])
   return (
     <SceneCanvas tier={tier} active={active} onReady={onReady} className="!absolute inset-0">

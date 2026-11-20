@@ -1,0 +1,25 @@
+/* ══ Particles ═════════════════════════════════════════════
+   Dots draw in the canvas `color` — espresso ink on light paper. */
+.ptc {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  width: min(100%, clamp(15rem, 36vw, 20rem));
+}
+
+.ptc-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 400;
+  color: var(--color-cream);
+  cursor: crosshair;
+  touch-action: none;
+  max-width: 100%;
+}
+
+/* Slightly tighter for inline headline overlays */
+.ptc--inline {
+  width: min(100%, clamp(11rem, 26vw, 15rem));
+}

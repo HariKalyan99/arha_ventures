@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { studio } from '../../data/site'
 
-const STYLE = 'https://tiles.openfreemap.org/styles/dark'
+const STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const OSM_URL = `https://www.openstreetmap.org/?mlat=${studio.coordinates.lat}&mlon=${studio.coordinates.lng}#map=16/${studio.coordinates.lat}/${studio.coordinates.lng}`
 
 /**
- * Stock OpenFreeMap “dark” is near-black on near-black — lift contrast into the ARHA palette.
+ * Soften Liberty into ARHA warm paper — terracotta water edges, brass roads.
  */
 function applyThemePaints(map: import('maplibre-gl').Map) {
   const style = map.getStyle()
@@ -15,41 +15,41 @@ function applyThemePaints(map: import('maplibre-gl').Map) {
     const id = layer.id
     try {
       if (layer.type === 'background') {
-        map.setPaintProperty(id, 'background-color', '#1c1815')
+        map.setPaintProperty(id, 'background-color', '#f3eee6')
         continue
       }
 
       if (layer.type === 'fill') {
-        if (id.includes('water')) map.setPaintProperty(id, 'fill-color', '#2f2824')
+        if (id.includes('water')) map.setPaintProperty(id, 'fill-color', '#d9cfc3')
         else if (id.includes('building')) {
-          map.setPaintProperty(id, 'fill-color', '#2a221c')
-          map.setPaintProperty(id, 'fill-opacity', 0.9)
+          map.setPaintProperty(id, 'fill-color', '#e4d9cb')
+          map.setPaintProperty(id, 'fill-opacity', 0.85)
         } else if (id.includes('park') || id.includes('landcover') || id.includes('landuse')) {
-          map.setPaintProperty(id, 'fill-color', '#25201c')
-          map.setPaintProperty(id, 'fill-opacity', 0.55)
+          map.setPaintProperty(id, 'fill-color', '#e8e0d2')
+          map.setPaintProperty(id, 'fill-opacity', 0.7)
         }
       }
 
       if (layer.type === 'line') {
         if (id.includes('water')) {
-          map.setPaintProperty(id, 'line-color', '#2f2824')
+          map.setPaintProperty(id, 'line-color', '#c9b8a6')
         } else if (id.includes('boundary')) {
-          map.setPaintProperty(id, 'line-color', 'rgba(147, 66, 54, 0.45)')
+          map.setPaintProperty(id, 'line-color', 'rgba(147, 66, 54, 0.35)')
         } else if (id.includes('highway') || id.includes('road') || id.includes('bridge') || id.includes('tunnel')) {
           if (id.includes('casing')) {
-            map.setPaintProperty(id, 'line-color', 'rgba(96, 74, 59, 0.65)')
+            map.setPaintProperty(id, 'line-color', 'rgba(96, 74, 59, 0.35)')
           } else {
-            map.setPaintProperty(id, 'line-color', '#c9b28f')
-            map.setPaintProperty(id, 'line-opacity', 0.95)
+            map.setPaintProperty(id, 'line-color', '#9a7d58')
+            map.setPaintProperty(id, 'line-opacity', 0.9)
           }
         }
       }
 
       if (layer.type === 'symbol') {
-        map.setPaintProperty(id, 'text-color', '#e8e0d2')
-        map.setPaintProperty(id, 'text-halo-color', '#171717')
-        map.setPaintProperty(id, 'text-halo-width', 1.25)
-        map.setPaintProperty(id, 'text-opacity', 0.9)
+        map.setPaintProperty(id, 'text-color', '#2a221e')
+        map.setPaintProperty(id, 'text-halo-color', '#faf7f2')
+        map.setPaintProperty(id, 'text-halo-width', 1.15)
+        map.setPaintProperty(id, 'text-opacity', 0.85)
       }
     } catch {
       /* some layers omit optional paint props */
@@ -58,7 +58,7 @@ function applyThemePaints(map: import('maplibre-gl').Map) {
 }
 
 /**
- * OpenFreeMap dark vector tiles via MapLibre — free, no API key.
+ * OpenFreeMap Liberty vector tiles via MapLibre — free, no API key.
  * https://openfreemap.org/
  */
 export function StudioMap() {

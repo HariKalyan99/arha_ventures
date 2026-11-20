@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { LOGO_ON_DARK_SRC } from '../../data/brand'
+import { ThemeLogo } from '../ui/ThemeLogo'
 import { media } from '../../data/media'
 import { studio } from '../../data/site'
 import { useReveal } from '../../animations/reveal'
@@ -120,13 +120,11 @@ export function Philosophy() {
           style={{ opacity: 0 }}
           aria-hidden
         >
-          <img
-            src={LOGO_ON_DARK_SRC}
-            alt=""
+          <ThemeLogo
             width={700}
             height={620}
             decoding="async"
-            className="h-auto w-[min(92vw,34rem)] max-w-none object-contain object-bottom drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)] sm:w-[min(80vw,40rem)] lg:w-[min(62vw,44rem)]"
+            className="h-auto w-[min(92vw,34rem)] max-w-none object-contain object-bottom opacity-90 drop-shadow-[0_18px_36px_rgba(42,34,30,0.12)] sm:w-[min(80vw,40rem)] lg:w-[min(62vw,44rem)]"
           />
           <span className="sr-only">{studio.name}</span>
         </div>

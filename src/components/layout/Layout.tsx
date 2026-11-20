@@ -7,11 +7,10 @@ import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
 import { CustomCursor } from '../ui/CustomCursor'
-import { CursorAtmosphere } from '../ui/CursorAtmosphere'
 import { PageLoader } from '../ui/PageLoader'
 
 function PageFallback() {
-  /* Obsidian hold — cream boot is reserved for #boot / PageLoader only */
+  /* Paper hold — parchment boot is reserved for #boot / PageLoader only */
   return <div className="min-h-svh bg-obsidian" role="status" aria-label="Loading" />
 }
 
@@ -35,9 +34,8 @@ export function Layout() {
     <>
       <PageLoader />
       <CustomCursor />
-      <CursorAtmosphere />
       {/* Sticky terracotta wash at the bottom of the frame */}
-      <div aria-hidden className="terracotta-vignette-bottom" />
+      <div aria-hidden data-brand-vignette className="terracotta-vignette-bottom" />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-terracotta focus:px-4 focus:py-3 focus:text-cream"

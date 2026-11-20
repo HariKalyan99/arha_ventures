@@ -45,7 +45,6 @@ function interiorBox(root: THREE.Object3D) {
 function InteriorEnclosure() {
   return (
     <group>
-      {/* Inverted box — only the inner faces render */}
       <mesh receiveShadow={false} castShadow={false}>
         <boxGeometry args={[28, 14, 28]} />
         <meshStandardMaterial
@@ -78,8 +77,8 @@ function InteriorEnclosure() {
 }
 
 /**
- * Imported loft GLB, recentred and scaled to the interior only.
- * City / exterior meshes are hidden; an enclosure keeps the void out of frame.
+ * Imported loft GLB — kept as a dark cinematic media plate.
+ * Light site chrome begins below the fold; materials stay native.
  */
 export function LivingRoomModel() {
   const { scene, animations } = useGLTF(LIVING_ROOM_GLB)
@@ -100,22 +99,47 @@ export function LivingRoomModel() {
 
       obj.castShadow = true
       obj.receiveShadow = true
-      const materials = Array.isArray(obj.material) ? obj.material : [obj.material]
-      for (const mat of materials) {
-        if (!mat) continue
-        if ('envMapIntensity' in mat) (mat as THREE.MeshStandardMaterial).envMapIntensity = 1.1
-        if ('roughness' in mat && typeof (mat as THREE.MeshStandardMaterial).roughness === 'number') {
-          const std = mat as THREE.MeshStandardMaterial
-          std.roughness = Math.min(1, Math.max(0.2, std.roughness * 0.94))
+
+      const source = Array.isArray(obj.material) ? obj.material : [obj.material]
+      const next = source.map((mat) => {
+        if (!(mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial)) return mat
+        const std = mat.clone() as THREE.MeshStandardMaterial
+
+        /* Keep native look + soft sheen — don’t crush metalness into matte */
+        std.envMapIntensity = Math.min(std.envMapIntensity ?? 1, 0.95)
+        if (typeof std.roughness === 'number') {
+          std.roughness = Math.min(1, Math.max(0.22, std.roughness * 0.96))
         }
-        mat.needsUpdate = true
-      }
+
+        /* Soften only loud gilt props — leave leather / brass accents with sheen */
+        if (std.metalness > 0.55) {
+          const goldish = std.color.r > 0.4 && std.color.g > 0.28 && std.color.b < 0.26
+          if (goldish) {
+            std.metalness = Math.min(std.metalness, 0.72)
+            std.roughness = Math.max(std.roughness, 0.32)
+            std.color.multiplyScalar(0.88)
+            std.envMapIntensity = Math.min(std.envMapIntensity, 0.75)
+          }
+        }
+
+        /* Pale floor — warm mid tone (not flood-white, not charcoal) */
+        if (std.name === 'Material.001' || std.name === 'Material.006') {
+          std.color.set(std.map ? '#948c82' : '#a09890')
+          std.roughness = Math.max(std.roughness, 0.82)
+          std.metalness = 0
+          std.envMapIntensity = Math.min(std.envMapIntensity, 0.35)
+          if ('emissive' in std) std.emissive.set('#000000')
+        }
+
+        std.needsUpdate = true
+        return std
+      })
+      obj.material = next.length === 1 ? next[0]! : next
     })
 
     return clone
   }, [scene])
 
-  // Keep clips available but do not autoplay — looping scene clips read as a spin.
   useAnimations(animations, root)
 
   useLayoutEffect(() => {
