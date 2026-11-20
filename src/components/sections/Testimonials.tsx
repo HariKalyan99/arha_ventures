@@ -1,10 +1,50 @@
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, SquareArrowOutUpRight } from 'lucide-react'
+import { googleReviews, studio } from '../../data/site'
 import { testimonials } from '../../data/testimonials'
 import { EASE_LUXE } from '../../lib/motion'
 import { useReveal } from '../../animations/reveal'
 import { SectionLabel } from '../ui/SectionLabel'
+
+const STAR_PATH =
+  'M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'
+
+/** Five stars with a true partial fill (e.g. 4.7 → four full + 70% fifth). */
+function GoogleStars({ rating }: { rating: number }) {
+  const uid = useId()
+  return (
+    <span
+      className="google-stars inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={`${rating.toFixed(1)} out of 5 stars`}
+    >
+      {Array.from({ length: 5 }, (_, i) => {
+        const fill = Math.min(1, Math.max(0, rating - i))
+        const clipId = `${uid}-clip-${i}`
+        return (
+          <svg key={i} viewBox="0 0 24 24" className="size-3.5 overflow-visible" aria-hidden>
+            <defs>
+              <clipPath id={clipId}>
+                <rect x="0" y="0" width={24 * fill} height="24" />
+              </clipPath>
+            </defs>
+            {/* Empty track — clear contrast so a partial star reads as fractional */}
+            <path className="fill-stone/35" d={STAR_PATH} />
+            {fill > 0 && (
+              <path
+                className="google-star-fill"
+                style={{ ['--star-i' as string]: i, fill: '#f5b400' }}
+                clipPath={`url(#${clipId})`}
+                d={STAR_PATH}
+              />
+            )}
+          </svg>
+        )
+      })}
+    </span>
+  )
+}
 
 export function Testimonials({ index }: { index: string }) {
   const ref = useRef<HTMLElement>(null)
@@ -19,7 +59,7 @@ export function Testimonials({ index }: { index: string }) {
   }
 
   return (
-    <section ref={ref} aria-labelledby="voices-title" aria-roledescription="carousel" className="relative bg-obsidian section-y">
+    <section ref={ref} aria-labelledby="voices-title" aria-roledescription="carousel" className="relative surface-obsidian section-y">
       <div className="shell grid gap-12 lg:grid-cols-12">
         <div className="flex flex-col justify-between gap-10 lg:col-span-3">
           <div>
@@ -28,15 +68,31 @@ export function Testimonials({ index }: { index: string }) {
               Client voices
             </h2>
           </div>
-          {item.sample && (
-            <p className="eyebrow max-w-52 border-l border-gold/50 pl-4 text-[0.62rem] leading-relaxed text-gold/90">
-              Placeholder testimonials — to be replaced with verified client feedback
+
+          {/* Google Business–style rating summary */}
+          <div className="max-w-56 border-l border-gold/50 pl-4">
+            <p className="font-display text-[1.15rem] leading-snug tracking-[-0.01em] text-cream">{studio.legalName}</p>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8rem] text-mist">
+              <span className="tabular-nums font-medium text-cream">{googleReviews.rating.toFixed(1)}</span>
+              <GoogleStars rating={googleReviews.rating} />
+              <a
+                href={googleReviews.href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-gold-soft transition-colors duration-500 hover:text-gold"
+              >
+                Google reviews
+                <SquareArrowOutUpRight className="size-3 shrink-0" strokeWidth={1.5} aria-hidden />
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
             </p>
-          )}
+          </div>
         </div>
 
         <div className="lg:col-span-8 lg:col-start-5">
-          <span aria-hidden className="block font-display text-[clamp(5rem,10vw,9rem)] leading-[0.5] text-gold/70">“</span>
+          <span aria-hidden className="block font-display text-[clamp(5rem,10vw,9rem)] leading-[0.5] text-gold/70">
+            “
+          </span>
           <div className="relative min-h-[16rem] sm:min-h-[14rem]" aria-live="polite">
             <AnimatePresence mode="wait" custom={direction} initial={false}>
               <motion.figure
@@ -50,8 +106,8 @@ export function Testimonials({ index }: { index: string }) {
                 aria-label={`${current + 1} of ${testimonials.length}`}
               >
                 <blockquote className="display text-display-md text-balance text-cream">{item.quote}</blockquote>
-                <figcaption className="mt-10 flex items-center gap-4 text-sm">
-                  <span aria-hidden className="h-px w-10 bg-gold" />
+                <figcaption className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                  <span aria-hidden className="h-px w-10 shrink-0 bg-gold" />
                   <span className="text-cream">{item.attribution}</span>
                   <span className="text-cream/50">— {item.reference}</span>
                 </figcaption>
@@ -73,7 +129,9 @@ export function Testimonials({ index }: { index: string }) {
                   }}
                   className="group flex min-h-11 items-center"
                 >
-                  <span className={`block h-px transition-all duration-700 ${i === current ? 'w-12 bg-gold' : 'w-6 bg-cream/30 group-hover:bg-cream/60'}`} />
+                  <span
+                    className={`block h-px transition-all duration-700 ${i === current ? 'w-12 bg-gold' : 'w-6 bg-cream/30 group-hover:bg-cream/60'}`}
+                  />
                 </button>
               ))}
             </div>

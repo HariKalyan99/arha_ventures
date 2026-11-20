@@ -5,6 +5,7 @@ import { services } from '../../data/services'
 import { EASE_LUXE } from '../../lib/motion'
 import { useReveal } from '../../animations/reveal'
 import { useFinePointer } from '../../hooks/useMediaQuery'
+import { TakeOnBill } from '../bencho/folding-bill/TakeOnBill'
 import { Img } from '../ui/Img'
 import { SectionLabel } from '../ui/SectionLabel'
 import { Lines } from '../ui/Text'
@@ -16,26 +17,53 @@ interface ServicesProps {
   footer?: ReactNode
 }
 
+const DEFAULT_HEADING: ReactNode[] = ['What we', <TakeOnBill key="take-on" />]
+
 /** Editorial services index: the active service expands and a sticky frame crossfades to its image. */
-export function Services({ index, heading = ['What we', <em key="e">take on.</em>], intro, footer }: ServicesProps) {
+export function Services({ index, heading = DEFAULT_HEADING, intro, footer }: ServicesProps) {
   const ref = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const finePointer = useFinePointer()
   useReveal(ref)
   const current = services[active]
+  /* Folding bill spills past its box — don't clip the second headline line */
+  const interactiveTakeOn = heading === DEFAULT_HEADING
 
   return (
-    <section ref={ref} aria-labelledby="services-title" className="relative bg-espresso section-y">
-      <div className="shell">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-7">
+    <section
+      ref={ref}
+      aria-labelledby="services-title"
+      className={`relative surface-espresso section-y ${interactiveTakeOn ? 'overflow-visible' : ''}`}
+    >
+      <div className={`shell ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
+        <div className={`grid gap-10 lg:grid-cols-12 lg:items-end ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
+          <div className={`lg:col-span-7 ${interactiveTakeOn ? 'overflow-visible' : ''}`}>
             <SectionLabel index={index} label="Services" />
-            <h2 id="services-title" className="display mt-8 text-display-xl text-cream">
-              <Lines lines={heading} />
+            <h2
+              id="services-title"
+              className={`display mt-8 text-display-xl text-cream ${interactiveTakeOn ? 'relative z-20 overflow-visible' : ''}`}
+            >
+              {interactiveTakeOn ? (
+                <span data-reveal="lines" className="overflow-visible">
+                  <span className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+                    <span data-line className="block">
+                      What we
+                    </span>
+                  </span>{' '}
+                  {/* No extra padding — bill overlays the line so the intro stays beside the headline */}
+                  <span className="relative z-20 block overflow-visible pb-[0.1em] -mb-[0.1em]">
+                    <span data-line className="relative block overflow-visible">
+                      <TakeOnBill />
+                    </span>
+                  </span>
+                </span>
+              ) : (
+                <Lines lines={heading} />
+              )}
             </h2>
           </div>
           {intro && (
-            <p data-reveal="fade" className="text-cream/75 lg:col-span-4 lg:col-start-9">
+            <p data-reveal="fade" className="relative z-10 text-cream/60 lg:col-span-4 lg:col-start-9">
               {intro}
             </p>
           )}
@@ -44,7 +72,7 @@ export function Services({ index, heading = ['What we', <em key="e">take on.</em
         <div className="mt-[clamp(3.5rem,7vw,6rem)] grid gap-12 lg:grid-cols-12">
           <div className="hidden lg:col-span-5 lg:block">
             <div className="sticky top-[calc(var(--header-h)+2rem)]">
-              <div className="frame-ticks relative aspect-[4/5] overflow-hidden bg-obsidian">
+              <div className="frame-ticks media-grade relative aspect-[4/5] overflow-hidden bg-obsidian">
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={current.id}

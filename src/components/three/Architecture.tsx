@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { SLAT_WALLS } from '../../data/configurator'
 import { ROOM, useRoom } from './roomContext'
 
 const WIDTH = ROOM.maxX - ROOM.minX
@@ -129,7 +130,7 @@ function FeatureWall() {
 
   return (
     <group>
-      {finishes.wall === 'walnut-slats' ? (
+      {SLAT_WALLS.has(finishes.wall) ? (
         <Slats />
       ) : (
         <mesh position={[x + 0.02, ROOM.height / 2, CENTER_Z]} rotation-y={Math.PI / 2} material={lib.wall[finishes.wall]} receiveShadow>
@@ -165,9 +166,9 @@ function Fire({ position, size }: { position: [number, number, number]; size: [n
   )
 }
 
-/** Fluted walnut wall rendered as a single instanced mesh. */
+/** Fluted timber wall rendered as a single instanced mesh. */
 function Slats() {
-  const { lib } = useRoom()
+  const { lib, finishes } = useRoom()
   const ref = useRef<THREE.InstancedMesh>(null)
   const positions = useMemo(() => {
     const spacing = 0.085
@@ -178,6 +179,7 @@ function Slats() {
     }
     return out
   }, [])
+  const slatMaterial = SLAT_WALLS.has(finishes.wall) ? lib.wall[finishes.wall] : lib.wall['walnut-slats']
 
   useLayoutEffect(() => {
     const mesh = ref.current
@@ -191,7 +193,7 @@ function Slats() {
   }, [positions])
 
   return (
-    <instancedMesh ref={ref} args={[undefined, lib.wall['walnut-slats'], positions.length]} receiveShadow castShadow>
+    <instancedMesh key={finishes.wall} ref={ref} args={[undefined, slatMaterial, positions.length]} receiveShadow castShadow>
       <boxGeometry args={[0.05, ROOM.height, 0.045]} />
     </instancedMesh>
   )

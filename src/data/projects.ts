@@ -28,7 +28,7 @@ export const projects: Project[] = [
     materials: [
       { name: 'Honed limestone', application: 'Walls, floors, terrace', swatch: '#cbbfa9' },
       { name: 'Smoked oak', application: 'Ceilings and joinery', swatch: '#6b513b' },
-      { name: 'Bronze', application: 'Window frames and fixtures', swatch: '#7a5c3d' },
+      { name: 'Bronze', application: 'Window frames and fixtures', swatch: '#604a3b' },
       { name: 'Raw linen', application: 'Upholstery and drapery', swatch: '#d9cfbf' },
     ],
     rooms: [
@@ -69,7 +69,7 @@ export const projects: Project[] = [
       { name: 'Nero Marquina marble', application: 'Bath and kitchen surfaces', swatch: '#1d1c1b' },
       { name: 'American walnut', application: 'Wall panelling and joinery', swatch: '#5a3f2e' },
       { name: 'Smoked glass', application: 'Balustrades and partitions', swatch: '#3b3a37' },
-      { name: 'Brushed brass', application: 'Lighting and hardware', swatch: '#b49a73' },
+      { name: 'Brushed brass', application: 'Lighting and hardware', swatch: '#b69b75' },
     ],
     rooms: [
       { name: 'Dining', note: 'A twelve-seat table sits beneath the stair, lit by a single linear pendant.', image: media['dining-stair'] },
@@ -190,7 +190,7 @@ export const projects: Project[] = [
       { name: 'Dark-stained oak', application: 'Panelling and casegoods', swatch: '#3e2e23' },
       { name: 'Local limestone', application: 'Courtyards and baths', swatch: '#c9b99e' },
       { name: 'Hand-woven wool', application: 'Rugs and headboards', swatch: '#8d7a66' },
-      { name: 'Aged brass', application: 'Lighting and bar', swatch: '#a68a5f' },
+      { name: 'Aged brass', application: 'Lighting and bar', swatch: '#b69b75' },
     ],
     rooms: [
       { name: 'Suites', note: 'Dark timber panelling with soft, low bedside light.', image: media['hotel-suite'] },

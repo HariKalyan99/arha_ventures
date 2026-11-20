@@ -1,0 +1,36 @@
+/* ══ Particles ═════════════════════════════════════════════
+   Dots draw in the canvas `color` — espresso ink on light paper.
+   Shapes are authored centred in a 480×400 stage; below md we
+   shift the stage so the form shares a left edge with the copy. */
+.ptc {
+  position: relative;
+  display: grid;
+  place-items: start;
+  justify-items: start;
+  overflow: visible;
+  width: min(100%, clamp(15rem, 36vw, 20rem));
+  margin-inline: 0 auto;
+}
+
+.ptc-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 400;
+  color: var(--color-cream);
+  cursor: crosshair;
+  touch-action: none;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .ptc-canvas {
+    /* Circle/square sit ~19% in from the stage edge — pull flush to the copy */
+    transform: translateX(-19%);
+  }
+}
+
+/* Slightly tighter for inline headline overlays */
+.ptc--inline {
+  width: min(100%, clamp(11rem, 26vw, 15rem));
+}

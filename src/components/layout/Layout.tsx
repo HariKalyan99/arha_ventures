@@ -6,13 +6,12 @@ import { EASE_CURTAIN, EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
+import { CustomCursor } from '../ui/CustomCursor'
+import { PageLoader } from '../ui/PageLoader'
 
 function PageFallback() {
-  return (
-    <div className="flex h-svh items-center justify-center bg-obsidian" role="status">
-      <span className="eyebrow text-cream/50">Loading</span>
-    </div>
-  )
+  /* Paper hold — parchment boot is reserved for #boot / PageLoader only */
+  return <div className="min-h-svh bg-obsidian" role="status" aria-label="Loading" />
 }
 
 /** Resets scroll and re-measures scroll-linked animations once a new page has mounted. */
@@ -33,9 +32,13 @@ export function Layout() {
 
   return (
     <>
+      <PageLoader />
+      <CustomCursor />
+      {/* Sticky terracotta wash at the bottom of the frame */}
+      <div aria-hidden data-brand-vignette className="terracotta-vignette-bottom" />
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-gold focus:px-4 focus:py-3 focus:text-obsidian"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-terracotta focus:px-4 focus:py-3 focus:text-cream"
       >
         Skip to content
       </a>
@@ -55,10 +58,10 @@ export function Layout() {
             </main>
             <Footer />
           </motion.div>
-          {/* Gold hairline sweeps across as each page arrives */}
+          {/* Brand hairline sweeps across as each page arrives */}
           <motion.span
             aria-hidden
-            className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-px origin-left bg-gold"
+            className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-px origin-left bg-terracotta"
             initial={{ scaleX: 0, opacity: 1 }}
             animate={{ scaleX: 1, opacity: 0, transition: { scaleX: { duration: 1.1, ease: EASE_CURTAIN }, opacity: { delay: 0.9, duration: 0.5 } } }}
           />

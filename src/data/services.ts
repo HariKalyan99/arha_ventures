@@ -35,14 +35,14 @@ export const services: Service[] = [
     title: 'Space Planning',
     summary: 'Measured layouts that resolve circulation, light and storage before a single finish is chosen.',
     scope: ['Surveys', 'Layouts', 'Zoning'],
-    image: media['plans'],
+    image: media['drawing'],
   },
   {
     id: 'styling',
     title: 'Furniture & Styling',
     summary: 'Bespoke and sourced pieces, art and objects — curated so each room feels collected over time.',
     scope: ['Bespoke', 'Sourcing', 'Art curation'],
-    image: media['vessels'],
+    image: media['lounge-chairs'],
   },
   {
     id: 'materials',

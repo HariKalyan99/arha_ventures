@@ -21,7 +21,7 @@ export const processStages: ProcessStage[] = [
     title: 'Space Planning',
     summary: 'Measured layouts that test circulation, light and furniture at true scale before anything is specified.',
     deliverables: ['Measured survey', 'Layout options', 'Furniture plans'],
-    image: media['plans'],
+    image: media['stair-view'],
   },
   {
     id: 'materials',

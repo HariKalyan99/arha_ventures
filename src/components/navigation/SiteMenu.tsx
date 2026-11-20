@@ -104,7 +104,7 @@ export function SiteMenu({ open, onClose }: SiteMenuProps) {
                           <span className="eyebrow w-8 shrink-0 text-gold tabular-nums">{String(i + 1).padStart(2, '0')}</span>
                           <span
                             className={`display text-[clamp(2.2rem,6.5vw,5rem)] leading-[0.95] transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:translate-x-3 group-focus-visible:translate-x-3 motion-reduce:transition-none ${
-                              isActive ? 'text-gold-soft italic' : 'text-cream'
+                              isActive ? 'text-brass-soft italic' : 'text-cream'
                             }`}
                           >
                             {item.label}

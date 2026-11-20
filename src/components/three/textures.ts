@@ -152,9 +152,20 @@ const painters: Record<string, Painter> = {
     ctx.fillRect(0, 0, Math.max(1, s / 600), s)
   },
   oak: (ctx, s, rand) => planks(ctx, s, rand, { base: '#a47d53', dark: '#6f4f31', light: '#c09a6e', planksAcross: 6 }),
+  smokedOak: (ctx, s, rand) => planks(ctx, s, rand, { base: '#6a5744', dark: '#3f3228', light: '#85705a', planksAcross: 6 }),
   walnut: (ctx, s, rand) => planks(ctx, s, rand, { base: '#5b3f2c', dark: '#34231a', light: '#7a573d', planksAcross: 6 }),
   walnutGrain: (ctx, s, rand) => grain(ctx, s, rand, { base: '#563a28', dark: '#2f1f16', light: '#734f37' }),
   oakGrain: (ctx, s, rand) => grain(ctx, s, rand, { base: '#9f7a52', dark: '#6b4c30', light: '#bb966b' }),
+  limestone(ctx, s, rand) {
+    ctx.fillStyle = '#ddd2c2'
+    ctx.fillRect(0, 0, s, s)
+    mottle(ctx, s, rand, ['#cfc3b0', '#e8e0d2', '#c4b8a4'], 55, [0.06, 0.28], [0.18, 0.42])
+    for (let i = 0; i < 5; i++) vein(ctx, s, rand, '#b5a890', s * 0.003, 0.18, s * 0.004)
+    speckle(ctx, s, rand, 7)
+    ctx.fillStyle = 'rgba(130,118,100,0.28)'
+    ctx.fillRect(0, 0, s, Math.max(1, s / 650))
+    ctx.fillRect(0, 0, Math.max(1, s / 650), s)
+  },
   plaster(ctx, s, rand) {
     ctx.fillStyle = '#d8cfc1'
     ctx.fillRect(0, 0, s, s)
@@ -195,6 +206,31 @@ const painters: Record<string, Painter> = {
       ctx.stroke()
     }
   },
+  charcoalWool(ctx, s, rand) {
+    ctx.fillStyle = '#3a3835'
+    ctx.fillRect(0, 0, s, s)
+    mottle(ctx, s, rand, ['#2c2a27', '#4a4743', '#524f4a'], 70, [0.03, 0.14], [0.25, 0.5])
+    for (let i = 0; i < s * 10; i++) {
+      const x = rand() * s
+      const y = rand() * s
+      ctx.fillStyle = rand() > 0.5 ? 'rgba(90,86,80,0.35)' : 'rgba(20,18,16,0.3)'
+      ctx.fillRect(x, y, s * 0.004, s * 0.002)
+    }
+    speckle(ctx, s, rand, 10)
+  },
+  linen(ctx, s, rand) {
+    ctx.fillStyle = '#d2c4ae'
+    ctx.fillRect(0, 0, s, s)
+    for (let i = 0; i < s * 18; i++) {
+      const x = rand() * s
+      const y = rand() * s
+      ctx.fillStyle = rand() > 0.5 ? 'rgba(240,230,214,0.35)' : 'rgba(150,130,105,0.28)'
+      if (rand() > 0.5) ctx.fillRect(x, y, s * 0.01, s * 0.0018)
+      else ctx.fillRect(x, y, s * 0.0018, s * 0.01)
+    }
+    mottle(ctx, s, rand, ['#c4b49c', '#e0d4c0'], 30, [0.05, 0.18], [0.15, 0.3])
+    speckle(ctx, s, rand, 8)
+  },
   leather(ctx, s, rand) {
     ctx.fillStyle = '#8a4f2c'
     ctx.fillRect(0, 0, s, s)
@@ -206,6 +242,12 @@ const painters: Record<string, Painter> = {
     ctx.fillRect(0, 0, s, s)
     mottle(ctx, s, rand, ['#3b412b', '#5c6447'], 50, [0.05, 0.2], [0.2, 0.4])
     speckle(ctx, s, rand, 8)
+  },
+  inkVelvet(ctx, s, rand) {
+    ctx.fillStyle = '#1c2230'
+    ctx.fillRect(0, 0, s, s)
+    mottle(ctx, s, rand, ['#151820', '#2a3144', '#243048'], 55, [0.05, 0.2], [0.25, 0.45])
+    speckle(ctx, s, rand, 7)
   },
   rug(ctx, s, rand) {
     ctx.fillStyle = '#8f7f6c'

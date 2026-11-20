@@ -4,20 +4,36 @@
 @import 'tailwindcss';
 
 /* ------------------------------------------------------------------
-   Design tokens — Dark Opulent Luxury
+   Design tokens — Light Opulent Luxury · Terracotta Edition
+   Same brand pigments; surfaces inverted to warm paper.
+   Legacy names kept: cream = primary ink, parchment = warm fill.
    ------------------------------------------------------------------ */
 @theme {
-  --color-obsidian: #171716;
-  --color-ink: #10100f;
-  --color-espresso: #302722;
-  --color-walnut: #604b3b;
-  --color-gold: #b49a73;
-  --color-gold-soft: #cbb592;
-  --color-cream: #e8dfd0;
-  --color-mist: #a9a196;
-  --color-stone: #8a8176;
-  --color-line: rgb(232 223 208 / 0.14);
-  --color-danger: #d89a8a;
+  /* Paper surfaces (was near-black) */
+  --color-ink: #faf7f2;
+  --color-obsidian: #f3eee6;
+  --color-espresso: #ebe4da;
+  --color-bronze: #604a3b;
+  --color-walnut: #604a3b; /* alias → bronze */
+  /* Brand primary */
+  --color-terracotta: #934236;
+  --color-terracotta-soft: #b0796c;
+  /* Secondary metal — Antique Gold (deepened for light grounds) */
+  --color-brass: #9a7d58;
+  --color-brass-soft: #8a6f4e;
+  /* gold-* utilities = brand terracotta (legacy class names) */
+  --color-gold: #934236;
+  --color-gold-soft: #b0796c;
+  /* Primary text (legacy “cream” class → espresso ink on paper) */
+  --color-cream: #2a221e;
+  /* True warm cream fill — buttons, plates, hero type on media */
+  --color-parchment: #e8e0d2;
+  --color-mist: #7a7168;
+  --color-stone: #5c554e;
+  --color-line: rgb(42 34 30 / 0.12);
+  --color-danger: #b45c4c;
+  /* Text on parchment / cream plates (solid button hover, selected chips) */
+  --color-on-plate: #2a221e;
 
   --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', 'Times New Roman', serif;
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
@@ -31,6 +47,9 @@
   --text-display-lg--line-height: 0.98;
   --text-display-md: clamp(1.9rem, 1.25rem + 2.4vw, 4rem);
   --text-display-md--line-height: 1.04;
+  /* Hero title — steeper mobile ramp so the loft stays readable on small screens */
+  --text-display-hero: clamp(1.45rem, 0.72rem + 3.4vw, 4rem);
+  --text-display-hero--line-height: 1.08;
   --text-display-sm: clamp(1.5rem, 1.15rem + 1.2vw, 2.4rem);
   --text-display-sm--line-height: 1.12;
   --text-lead: clamp(1.05rem, 0.95rem + 0.35vw, 1.3rem);
@@ -55,7 +74,31 @@
     --gutter: clamp(1.25rem, 0.6rem + 3.2vw, 4.5rem);
     --section-y: clamp(6rem, 4rem + 9vw, 13rem);
     --header-h: clamp(4.25rem, 3.8rem + 1.2vw, 5.5rem);
+    color-scheme: light;
+  }
+
+  /* Dark Opulent Luxury — earlier site plate (toggle via data-theme) */
+  html[data-theme='dark'] {
     color-scheme: dark;
+    --color-ink: #111111;
+    --color-obsidian: #171717;
+    --color-espresso: #2d2420;
+    --color-bronze: #604a3b;
+    --color-walnut: #604a3b;
+    --color-terracotta: #934236;
+    --color-terracotta-soft: #b0796c;
+    --color-brass: #b69b75;
+    --color-brass-soft: #c9b28f;
+    --color-gold: #934236;
+    --color-gold-soft: #b0796c;
+    /* cream = warm type on dark grounds again */
+    --color-cream: #e8e0d2;
+    --color-parchment: #e8e0d2;
+    --color-mist: #a89f93;
+    --color-stone: #8a8176;
+    --color-line: rgb(232 224 210 / 0.14);
+    --color-danger: #d89a8a;
+    --color-on-plate: #111111;
   }
 
   html {
@@ -84,15 +127,94 @@
     line-height: 1.6;
     overflow-x: clip;
     min-height: 100svh;
+    background: var(--color-ink);
+  }
+
+  html.is-booting,
+  html.is-booting body {
+    overflow: hidden;
+  }
+
+  /* Route-change loader — mirrors the first-paint #boot screen */
+  .page-loader-mark {
+    animation: boot-rise 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .page-loader-dots {
+    opacity: 0;
+    animation: boot-dots-in 0.65s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
+  }
+
+  .page-loader-dots span {
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-terracotta);
+    animation: boot-dot 1.25s ease-in-out infinite;
+  }
+
+  .page-loader-dots span:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+
+  .page-loader-dots span:nth-child(3) {
+    animation-delay: 0.36s;
+  }
+
+  @keyframes boot-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 3.25rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes boot-dots-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes boot-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.28;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader-mark {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+    .page-loader-dots {
+      animation: none;
+      opacity: 1;
+    }
+    .page-loader-dots span {
+      animation: none;
+      opacity: 0.7;
+    }
   }
 
   ::selection {
-    background: var(--color-gold);
-    color: var(--color-obsidian);
+    background: var(--color-terracotta);
+    color: var(--color-parchment);
   }
 
   :focus-visible {
-    outline: 1px solid var(--color-gold);
+    outline: 1px solid var(--color-terracotta);
     outline-offset: 4px;
   }
 
@@ -103,6 +225,18 @@
 
   button {
     cursor: pointer;
+  }
+
+  /* Dual-ring custom cursor — fine pointer only (class toggled by CustomCursor) */
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [contenteditable='true'] {
+    cursor: text !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -153,15 +287,95 @@
 }
 
 @layer components {
-  /* Film grain over the whole experience — purely decorative */
+  /* Film grain — quiet static overlay (no cursor coupling) */
   .grain::after {
     content: '';
     position: fixed;
     inset: -50%;
     z-index: 90;
     pointer-events: none;
-    opacity: 0.055;
+    opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Google rating stars — shine only the filled portion (keeps partials readable) */
+  @keyframes google-star-shine {
+    0%,
+    12%,
+    100% {
+      filter: brightness(0.95) drop-shadow(0 0 0 transparent);
+    }
+    4%,
+    8% {
+      filter: brightness(1.35) drop-shadow(0 0 6px rgb(245 180 0 / 0.75));
+    }
+  }
+
+  .google-star-fill {
+    animation: google-star-shine 2.5s ease-in-out infinite;
+    animation-delay: calc(var(--star-i, 0) * 0.5s);
+    will-change: filter;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .google-star-fill {
+      animation: none;
+      filter: none;
+    }
+  }
+
+  /* Sticky terracotta vignette — soft brand wash pinned to the bottom edge */
+  .terracotta-vignette-bottom {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 55;
+    height: min(58vh, 28rem);
+    pointer-events: none;
+    background:
+      radial-gradient(140% 120% at 50% 110%, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.12) 34%, rgba(147, 66, 54, 0.04) 62%, transparent 78%),
+      linear-gradient(0deg, rgba(147, 66, 54, 0.18) 0%, rgba(147, 66, 54, 0.08) 40%, rgba(147, 66, 54, 0.02) 68%, transparent 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.85;
+    transform: scaleY(1);
+    transform-origin: bottom center;
+    transition:
+      opacity 0.75s var(--ease-luxe),
+      transform 0.75s var(--ease-luxe);
+    will-change: opacity, transform;
+  }
+
+  /* Shake inhale — quick brighten, then the long transition exhales */
+  .terracotta-vignette-bottom.is-inhaling {
+    opacity: 1;
+    transform: scaleY(1.1);
+    transition-duration: 0.2s;
+  }
+
+  html[data-theme='dark'] .terracotta-vignette-bottom {
+    mix-blend-mode: soft-light;
+    opacity: 0.7;
+    background:
+      radial-gradient(140% 120% at 50% 110%, rgba(147, 66, 54, 0.42) 0%, rgba(147, 66, 54, 0.18) 34%, rgba(147, 66, 54, 0.06) 62%, transparent 78%),
+      linear-gradient(0deg, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.12) 40%, rgba(147, 66, 54, 0.03) 68%, transparent 100%);
+  }
+
+  html[data-theme='dark'] .terracotta-vignette-bottom.is-inhaling {
+    opacity: 0.95;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .terracotta-vignette-bottom,
+    .terracotta-vignette-bottom.is-inhaling {
+      transition: none;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce), (pointer: coarse) {
+    .grain::after {
+      opacity: 0.05;
+    }
   }
 
   .display {
@@ -174,7 +388,45 @@
   .display i {
     font-style: italic;
     font-weight: 300;
-    color: var(--color-gold-soft);
+    /* Secondary metal — quieter than brand terracotta */
+    color: var(--color-brass-soft);
+  }
+
+  /* Soft veil for display type over photography / 3D — not a sitewide glow */
+  .display-on-media {
+    text-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.45),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Quiet section fields — flat warm paper (no edge vignette) */
+  .surface-ink {
+    background: var(--color-ink);
+  }
+  .surface-obsidian {
+    background: var(--color-obsidian);
+  }
+  .surface-espresso {
+    background: var(--color-espresso);
+  }
+
+  /* Warm grade + edge vignette for editorial imagery */
+  .media-grade {
+    position: relative;
+    isolation: isolate;
+  }
+  .media-grade img {
+    filter: saturate(0.92) contrast(1.04) brightness(1.01);
+  }
+  .media-grade::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(to top, rgba(42, 34, 30, 0.12), transparent 38%),
+      radial-gradient(120% 95% at 50% 40%, transparent 42%, rgba(42, 34, 30, 0.14) 100%);
   }
 
   /* Underline-on-hover links */
@@ -211,7 +463,7 @@
     position: absolute;
     width: 14px;
     height: 14px;
-    border-color: var(--color-gold);
+    border-color: var(--color-terracotta);
     pointer-events: none;
     z-index: 2;
   }
@@ -247,14 +499,14 @@
     transition: border-color 0.4s var(--ease-luxe);
   }
   .field-input::placeholder {
-    color: rgb(232 223 208 / 0.32);
+    color: rgb(42 34 30 / 0.35);
   }
   .field-input:hover {
-    border-bottom-color: rgb(232 223 208 / 0.32);
+    border-bottom-color: rgb(42 34 30 / 0.28);
   }
   .field-input:focus {
     outline: none;
-    border-bottom-color: var(--color-gold);
+    border-bottom-color: var(--color-terracotta);
   }
   .field-input:focus-visible {
     outline: none;
@@ -264,8 +516,8 @@
   }
   select.field-input {
     appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, var(--color-gold) 50%),
-      linear-gradient(135deg, var(--color-gold) 50%, transparent 50%);
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-terracotta) 50%),
+      linear-gradient(135deg, var(--color-terracotta) 50%, transparent 50%);
     background-position:
       calc(100% - 10px) 55%,
       calc(100% - 5px) 55%;
@@ -323,4 +575,95 @@
   .animate-loading-bar {
     animation: loading-bar 1.6s var(--ease-curtain) infinite;
   }
+
+  /* Footer wordmark — each letter grows on hover, shrinks on leave (no loop) */
+  .footer-mark {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .footer-mark-letter {
+    display: inline-block;
+    transform-origin: 50% 70%;
+    will-change: transform;
+    transition:
+      transform 0.65s ease-in-out,
+      color 0.65s ease-in-out;
+  }
+
+  .footer-mark-letter:hover {
+    transform: scale(1.12);
+    color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  }
+
+  html[data-theme='dark'] .footer-mark-letter:hover {
+    color: rgb(232 224 210 / 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-mark-letter {
+      transition: none;
+    }
+    .footer-mark-letter:hover {
+      transform: none;
+      color: color-mix(in srgb, var(--color-cream) 16%, transparent);
+    }
+  }
+}
+
+/* OpenFreeMap (MapLibre) embed on Contact — follows site theme */
+.studio-map.maplibregl-map {
+  background: var(--color-obsidian);
+  font: inherit;
+}
+
+.studio-map .maplibregl-ctrl-group {
+  background: color-mix(in srgb, var(--color-ink) 94%, transparent);
+  border: 1px solid var(--color-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.studio-map .maplibregl-ctrl-group button {
+  width: 2rem;
+  height: 2rem;
+}
+
+.studio-map .maplibregl-ctrl-group button + button {
+  border-top-color: var(--color-line);
+}
+
+.studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  filter: none;
+}
+
+html[data-theme='dark'] .studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+html[data-theme='dark'] .studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.1);
+}
+
+.studio-map .maplibregl-ctrl-attrib {
+  background: color-mix(in srgb, var(--color-ink) 85%, transparent);
+  color: color-mix(in srgb, var(--color-cream) 50%, transparent);
+  font-size: 0.55rem;
+}
+
+.studio-map .maplibregl-ctrl-attrib a {
+  color: rgb(147 66 54 / 0.9);
+}
+
+.studio-map-popup .maplibregl-popup-content {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  border-radius: 0;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.28);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.studio-map-popup .maplibregl-popup-tip {
+  border-top-color: var(--color-ink);
 }

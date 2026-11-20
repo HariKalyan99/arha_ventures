@@ -79,7 +79,7 @@ export function ProjectIndex() {
                   <Img media={project.cover} alt="" className="size-full object-cover" sizes="6rem" />
                 </span>
                 <span className="flex flex-col gap-1">
-                  <span className="display text-[clamp(1.6rem,1.1rem+2vw,3.25rem)] leading-tight text-cream transition-[color,transform] duration-700 ease-[var(--ease-luxe)] group-hover:translate-x-2 group-hover:text-gold-soft">
+                  <span className="display text-[clamp(1.6rem,1.1rem+2vw,3.25rem)] leading-tight text-cream transition-[color,transform] duration-700 ease-[var(--ease-luxe)] group-hover:translate-x-2 group-hover:text-brass-soft">
                     {project.title}
                   </span>
                   <span className="eyebrow text-cream/55 lg:hidden">

@@ -4,6 +4,7 @@ import { ArrowUp } from 'lucide-react'
 import { legalNavigation, navigation, studio } from '../../data/site'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { useReveal } from '../../animations/reveal'
+import { Particles } from '../bencho/particles/Particles'
 import { ArrowLink } from '../ui/ArrowButton'
 import { Lines } from '../ui/Text'
 
@@ -15,16 +16,19 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer ref={ref} className="relative overflow-hidden bg-ink">
+    <footer ref={ref} className="relative overflow-hidden surface-ink">
       {pathname !== '/contact' && !pathname.startsWith('/projects/') && (
-        <div className="shell section-y border-b border-line">
-          <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+        <div className="shell section-y overflow-visible border-b border-line">
+          <div className="grid gap-10 overflow-visible lg:grid-cols-12 lg:items-end">
             <p className="eyebrow text-gold lg:col-span-12">Begin</p>
             <h2 className="display text-display-xl text-cream lg:col-span-8">
               <Lines lines={['Have a space', <>in <em>mind?</em></>]} />
             </h2>
-            <div data-reveal="fade" className="flex flex-col gap-6 lg:col-span-4">
-              <p className="text-cream/75">
+            <div data-reveal="fade" className="relative z-10 flex flex-col items-start gap-6 overflow-visible lg:col-span-4">
+              <div className="w-full max-w-[min(100%,20rem)] self-start" aria-hidden>
+                <Particles shape="Circle" grain="Fine" reach={80} force={60} />
+              </div>
+              <p className="text-cream/60">
                 Tell us about the place, the people who will live in it, and what you hope it will feel like. We reply to every enquiry personally.
               </p>
               <ArrowLink to="/contact" variant="solid" className="self-start">
@@ -86,10 +90,14 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark, cropped by the page edge */}
-      <div aria-hidden className="pointer-events-none select-none px-[var(--gutter)]">
-        <p className="font-display text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.06]">
-          {studio.name}
+      {/* Oversized wordmark — each letter grows / shrinks once on hover */}
+      <div className="select-none px-[var(--gutter)]" aria-hidden>
+        <p className="footer-mark font-display cursor-default text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.07]">
+          {studio.name.split('').map((char, i) => (
+            <span key={`${char}-${i}`} className="footer-mark-letter">
+              {char}
+            </span>
+          ))}
         </p>
       </div>
 
@@ -98,9 +106,9 @@ export function Footer() {
           © {year} {studio.legalName}. All rights reserved.
         </p>
         {studio.contactIsPlaceholder && (
-          <p className="text-gold/80">Projects, testimonials, journal entries and contact details are sample content.</p>
+          <p className="text-gold/80">Projects, journal entries and studio email are still sample content.</p>
         )}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {legalNavigation.map((item) => (
             <Link key={item.to} to={item.to} className="link-line hover:text-cream">
               {item.label}

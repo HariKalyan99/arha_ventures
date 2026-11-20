@@ -5,15 +5,19 @@ import * as THREE from 'three'
 import type { LightingMood, RoomFinishes, RoomView } from '../../data/configurator'
 import type { QualityTier } from '../../lib/device'
 import { RoomScene } from './RoomScene'
+import { ATELIER_ROOM_SOURCE } from './roomSource'
 import { SceneCanvas } from './SceneCanvas'
 
-/** Camera position and look-at target for each named view. */
+/** Camera position and look-at target for each named view (procedural atelier room). */
 const views: Record<RoomView, { position: [number, number, number]; target: [number, number, number] }> = {
   lounge: { position: [3.2, 1.75, 4.3], target: [-1.6, 0.85, -1.1] },
   hearth: { position: [1.7, 1.45, 1.6], target: [-5, 1.0, -0.6] },
   dining: { position: [0.1, 1.6, 1.9], target: [3.6, 0.85, -1.4] },
   terrace: { position: [-0.6, 1.5, 3.4], target: [1.6, 1.15, -8] },
 }
+
+const boundary = new THREE.Box3(new THREE.Vector3(-4.6, 0.35, -3.7), new THREE.Vector3(4.6, 3.0, 4.8))
+const maxDistance = 7
 
 interface ConfiguratorSceneProps {
   finishes: RoomFinishes
@@ -54,14 +58,14 @@ function ViewController({ view, viewRequest, interactive, controlsRef }: Pick<Co
     controls.touches.two = ACTION.TOUCH_DOLLY_TRUCK
     controls.touches.three = ACTION.NONE
     controls.minDistance = 0.8
-    controls.maxDistance = 7
+    controls.maxDistance = maxDistance
     controls.minPolarAngle = Math.PI * 0.3
     controls.maxPolarAngle = Math.PI * 0.56
     controls.smoothTime = 0.45
     controls.draggingSmoothTime = 0.18
     // Keep both the camera and its target inside the room shell.
     controls.boundaryEnclosesCamera = true
-    controls.setBoundary(new THREE.Box3(new THREE.Vector3(-4.6, 0.35, -3.7), new THREE.Vector3(4.6, 3.0, 4.8)))
+    controls.setBoundary(boundary)
     return () => {
       controlsRef.current = null
     }
@@ -86,7 +90,7 @@ export default function ConfiguratorScene({ finishes, mood, view, viewRequest, t
   return (
     <SceneCanvas tier={tier} active={active} onReady={onReady}>
       <ViewController view={view} viewRequest={viewRequest} interactive={interactive} controlsRef={controlsRef} />
-      <RoomScene finishes={finishes} mood={mood} tier={tier} />
+      <RoomScene finishes={finishes} mood={mood} tier={tier} source={ATELIER_ROOM_SOURCE} />
     </SceneCanvas>
   )
 }

@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router'
 import { ArrowUpRight } from 'lucide-react'
+import { Magnetic } from './Magnetic'
 
 type Variant = 'solid' | 'outline' | 'ghost'
 
@@ -8,11 +9,12 @@ const base =
   'group relative inline-flex min-h-12 items-center disabled:cursor-not-allowed disabled:opacity-50'
 
 const variants: Record<Variant, string> = {
-  // Vertical padding lives on the roll lines so the mask height stays exact (one label tall).
-  solid: 'overflow-hidden bg-gold px-6 text-obsidian hover:bg-cream focus-visible:bg-cream',
+  // Soft relief (restrained neumorphism) — dual light/dark shadows, pressed on active. No pill rounding.
+  solid:
+    'overflow-hidden bg-terracotta px-6 text-parchment transition-[background-color,box-shadow,color,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),5px_5px_12px_rgba(42,34,30,0.18),-4px_-4px_10px_rgba(255,255,255,0.65)] hover:bg-parchment hover:text-on-plate hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.7),6px_6px_14px_rgba(42,34,30,0.14),-5px_-5px_12px_rgba(255,255,255,0.85)] active:translate-y-px active:shadow-[inset_4px_4px_10px_rgba(96,74,59,0.22),inset_-3px_-3px_8px_rgba(255,255,255,0.55)] focus-visible:bg-parchment focus-visible:text-on-plate',
   outline:
-    'overflow-hidden border border-gold/60 px-6 text-cream hover:border-gold focus-visible:border-gold',
-  ghost: 'px-0 text-cream hover:text-gold focus-visible:text-gold',
+    'overflow-hidden border border-terracotta/45 bg-obsidian px-6 text-cream transition-[border-color,background-color,box-shadow,transform] duration-500 ease-[var(--ease-luxe)] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),4px_4px_12px_rgba(42,34,30,0.1),-3px_-3px_8px_rgba(255,255,255,0.7)] hover:border-terracotta hover:bg-espresso hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.65),5px_5px_14px_rgba(42,34,30,0.12),-4px_-4px_10px_rgba(255,255,255,0.8)] active:translate-y-px active:shadow-[inset_3px_3px_10px_rgba(42,34,30,0.12),inset_-2px_-2px_6px_rgba(255,255,255,0.7)] focus-visible:border-terracotta',
+  ghost: 'px-0 text-cream hover:text-terracotta focus-visible:text-terracotta',
 }
 
 function ArrowIcon({ className = '' }: { className?: string }) {
@@ -31,7 +33,7 @@ function Inner({ children, variant }: { children: ReactNode; variant: Variant })
           {children}
           <span
             aria-hidden
-            className="absolute inset-x-0 -bottom-[0.2em] h-px origin-left scale-x-0 bg-gold transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
+            className="absolute inset-x-0 -bottom-[0.2em] h-px origin-left scale-x-0 bg-terracotta transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
           />
         </span>
         <ArrowIcon className="transition-transform duration-700 ease-[var(--ease-luxe)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-focus-visible:translate-x-0.5 group-focus-visible:-translate-y-0.5 motion-reduce:transition-none" />
@@ -64,12 +66,14 @@ interface ArrowButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
 }
 
-export function ArrowButton({ variant = 'outline', className = '', children, ...rest }: ArrowButtonProps) {
-  return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...rest}>
+export function ArrowButton({ variant = 'outline', className = '', children, disabled, ...rest }: ArrowButtonProps) {
+  const el = (
+    <button className={`${base} ${variants[variant]} ${className}`} disabled={disabled} {...rest}>
       <Inner variant={variant}>{children}</Inner>
     </button>
   )
+  if (variant === 'ghost' || disabled) return el
+  return <Magnetic strength={0.26}>{el}</Magnetic>
 }
 
 interface ArrowLinkProps {
@@ -80,9 +84,11 @@ interface ArrowLinkProps {
 }
 
 export function ArrowLink({ to, variant = 'outline', className = '', children }: ArrowLinkProps) {
-  return (
+  const el = (
     <Link to={to} className={`${base} ${variants[variant]} ${className}`}>
       <Inner variant={variant}>{children}</Inner>
     </Link>
   )
+  if (variant === 'ghost') return el
+  return <Magnetic strength={0.26}>{el}</Magnetic>
 }

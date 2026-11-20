@@ -39,6 +39,8 @@ export interface StudioConfig {
   email: string
   phone: string
   location: string
+  /** WGS84 for the studio map pin */
+  coordinates: { lat: number; lng: number }
   hours: string
   socials: SocialLink[]
   /** True while contact details are placeholders. Shows a visible notice in the UI. */
