@@ -27,23 +27,23 @@ const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z)
 
 export const moods: Record<LightingMood, MoodParams> = {
   daylight: {
-    /* Soft daylight — clear windows, warm midtones (held short of white clip) */
-    sunColor: c('#fff1dc'),
-    sunIntensity: 3.2,
-    sunPosition: v(8, 13.5, -8.5),
-    hemiSky: c('#dce4ea'),
-    hemiGround: c('#b09a7e'),
-    hemiIntensity: 1.15,
-    envIntensity: 0.88,
-    exposure: 1.05,
-    lamp: 0.1,
-    fire: 0.22,
-    skyTop: c('#96b2cc'),
-    skyHorizon: c('#eee6da'),
-    skyGlow: c('#fff6e8'),
-    glowStrength: 0.22,
-    sea: c('#547282'),
-    pool: 0.04,
+    /* Soft daylight — warm midtones, controlled highlights (no white clip) */
+    sunColor: c('#ffe8c8'),
+    sunIntensity: 2.2,
+    sunPosition: v(8, 13, -9),
+    hemiSky: c('#cfd8e0'),
+    hemiGround: c('#9a866c'),
+    hemiIntensity: 0.85,
+    envIntensity: 0.62,
+    exposure: 0.92,
+    lamp: 0.14,
+    fire: 0.25,
+    skyTop: c('#8aa8c4'),
+    skyHorizon: c('#e6dfd2'),
+    skyGlow: c('#fff1d6'),
+    glowStrength: 0.25,
+    sea: c('#4d6670'),
+    pool: 0.05,
   },
   evening: {
     /* Warm dusk — soft gold, lamps beginning to carry */

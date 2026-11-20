@@ -15,12 +15,8 @@ export const ATELIER_ROOM_SOURCE: RoomSource = 'procedural'
 export const ROOM_SOURCE: RoomSource = HERO_ROOM_SOURCE
 
 /**
- * Active hero model — meshopt + WebP optimized.
- * City exterior meshes are still stripped at load.
- *
- * Re-optimize with palette OFF (palette + quantized UVs crush glass/walls):
- *   npx @gltf-transform/cli optimize free_loft_17.glb free_loft_17.opt.glb \
- *     --compress meshopt --texture-compress webp --palette false
+ * Active hero model — free loft (city exterior meshes are stripped at load).
+ * Alternatives: '/models/loft_interior_6_for_free.glb' | '/models/living_room_interior_free_v2.glb'
  */
 export const LIVING_ROOM_GLB = '/models/free_loft_17.glb'
 

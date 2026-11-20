@@ -59,7 +59,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     if (sun.current) {
       sun.current.color.copy(m.sunColor)
-      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.95)
+      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.88)
       sun.current.position.copy(m.sunPosition).multiplyScalar(1.1)
     }
     if (windowKey.current) {
@@ -67,19 +67,19 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         windowKey.current.color.copy(m.sunColor).lerp(coolFill.current, 0.5)
         windowKey.current.intensity = THREE.MathUtils.lerp(1.1, 0.55, lamp)
       } else {
-        /* Day: window key carries the daylight read through the glazing. */
-        windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.42)
-        windowKey.current.intensity = THREE.MathUtils.lerp(2.05, 0.9, lamp)
+        /* Day: directional window key — warm, not a white flood. */
+        windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.5)
+        windowKey.current.intensity = THREE.MathUtils.lerp(1.45, 0.85, lamp)
       }
     }
     if (hemi.current) {
       hemi.current.color.copy(m.hemiSky)
       hemi.current.groundColor.copy(m.hemiGround)
-      hemi.current.intensity = m.hemiIntensity * (ink ? 1.05 : 1.2)
+      hemi.current.intensity = m.hemiIntensity * (ink ? 1.05 : 1.15)
     }
     if (ambient.current) {
-      ambient.current.intensity = ink ? 0.22 : THREE.MathUtils.lerp(0.52, 0.32, lamp)
-      ambient.current.color.set(ink ? '#1c222e' : '#e8dcc8')
+      ambient.current.intensity = ink ? 0.22 : THREE.MathUtils.lerp(0.38, 0.28, lamp)
+      ambient.current.color.set(ink ? '#1c222e' : '#e2d4c2')
     }
 
     /* Day keeps lamps quiet; night leans on them. */
@@ -102,8 +102,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     scene.environmentIntensity = ink
       ? Math.max(0.7, m.envIntensity * 1.35)
-      : Math.max(0.62, m.envIntensity * 1.15)
-    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.1)
+      : Math.max(0.48, m.envIntensity * 0.95)
+    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.0)
   })
 
   return (
@@ -146,11 +146,11 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         </Environment>
       ) : (
         <Environment frames={1} resolution={384} key="env-day">
-          <Lightformer form="rect" intensity={4.2} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f4eadc" />
-          <Lightformer form="rect" intensity={2.1} position={[-7, 2.8, 2]} scale={[3, 8, 1]} color="#d4c4aa" />
-          <Lightformer form="rect" intensity={1.2} position={[7, 2.4, 1]} scale={[3, 7, 1]} color="#dccab4" />
-          <Lightformer form="ring" intensity={1.0} position={[0, 7, 0]} scale={10} color="#ece4d6" />
-          <Lightformer form="rect" intensity={0.45} position={[0, 1, 8]} scale={[12, 4, 1]} color="#6a5444" />
+          <Lightformer form="rect" intensity={3.2} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
+          <Lightformer form="rect" intensity={1.4} position={[-7, 2.8, 2]} scale={[3, 8, 1]} color="#c8b49a" />
+          <Lightformer form="rect" intensity={0.95} position={[7, 2.4, 1]} scale={[3, 7, 1]} color="#d4c0a8" />
+          <Lightformer form="ring" intensity={0.7} position={[0, 7, 0]} scale={10} color="#e8e0d2" />
+          <Lightformer form="rect" intensity={0.4} position={[0, 1, 8]} scale={[12, 4, 1]} color="#604a3b" />
         </Environment>
       )}
     </>

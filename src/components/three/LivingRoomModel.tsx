@@ -41,13 +41,13 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Beyond the glass — daylight sky bounce for Day, cooler ink for Night. */
+/** Beyond the glass — warm day bounce (not white), cooler ink for Night. */
 function InteriorEnclosure({ noir }: { noir: boolean }) {
-  const shell = noir ? '#0a0a0e' : '#2e2822'
-  const far = noir ? '#12151e' : '#c5d0dc'
-  const left = noir ? '#0e1016' : '#4a4036'
-  const right = noir ? '#0c0e14' : '#433a32'
-  const near = noir ? '#08090c' : '#2a2420'
+  const shell = noir ? '#0a0a0e' : '#2a2420'
+  const far = noir ? '#12151e' : '#6a7a8c'
+  const left = noir ? '#0e1016' : '#3d342c'
+  const right = noir ? '#0c0e14' : '#352e28'
+  const near = noir ? '#08090c' : '#221e1a'
 
   return (
     <group>
@@ -126,32 +126,30 @@ function applyNoirLook(std: THREE.MeshStandardMaterial) {
 
 function applyDayLook(std: THREE.MeshStandardMaterial) {
   const next = std.clone() as THREE.MeshStandardMaterial
-  /* Lift the near-black loft plate so daylight can read — hold short of white clip. */
-  next.color.lerp(new THREE.Color('#f2ebe2'), 0.07)
-  next.color.multiplyScalar(1.05)
-  next.envMapIntensity = Math.min(1.15, Math.max(0.7, (next.envMapIntensity ?? 1) * 1.05))
+  /* Keep albedo honest — dull hot speculars so daylight doesn’t clip white. */
+  next.envMapIntensity = Math.min(0.85, Math.max(0.55, (next.envMapIntensity ?? 1) * 0.82))
   if (typeof next.roughness === 'number') {
-    next.roughness = Math.min(1, Math.max(0.24, next.roughness * 0.98))
+    next.roughness = Math.min(1, Math.max(0.28, next.roughness * 1.04))
   }
-  if (next.metalness < 0.35 && typeof next.roughness === 'number' && next.roughness < 0.4) {
-    next.roughness = Math.min(0.55, next.roughness + 0.08)
+  if (next.metalness < 0.35 && typeof next.roughness === 'number' && next.roughness < 0.45) {
+    next.roughness = Math.min(0.62, next.roughness + 0.12)
   }
 
   if (next.metalness > 0.55) {
     const goldish = next.color.r > 0.4 && next.color.g > 0.28 && next.color.b < 0.26
     if (goldish) {
       next.metalness = Math.min(next.metalness, 0.72)
-      next.roughness = Math.max(next.roughness, 0.3)
-      next.color.multiplyScalar(0.92)
-      next.envMapIntensity = Math.min(next.envMapIntensity, 0.95)
+      next.roughness = Math.max(next.roughness, 0.32)
+      next.color.multiplyScalar(0.9)
+      next.envMapIntensity = Math.min(next.envMapIntensity, 0.8)
     }
   }
 
   if (next.name === 'Material.001' || next.name === 'Material.006') {
-    next.color.set(next.map ? '#a39a90' : '#aea69c')
-    next.roughness = Math.max(next.roughness, 0.78)
+    next.color.set(next.map ? '#948c82' : '#a09890')
+    next.roughness = Math.max(next.roughness, 0.82)
     next.metalness = 0
-    next.envMapIntensity = Math.min(next.envMapIntensity, 0.45)
+    next.envMapIntensity = Math.min(next.envMapIntensity, 0.35)
     if ('emissive' in next) next.emissive.set('#000000')
   }
 
@@ -169,8 +167,7 @@ interface LivingRoomModelProps {
  * Night deepens toward black with a quiet sheen (still fully readable).
  */
 export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
-  /* false, true = skip Draco CDN; Meshopt decoder for compressed loft GLB */
-  const { scene, animations } = useGLTF(LIVING_ROOM_GLB, false, true)
+  const { scene, animations } = useGLTF(LIVING_ROOM_GLB)
   const root = useRef<THREE.Group>(null)
 
   const prepared = useMemo(() => {
@@ -239,4 +236,4 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
   )
 }
 
-useGLTF.preload(LIVING_ROOM_GLB, false, true)
+useGLTF.preload(LIVING_ROOM_GLB)
