@@ -44,7 +44,7 @@ export function BootLoader() {
     const started = performance.now()
 
     try {
-      useGLTF.preload(LIVING_ROOM_GLB)
+      useGLTF.preload(LIVING_ROOM_GLB, false, true)
     } catch {
       /* preload is best-effort */
     }

@@ -84,9 +84,13 @@ export function TakeOnBill() {
 
       const pr = phrase.getBoundingClientRect()
       const sr = stage.getBoundingClientRect()
-      /* Cover ~viewport-worth of the stage so the sheet can travel freely. */
+      /* Cover ~viewport-worth of the stage so the sheet can travel freely.
+         Cap below lg — oversized spill canvases widen the document on phones/tablets. */
       const cover = Math.max(sr.width / Math.max(nextW, 1), Math.min(sr.height, vw * 1.2) / Math.max(nextH, 1))
-      const spill = Math.round(Math.min(10, Math.max(7, cover)) * 10) / 10
+      const spill =
+        vw < 1024
+          ? Math.round(Math.min(2.4, Math.max(1.6, cover * 0.35)) * 10) / 10
+          : Math.round(Math.min(10, Math.max(7, cover)) * 10) / 10
 
       const left = pr.left - sr.left + pr.width / 2
       const top = pr.top - sr.top + pr.height / 2

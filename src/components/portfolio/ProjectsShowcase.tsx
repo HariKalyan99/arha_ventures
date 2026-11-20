@@ -86,7 +86,7 @@ export function ProjectsShowcase() {
   }
 
   return (
-    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative surface-ink">
+    <section ref={section} id="projects" aria-labelledby="projects-title" className="relative z-10 surface-ink">
       <div className="shell section-y pb-[clamp(3rem,6vw,6rem)]">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">

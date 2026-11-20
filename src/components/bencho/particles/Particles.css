@@ -7,7 +7,7 @@
   display: grid;
   place-items: start;
   justify-items: start;
-  overflow: visible;
+  overflow: hidden;
   width: min(100%, clamp(15rem, 36vw, 20rem));
   margin-inline: 0 auto;
 }
@@ -25,7 +25,8 @@
 
 @media (max-width: 767px) {
   .ptc-canvas {
-    /* Circle/square sit ~19% in from the stage edge — pull flush to the copy */
+    /* Circle/square sit ~19% in from the stage edge — pull flush to the copy.
+       Parent overflow:hidden clips so this shift cannot widen the page. */
     transform: translateX(-19%);
   }
 }

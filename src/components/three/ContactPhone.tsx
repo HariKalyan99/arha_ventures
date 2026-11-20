@@ -25,7 +25,8 @@ const HOVER_AMP = 0.055
 export function ContactPhone() {
   const group = useRef<THREE.Group>(null)
   const navigate = useNavigate()
-  const { scene } = useGLTF(PHONE_GLB)
+  /* Loaded only when the loft Suspense mounts — no eager preload (~0.8 MB meshopt). */
+  const { scene } = useGLTF(PHONE_GLB, false, true)
 
   const phone = useMemo(() => {
     const root = scene.clone(true)
@@ -98,4 +99,3 @@ export function ContactPhone() {
   )
 }
 
-useGLTF.preload(PHONE_GLB)
