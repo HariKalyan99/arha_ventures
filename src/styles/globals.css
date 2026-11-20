@@ -278,6 +278,35 @@
     will-change: opacity;
   }
 
+  /* Google rating stars — shine one-by-one in a loop */
+  @keyframes google-star-shine {
+    0%,
+    12%,
+    100% {
+      filter: brightness(0.88) drop-shadow(0 0 0 transparent);
+      opacity: 0.72;
+    }
+    4%,
+    8% {
+      filter: brightness(1.55) drop-shadow(0 0 5px rgb(201 178 143 / 0.9));
+      opacity: 1;
+    }
+  }
+
+  .google-star {
+    animation: google-star-shine 2.5s ease-in-out infinite;
+    animation-delay: calc(var(--star-i, 0) * 0.5s);
+    will-change: filter, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .google-star {
+      animation: none;
+      filter: none;
+      opacity: 1;
+    }
+  }
+
   /* Sticky terracotta vignette — soft brand wash pinned to the bottom edge */
   .terracotta-vignette-bottom {
     position: fixed;

@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { PageHeader } from '../components/ui/PageHeader'
 import { InquiryForm } from '../components/contact/InquiryForm'
 import { StudioMap } from '../components/contact/StudioMap'
+import { Particles } from '../components/bencho/particles/Particles'
 import { studio } from '../data/site'
 import { useReveal } from '../animations/reveal'
 import { usePageMeta } from '../hooks/usePageMeta'
@@ -24,7 +25,17 @@ export default function ContactPage() {
         index="01"
         label="Contact"
         title={['Begin with', <>a <em>conversation.</em></>]}
-        intro="Tell us about the space, the way you want to live in it and the timing you have in mind. We reply to every enquiry personally."
+        intro={
+          <div className="flex flex-col gap-6">
+            <div className="w-full max-w-[min(100%,20rem)] self-start" aria-hidden>
+              <Particles shape="Circle" grain="Fine" reach={80} force={60} />
+            </div>
+            <p>
+              Tell us about the space, the way you want to live in it and the timing you have in mind. We reply to every
+              enquiry personally.
+            </p>
+          </div>
+        }
       />
       <section ref={ref} aria-label="Enquiry" className="bg-obsidian pb-[var(--section-y)]">
         <div className="shell grid gap-16 lg:grid-cols-12">

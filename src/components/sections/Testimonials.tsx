@@ -9,11 +9,17 @@ import { SectionLabel } from '../ui/SectionLabel'
 
 function GoogleStars({ rating }: { rating: number }) {
   return (
-    <span className="inline-flex items-center gap-0.5" aria-hidden>
+    <span className="google-stars inline-flex items-center gap-0.5" aria-hidden>
       {Array.from({ length: 5 }, (_, i) => {
         const fill = Math.min(1, Math.max(0, rating - i))
         return (
-          <svg key={i} viewBox="0 0 24 24" className="size-3.5" aria-hidden>
+          <svg
+            key={i}
+            viewBox="0 0 24 24"
+            className="google-star size-3.5"
+            style={{ ['--star-i' as string]: i }}
+            aria-hidden
+          >
             <defs>
               <linearGradient id={`star-fill-${i}`}>
                 <stop offset={`${fill * 100}%`} stopColor="#b69b75" />
