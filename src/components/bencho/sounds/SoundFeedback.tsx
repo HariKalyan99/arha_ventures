@@ -10,9 +10,9 @@ function isInteractive(target: EventTarget | null) {
 }
 
 /**
- * Global UI audio — Nib on any screen tap, Paid on links/buttons.
+ * Global UI audio — Paid on links/buttons.
  * Keyboard activation of interactive controls also plays Paid (click detail === 0).
- * Particles / folding bill ([data-bencho-sound]) play their own cues.
+ * Particles ([data-bencho-sound]) and 3D plaque/phone play their own cues.
  */
 export function SoundFeedback() {
   useEffect(() => {
@@ -21,7 +21,6 @@ export function SoundFeedback() {
       /* Elements with data-bencho-sound play their own cue (e.g. particles → clack). */
       if (e.target instanceof Element && e.target.closest('[data-bencho-sound]')) return
       if (isInteractive(e.target)) play('paid')
-      else play('nib')
     }
 
     const onClick = (e: MouseEvent) => {

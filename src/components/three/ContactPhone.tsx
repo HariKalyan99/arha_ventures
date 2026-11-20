@@ -3,6 +3,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { useNavigate } from 'react-router'
 import * as THREE from 'three'
+import { play } from '../bencho/sounds/sounds'
 
 const PHONE_GLB = '/models/vintage_telephone_toscano_pm1920.glb'
 
@@ -67,6 +68,7 @@ export function ContactPhone() {
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
+    play('nib')
     navigate('/contact')
   }
 

@@ -71,7 +71,16 @@ export function TakeOnBill() {
         if (tr.width >= 4) {
           const center = tr.left + tr.width / 2
           const maxW = Math.floor(2 * Math.min(center - EDGE_PAD, vw - center - EDGE_PAD))
-          nextW = Math.min(fluid, Math.max(MIN_W, maxW))
+          /*
+            Desktop can sit a touch wider than the phrase — the 3D sheet still
+            leaves “t…n.” peeking. On md/phone the host was larger than the
+            word and fully blanketed it; keep ~68% of the phrase so the ends
+            stay curious and readable.
+          */
+          const cover = vw < 1024 ? 0.68 : 1.08
+          const minW = vw < 1024 ? 72 : MIN_W
+          const target = Math.round(tr.width * cover)
+          nextW = Math.min(fluid, maxW, Math.max(minW, target))
         }
       }
       const nextH = Math.round(nextW * RATIO)
@@ -84,8 +93,7 @@ export function TakeOnBill() {
 
       const pr = phrase.getBoundingClientRect()
       const sr = stage.getBoundingClientRect()
-      /* Cover ~viewport-worth of the stage so the sheet can travel freely.
-         Cap below lg — oversized spill canvases widen the document on phones/tablets. */
+      /* Contained spill — stays sharp and cheap on phones/tablets. */
       const cover = Math.max(sr.width / Math.max(nextW, 1), Math.min(sr.height, vw * 1.2) / Math.max(nextH, 1))
       const spill =
         vw < 1024

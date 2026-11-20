@@ -18,7 +18,7 @@ export type Note = {
 }
 
 export const SOUNDS = {
-  /* Nib · Actions — https://bencho.dev/sounds/nib — soft ambient screen tap */
+  /* Nib · Actions — https://bencho.dev/sounds/nib — plaque + telephone */
   nib: [
     { hz: 1900, ms: 12, gain: 0.058, noise: 'bandpass' as const, q: 2.5, atk: 1 },
     { hz: 2250, to: 2000, ms: 12, gain: 0.046, atk: 1 },
@@ -30,6 +30,8 @@ export const SOUNDS = {
     { hz: 880, ms: 460, gain: 0.046, wave: 'sine' as const, cut: 2800, atk: 6, at: 95 },
     { hz: 1760, ms: 300, gain: 0.009, wave: 'sine' as const, atk: 8, at: 100 },
   ],
+  /* Latch · Selection — https://bencho.dev/sounds/latch */
+  latch: [{ hz: 256, ms: 90, gain: 0.058, wave: 'square' as const, cut: 2400, atk: 10 }],
   /* Clack · Selection — https://bencho.dev/sounds/clack */
   clack: [
     { hz: 2600, ms: 5, gain: 0.19, noise: 'bandpass' as const, q: 0.5, atk: 0.5 },

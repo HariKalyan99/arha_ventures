@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { play } from '../bencho/sounds/sounds'
 
 /** Texture path without cache-bust query — useTexture is happier with a clean URL. */
 const LOGO_MAP = '/brand/arha-logo.png'
@@ -93,6 +94,7 @@ export function WallLogo() {
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation()
+    play('nib')
     dragging.current = true
     lastX.current = e.clientX
     ;(e.target as HTMLElement)?.setPointerCapture?.(e.pointerId)

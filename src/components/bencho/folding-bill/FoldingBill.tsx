@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { play } from "../sounds/sounds";
 
 type Three = typeof import("three");
 
@@ -261,7 +260,6 @@ export function FoldingBill({
     el.appendChild(cv);
     el.style.touchAction = "none";
     el.style.cursor = "default";
-    el.dataset.benchoSound = "clack";
 
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -433,7 +431,6 @@ export function FoldingBill({
       aim();
       cv.dataset.held = "true";
       el.dataset.held = "true";
-      play("clack");
       try { el.setPointerCapture(e.pointerId); } catch { /* scripted pointers */ }
       wake();
     };

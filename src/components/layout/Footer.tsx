@@ -1,12 +1,21 @@
-import { useRef } from 'react'
+import { useRef, type PointerEvent as ReactPointerEvent } from 'react'
 import { Link, useLocation } from 'react-router'
 import { ArrowUp } from 'lucide-react'
 import { legalNavigation, navigation, studio } from '../../data/site'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { useReveal } from '../../animations/reveal'
+import { play } from '../bencho/sounds/sounds'
 import { Particles } from '../bencho/particles/Particles'
 import { ArrowLink } from '../ui/ArrowButton'
 import { Lines } from '../ui/Text'
+
+/** Latch on desktop hover; touch/pen use pointerdown (no reliable hover). */
+function onMarkEnter(e: ReactPointerEvent<HTMLSpanElement>) {
+  if (e.pointerType === 'mouse') play('latch')
+}
+function onMarkDown(e: ReactPointerEvent<HTMLSpanElement>) {
+  if (e.pointerType !== 'mouse') play('latch')
+}
 
 export function Footer() {
   const ref = useRef<HTMLElement>(null)
@@ -92,11 +101,17 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark — each letter grows / shrinks once on hover */}
+      {/* Oversized wordmark — each letter grows / shrinks once on hover; Latch on hover / touch */}
       <div className="select-none px-[var(--gutter)]" aria-hidden>
         <p className="footer-mark font-display cursor-default text-[clamp(6rem,30vw,34rem)] leading-[0.72] font-light tracking-[0.08em] text-cream/[0.07]">
           {studio.name.split('').map((char, i) => (
-            <span key={`${char}-${i}`} className="footer-mark-letter">
+            <span
+              key={`${char}-${i}`}
+              className="footer-mark-letter"
+              data-bencho-sound="latch"
+              onPointerEnter={onMarkEnter}
+              onPointerDown={onMarkDown}
+            >
               {char}
             </span>
           ))}
