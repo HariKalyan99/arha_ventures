@@ -3,6 +3,14 @@ import { useFinePointer, usePrefersReducedMotion } from '../../hooks/useMediaQue
 
 type CursorMode = 'default' | 'hover' | 'grab' | 'grabbing' | 'hidden'
 
+type Sample = { x: number; y: number; t: number }
+
+const SAMPLE_MS = 420
+const MIN_FLIPS = 4
+const MIN_SPEED = 1.55
+const COOLDOWN_MS = 900
+const BLOOM_MS = 520
+
 function modeFromTarget(target: EventTarget | null): CursorMode {
   if (!(target instanceof Element)) return 'default'
   if (target.closest('input, textarea, select, [contenteditable="true"]')) return 'hidden'
@@ -20,7 +28,8 @@ function modeFromTarget(target: EventTarget | null): CursorMode {
 
 /**
  * Architectural crosshair cursor — centre + with lagging L-corner ticks.
- * On interactive targets the ticks open into a small frame. Fine-pointer only.
+ * On interactive targets the ticks open into a small frame.
+ * Hard pointer shake → terracotta frame bloom, then snap back.
  */
 export function CustomCursor() {
   const fine = useFinePointer()
@@ -28,11 +37,13 @@ export function CustomCursor() {
   const enabled = fine && !reducedMotion
   const [mode, setMode] = useState<CursorMode>('default')
   const [visible, setVisible] = useState(false)
+  const [bloom, setBloom] = useState(false)
   const cross = useRef<HTMLSpanElement>(null)
   const frame = useRef<HTMLSpanElement>(null)
   const pos = useRef({ x: 0, y: 0, rx: 0, ry: 0 })
   const pressed = useRef(false)
   const raf = useRef(0)
+  const bloomTimer = useRef(0)
 
   useEffect(() => {
     if (!enabled) {
@@ -52,13 +63,77 @@ export function CustomCursor() {
       return next
     }
 
+    let samples: Sample[] = []
+    let lastFlipDir = 0
+    let flips = 0
+    let coolUntil = 0
+
+    const triggerBloom = () => {
+      setBloom(true)
+      window.clearTimeout(bloomTimer.current)
+      bloomTimer.current = window.setTimeout(() => setBloom(false), BLOOM_MS)
+    }
+
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
       pos.current.x = e.clientX
       pos.current.y = e.clientY
       setVisible(true)
       setMode(resolve(e.target))
+
+      const now = performance.now()
+      const x = e.clientX
+      const y = e.clientY
+      samples.push({ x, y, t: now })
+      while (samples.length && now - samples[0]!.t > SAMPLE_MS) samples.shift()
+
+      if (samples.length >= 3) {
+        const a = samples[samples.length - 3]!
+        const b = samples[samples.length - 2]!
+        const c = samples[samples.length - 1]!
+        const abx = b.x - a.x
+        const aby = b.y - a.y
+        const bcx = c.x - b.x
+        const bcy = c.y - b.y
+        const dot = abx * bcx + aby * bcy
+        const mag = Math.hypot(abx, aby) * Math.hypot(bcx, bcy)
+        if (mag > 1 && dot / mag < -0.15) {
+          const dir = Math.atan2(bcy, bcx)
+          if (
+            lastFlipDir === 0 ||
+            Math.abs(Math.atan2(Math.sin(dir - lastFlipDir), Math.cos(dir - lastFlipDir))) > 0.6
+          ) {
+            flips += 1
+            lastFlipDir = dir
+          }
+        }
+      }
+
+      if (samples.length < 2) {
+        flips = 0
+        lastFlipDir = 0
+      }
+
+      if (flips < MIN_FLIPS || now < coolUntil || samples.length < 4) return
+
+      const first = samples[0]!
+      const last = samples[samples.length - 1]!
+      const dist = Math.hypot(last.x - first.x, last.y - first.y)
+      let path = 0
+      for (let i = 1; i < samples.length; i++) {
+        path += Math.hypot(samples[i]!.x - samples[i - 1]!.x, samples[i]!.y - samples[i - 1]!.y)
+      }
+      const dt = Math.max(last.t - first.t, 1)
+      const speed = path / dt
+      if (speed < MIN_SPEED || path <= dist * 1.6) return
+
+      triggerBloom()
+      coolUntil = now + COOLDOWN_MS
+      flips = 0
+      lastFlipDir = 0
+      samples = []
     }
+
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
       pressed.current = true
@@ -97,6 +172,7 @@ export function CustomCursor() {
 
     return () => {
       cancelAnimationFrame(raf.current)
+      window.clearTimeout(bloomTimer.current)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerdown', onDown)
       window.removeEventListener('pointerup', onUp)
@@ -111,11 +187,15 @@ export function CustomCursor() {
   const grabbing = mode === 'grabbing' || mode === 'grab'
   const show = visible && mode !== 'hidden'
   const tick = 'absolute bg-terracotta-soft'
-  const corner = hovering
-    ? 'opacity-100'
-    : grabbing
-      ? 'opacity-70'
-      : 'opacity-80'
+  const corner = bloom
+    ? 'opacity-100 bg-terracotta'
+    : hovering
+      ? 'opacity-100'
+      : grabbing
+        ? 'opacity-70'
+        : 'opacity-80'
+
+  const frameSize = bloom ? 'size-16' : hovering ? 'size-11' : grabbing ? 'size-8' : 'size-5'
 
   return (
     <div
@@ -126,32 +206,42 @@ export function CustomCursor() {
       <span ref={cross} className="absolute top-0 left-0 size-4 will-change-transform">
         <span
           className={`${tick} top-1/2 left-0 h-px w-full -translate-y-1/2 transition-opacity duration-300 ${
-            hovering ? 'opacity-40' : 'opacity-90'
+            bloom || hovering ? 'opacity-40' : 'opacity-90'
           }`}
         />
         <span
           className={`${tick} top-0 left-1/2 h-full w-px -translate-x-1/2 transition-opacity duration-300 ${
-            hovering ? 'opacity-40' : 'opacity-90'
+            bloom || hovering ? 'opacity-40' : 'opacity-90'
           }`}
         />
-        <span className="absolute top-1/2 left-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-terracotta" />
+        <span
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-terracotta transition-[width,height] duration-300 ease-[var(--ease-luxe)] ${
+            bloom ? 'size-1.5' : 'size-1'
+          }`}
+        />
       </span>
 
-      {/* Lagging L-corner ticks — open into a frame on hover */}
+      {/* Lagging L-corner ticks — open into a frame on hover; bloom expands further */}
       <span
         ref={frame}
-        className={`absolute top-0 left-0 will-change-transform transition-[width,height] duration-500 ease-[var(--ease-luxe)] ${
-          hovering ? 'size-11' : grabbing ? 'size-8' : 'size-5'
+        className={`absolute top-0 left-0 will-change-transform transition-[width,height] duration-500 ease-[var(--ease-luxe)] ${frameSize} ${
+          bloom ? 'duration-200' : ''
         }`}
       >
-        <span className={`${tick} ${corner} top-0 left-0 h-px w-2.5 transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'w-3.5' : ''}`} />
-        <span className={`${tick} ${corner} top-0 left-0 h-2.5 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'h-3.5' : ''}`} />
-        <span className={`${tick} ${corner} top-0 right-0 h-px w-2.5 transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'w-3.5' : ''}`} />
-        <span className={`${tick} ${corner} top-0 right-0 h-2.5 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'h-3.5' : ''}`} />
-        <span className={`${tick} ${corner} bottom-0 left-0 h-px w-2.5 transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'w-3.5' : ''}`} />
-        <span className={`${tick} ${corner} bottom-0 left-0 h-2.5 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'h-3.5' : ''}`} />
-        <span className={`${tick} ${corner} right-0 bottom-0 h-px w-2.5 transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'w-3.5' : ''}`} />
-        <span className={`${tick} ${corner} right-0 bottom-0 h-2.5 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${hovering ? 'h-3.5' : ''}`} />
+        {/* Full-edge hairlines only while blooming — reads as a terracotta frame */}
+        <span
+          className={`pointer-events-none absolute inset-0 border border-terracotta transition-opacity duration-300 ease-[var(--ease-luxe)] ${
+            bloom ? 'opacity-90' : 'opacity-0'
+          }`}
+        />
+        <span className={`${tick} ${corner} top-0 left-0 h-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'w-full duration-200' : hovering ? 'w-3.5' : 'w-2.5'}`} />
+        <span className={`${tick} ${corner} top-0 left-0 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'h-full duration-200' : hovering ? 'h-3.5' : 'h-2.5'}`} />
+        <span className={`${tick} ${corner} top-0 right-0 h-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'w-full duration-200' : hovering ? 'w-3.5' : 'w-2.5'}`} />
+        <span className={`${tick} ${corner} top-0 right-0 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'h-full duration-200' : hovering ? 'h-3.5' : 'h-2.5'}`} />
+        <span className={`${tick} ${corner} bottom-0 left-0 h-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'w-full duration-200' : hovering ? 'w-3.5' : 'w-2.5'}`} />
+        <span className={`${tick} ${corner} bottom-0 left-0 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'h-full duration-200' : hovering ? 'h-3.5' : 'h-2.5'}`} />
+        <span className={`${tick} ${corner} right-0 bottom-0 h-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'w-full duration-200' : hovering ? 'w-3.5' : 'w-2.5'}`} />
+        <span className={`${tick} ${corner} right-0 bottom-0 w-px transition-all duration-500 ease-[var(--ease-luxe)] ${bloom ? 'h-full duration-200' : hovering ? 'h-3.5' : 'h-2.5'}`} />
       </span>
     </div>
   )

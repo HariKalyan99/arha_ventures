@@ -3,6 +3,7 @@ import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import { useLocation } from 'react-router'
 import { EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
+import { ThemeToggle } from '../ui/ThemeToggle'
 import { SiteMenu } from './SiteMenu'
 import { Wordmark } from './Wordmark'
 
@@ -172,7 +173,10 @@ export function Header() {
         />
         <div className="shell relative flex h-[var(--header-h)] items-center justify-between gap-6">
           <Wordmark onNavigate={menuOpen ? closeMenu : undefined} />
-          <MenuToggle open={menuOpen} onClick={toggleMenu} onMedia={pathname === '/' && !solid && !menuOpen} />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ThemeToggle onMedia={pathname === '/' && !solid && !menuOpen} />
+            <MenuToggle open={menuOpen} onClick={toggleMenu} onMedia={pathname === '/' && !solid && !menuOpen} />
+          </div>
         </div>
       </motion.header>
       <SiteMenu open={menuOpen} onClose={closeMenu} />

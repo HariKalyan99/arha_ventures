@@ -1,35 +1,44 @@
-import { useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, SquareArrowOutUpRight } from 'lucide-react'
 import { googleReviews, studio } from '../../data/site'
 import { testimonials } from '../../data/testimonials'
 import { EASE_LUXE } from '../../lib/motion'
 import { useReveal } from '../../animations/reveal'
 import { SectionLabel } from '../ui/SectionLabel'
 
+const STAR_PATH =
+  'M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'
+
+/** Five stars with a true partial fill (e.g. 4.7 → four full + 70% fifth). */
 function GoogleStars({ rating }: { rating: number }) {
+  const uid = useId()
   return (
-    <span className="google-stars inline-flex items-center gap-0.5" aria-hidden>
+    <span
+      className="google-stars inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={`${rating.toFixed(1)} out of 5 stars`}
+    >
       {Array.from({ length: 5 }, (_, i) => {
         const fill = Math.min(1, Math.max(0, rating - i))
+        const clipId = `${uid}-clip-${i}`
         return (
-          <svg
-            key={i}
-            viewBox="0 0 24 24"
-            className="google-star size-3.5"
-            style={{ ['--star-i' as string]: i }}
-            aria-hidden
-          >
+          <svg key={i} viewBox="0 0 24 24" className="size-3.5 overflow-visible" aria-hidden>
             <defs>
-              <linearGradient id={`star-fill-${i}`}>
-                <stop offset={`${fill * 100}%`} stopColor="#9a7d58" />
-                <stop offset={`${fill * 100}%`} stopColor="rgb(42 34 30 / 0.14)" />
-              </linearGradient>
+              <clipPath id={clipId}>
+                <rect x="0" y="0" width={24 * fill} height="24" />
+              </clipPath>
             </defs>
-            <path
-              fill={`url(#star-fill-${i})`}
-              d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-            />
+            {/* Empty track — clear contrast so a partial star reads as fractional */}
+            <path className="fill-stone/35" d={STAR_PATH} />
+            {fill > 0 && (
+              <path
+                className="google-star-fill"
+                style={{ ['--star-i' as string]: i, fill: '#f5b400' }}
+                clipPath={`url(#${clipId})`}
+                d={STAR_PATH}
+              />
+            )}
           </svg>
         )
       })}
@@ -64,15 +73,17 @@ export function Testimonials({ index }: { index: string }) {
           <div className="max-w-56 border-l border-gold/50 pl-4">
             <p className="font-display text-[1.15rem] leading-snug tracking-[-0.01em] text-cream">{studio.legalName}</p>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8rem] text-mist">
-              <span className="tabular-nums text-cream/65">{googleReviews.rating.toFixed(1)}</span>
+              <span className="tabular-nums font-medium text-cream">{googleReviews.rating.toFixed(1)}</span>
               <GoogleStars rating={googleReviews.rating} />
               <a
                 href={googleReviews.href}
                 target="_blank"
                 rel="noreferrer"
-                className="text-gold-soft transition-colors duration-500 hover:text-gold"
+                className="inline-flex items-center gap-1.5 text-gold-soft transition-colors duration-500 hover:text-gold"
               >
-                {googleReviews.count} Google reviews
+                Google reviews
+                <SquareArrowOutUpRight className="size-3 shrink-0" strokeWidth={1.5} aria-hidden />
+                <span className="sr-only">(opens in a new tab)</span>
               </a>
             </p>
           </div>

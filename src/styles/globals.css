@@ -32,6 +32,8 @@
   --color-stone: #5c554e;
   --color-line: rgb(42 34 30 / 0.12);
   --color-danger: #b45c4c;
+  /* Text on parchment / cream plates (solid button hover, selected chips) */
+  --color-on-plate: #2a221e;
 
   --font-display: 'Cormorant Garamond Variable', 'Cormorant Garamond', 'Times New Roman', serif;
   --font-sans: 'Manrope Variable', 'Manrope', ui-sans-serif, system-ui, sans-serif;
@@ -70,6 +72,30 @@
     --section-y: clamp(6rem, 4rem + 9vw, 13rem);
     --header-h: clamp(4.25rem, 3.8rem + 1.2vw, 5.5rem);
     color-scheme: light;
+  }
+
+  /* Dark Opulent Luxury — earlier site plate (toggle via data-theme) */
+  html[data-theme='dark'] {
+    color-scheme: dark;
+    --color-ink: #111111;
+    --color-obsidian: #171717;
+    --color-espresso: #2d2420;
+    --color-bronze: #604a3b;
+    --color-walnut: #604a3b;
+    --color-terracotta: #934236;
+    --color-terracotta-soft: #b0796c;
+    --color-brass: #b69b75;
+    --color-brass-soft: #c9b28f;
+    --color-gold: #934236;
+    --color-gold-soft: #b0796c;
+    /* cream = warm type on dark grounds again */
+    --color-cream: #e8e0d2;
+    --color-parchment: #e8e0d2;
+    --color-mist: #a89f93;
+    --color-stone: #8a8176;
+    --color-line: rgb(232 224 210 / 0.14);
+    --color-danger: #d89a8a;
+    --color-on-plate: #111111;
   }
 
   html {
@@ -258,57 +284,40 @@
 }
 
 @layer components {
-  /* Film grain — base opacity + speed-gated surge from CursorAtmosphere (--grain-energy) */
+  /* Film grain — quiet static overlay (no cursor coupling) */
   .grain::after {
     content: '';
     position: fixed;
     inset: -50%;
     z-index: 90;
     pointer-events: none;
-    opacity: calc(0.035 + (var(--grain-energy, 0) * 0.07));
+    opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    transition: opacity 80ms linear;
   }
 
-  /* Warm vignette that follows aggressive cursor motion */
-  .cursor-atmosphere {
-    background: radial-gradient(
-      circle 32vmax at var(--cx, 50%) var(--cy, 50%),
-      rgba(147, 66, 54, 0.18) 0%,
-      rgba(147, 66, 54, 0.06) 32%,
-      transparent 62%
-    );
-    opacity: var(--atmosphere-energy, 0);
-    mix-blend-mode: soft-light;
-    will-change: opacity;
-  }
-
-  /* Google rating stars — shine one-by-one in a loop */
+  /* Google rating stars — shine only the filled portion (keeps partials readable) */
   @keyframes google-star-shine {
     0%,
     12%,
     100% {
-      filter: brightness(0.88) drop-shadow(0 0 0 transparent);
-      opacity: 0.72;
+      filter: brightness(0.95) drop-shadow(0 0 0 transparent);
     }
     4%,
     8% {
-      filter: brightness(1.55) drop-shadow(0 0 5px rgb(201 178 143 / 0.9));
-      opacity: 1;
+      filter: brightness(1.35) drop-shadow(0 0 6px rgb(245 180 0 / 0.75));
     }
   }
 
-  .google-star {
+  .google-star-fill {
     animation: google-star-shine 2.5s ease-in-out infinite;
     animation-delay: calc(var(--star-i, 0) * 0.5s);
-    will-change: filter, opacity;
+    will-change: filter;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .google-star {
+    .google-star-fill {
       animation: none;
       filter: none;
-      opacity: 1;
     }
   }
 
@@ -325,15 +334,44 @@
       linear-gradient(0deg, rgba(147, 66, 54, 0.18) 0%, rgba(147, 66, 54, 0.08) 40%, rgba(147, 66, 54, 0.02) 68%, transparent 100%);
     mix-blend-mode: multiply;
     opacity: 0.85;
+    transform: scaleY(1);
+    transform-origin: bottom center;
+    transition:
+      opacity 0.75s var(--ease-luxe),
+      transform 0.75s var(--ease-luxe);
+    will-change: opacity, transform;
+  }
+
+  /* Shake inhale — quick brighten, then the long transition exhales */
+  .terracotta-vignette-bottom.is-inhaling {
+    opacity: 1;
+    transform: scaleY(1.1);
+    transition-duration: 0.2s;
+  }
+
+  html[data-theme='dark'] .terracotta-vignette-bottom {
+    mix-blend-mode: soft-light;
+    opacity: 0.7;
+    background:
+      radial-gradient(140% 120% at 50% 110%, rgba(147, 66, 54, 0.42) 0%, rgba(147, 66, 54, 0.18) 34%, rgba(147, 66, 54, 0.06) 62%, transparent 78%),
+      linear-gradient(0deg, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.12) 40%, rgba(147, 66, 54, 0.03) 68%, transparent 100%);
+  }
+
+  html[data-theme='dark'] .terracotta-vignette-bottom.is-inhaling {
+    opacity: 0.95;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .terracotta-vignette-bottom,
+    .terracotta-vignette-bottom.is-inhaling {
+      transition: none;
+      transform: none;
+    }
   }
 
   @media (prefers-reduced-motion: reduce), (pointer: coarse) {
     .grain::after {
-      opacity: 0.055;
-      transition: none;
-    }
-    .cursor-atmosphere {
-      display: none !important;
+      opacity: 0.05;
     }
   }
 
@@ -553,7 +591,11 @@
 
   .footer-mark-letter:hover {
     transform: scale(1.12);
-    color: rgb(42 34 30 / 0.22);
+    color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  }
+
+  html[data-theme='dark'] .footer-mark-letter:hover {
+    color: rgb(232 224 210 / 0.22);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -562,20 +604,20 @@
     }
     .footer-mark-letter:hover {
       transform: none;
-      color: rgb(42 34 30 / 0.16);
+      color: color-mix(in srgb, var(--color-cream) 16%, transparent);
     }
   }
 }
 
-/* OpenFreeMap (MapLibre) embed on Contact — light paper chrome */
+/* OpenFreeMap (MapLibre) embed on Contact — follows site theme */
 .studio-map.maplibregl-map {
-  background: #f3eee6;
+  background: var(--color-obsidian);
   font: inherit;
 }
 
 .studio-map .maplibregl-ctrl-group {
-  background: rgb(250 247 242 / 0.94);
-  border: 1px solid rgb(42 34 30 / 0.12);
+  background: color-mix(in srgb, var(--color-ink) 94%, transparent);
+  border: 1px solid var(--color-line);
   border-radius: 0;
   box-shadow: none;
 }
@@ -586,7 +628,7 @@
 }
 
 .studio-map .maplibregl-ctrl-group button + button {
-  border-top-color: rgb(42 34 30 / 0.12);
+  border-top-color: var(--color-line);
 }
 
 .studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
@@ -594,9 +636,14 @@
   filter: none;
 }
 
+html[data-theme='dark'] .studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+html[data-theme='dark'] .studio-map .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.1);
+}
+
 .studio-map .maplibregl-ctrl-attrib {
-  background: rgb(250 247 242 / 0.85);
-  color: rgb(42 34 30 / 0.5);
+  background: color-mix(in srgb, var(--color-ink) 85%, transparent);
+  color: color-mix(in srgb, var(--color-cream) 50%, transparent);
   font-size: 0.55rem;
 }
 
@@ -605,15 +652,15 @@
 }
 
 .studio-map-popup .maplibregl-popup-content {
-  background: #faf7f2;
-  color: #2a221e;
+  background: var(--color-ink);
+  color: var(--color-cream);
   border-radius: 0;
-  box-shadow: 0 12px 32px rgb(42 34 30 / 0.16);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.28);
   padding: 0.75rem 0.9rem;
   font-size: 0.75rem;
   line-height: 1.45;
 }
 
 .studio-map-popup .maplibregl-popup-tip {
-  border-top-color: #faf7f2;
+  border-top-color: var(--color-ink);
 }

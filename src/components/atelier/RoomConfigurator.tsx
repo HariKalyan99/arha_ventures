@@ -242,7 +242,7 @@ export function RoomConfigurator() {
                       aria-pressed={view === o.id}
                       onClick={() => frame(o.id)}
                       className={`eyebrow min-h-10 px-3 transition-colors duration-500 sm:px-4 ${
-                        view === o.id ? 'bg-parchment text-cream' : 'text-cream/70 hover:text-cream'
+                        view === o.id ? 'bg-parchment text-on-plate' : 'text-cream/70 hover:text-cream'
                       }`}
                     >
                       {o.label}
@@ -341,7 +341,7 @@ export function RoomConfigurator() {
                           <span
                             aria-hidden
                             className={`mt-0.5 flex size-10 shrink-0 items-center justify-center border border-cream/15 text-[0.55rem] tracking-[0.18em] uppercase sm:size-11 ${
-                              s.id === 'daylight' ? 'bg-parchment text-cream' : s.id === 'evening' ? 'bg-gold/25 text-cream' : 'bg-espresso text-cream/70'
+                              s.id === 'daylight' ? 'bg-parchment text-on-plate' : s.id === 'evening' ? 'bg-gold/25 text-cream' : 'bg-espresso text-cream/70'
                             }`}
                           >
                             {s.id === 'daylight' ? 'Day' : s.id === 'evening' ? 'Eve' : 'Ngt'}
@@ -381,7 +381,7 @@ export function RoomConfigurator() {
                   <label key={o.id} className="relative cursor-pointer bg-obsidian">
                     <input type="radio" name="mood" value={o.id} checked={mood === o.id} onChange={() => changeMood(o.id)} className="peer sr-only" />
                     <span
-                      className={`flex h-full flex-col gap-1 p-3 transition-colors duration-500 peer-checked:bg-parchment peer-checked:text-cream peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-gold hover:bg-espresso peer-checked:hover:bg-parchment ${
+                      className={`flex h-full flex-col gap-1 p-3 transition-colors duration-500 peer-checked:bg-parchment peer-checked:text-on-plate peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-gold hover:bg-espresso peer-checked:hover:bg-parchment ${
                         isRec ? 'ring-1 ring-inset ring-gold/50' : ''
                       }`}
                     >

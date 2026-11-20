@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { LOGO_SRC } from '../../data/brand'
+import { LOGO_ON_DARK_SRC, LOGO_SRC } from '../../data/brand'
+import { readStoredTheme } from '../../lib/theme'
 import { LIVING_ROOM_GLB } from '../three/roomSource'
 
 const RISE_MS = 2400
@@ -55,7 +56,10 @@ export function BootLoader() {
     ;(async () => {
       try {
         await withTimeout(
-          Promise.all([document.fonts?.ready ?? Promise.resolve(), loadImage(LOGO_SRC)]),
+          Promise.all([
+            document.fonts?.ready ?? Promise.resolve(),
+            loadImage(readStoredTheme() === 'dark' ? LOGO_ON_DARK_SRC : LOGO_SRC),
+          ]),
           2000,
         )
       } catch {

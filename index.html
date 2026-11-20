@@ -17,6 +17,25 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/brand/arha-logo.png?v=7" />
     <title>ARHA — Architecture & Interiors</title>
+    <script>
+      /* Apply stored theme before paint to avoid a light→dark flash */
+      (function () {
+        try {
+          var t = localStorage.getItem('arha-theme')
+          if (t !== 'light' && t !== 'dark') t = 'light'
+          document.documentElement.setAttribute('data-theme', t)
+          document.documentElement.style.colorScheme = t
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', t === 'dark' ? '#171717' : '#f3eee6')
+          var scheme = document.querySelector('meta[name="color-scheme"]')
+          if (scheme) scheme.setAttribute('content', t)
+          window.__arhaBootTheme = t
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light')
+          window.__arhaBootTheme = 'light'
+        }
+      })()
+    </script>
     <style>
       /* Critical boot styles — painted before the JS bundle arrives */
       html.is-booting,
@@ -31,6 +50,9 @@
         transition:
           opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
           visibility 0.75s;
+      }
+      html[data-theme='dark'] #boot {
+        background: #111111;
       }
       #boot.is-done {
         opacity: 0;
@@ -135,13 +157,21 @@
     <div id="boot" role="status" aria-live="polite" aria-label="Loading ARHA">
       <div class="boot-inner">
         <div class="boot-mark">
-          <img src="/brand/arha-logo.png?v=7" alt="" width="700" height="620" decoding="async" fetchpriority="high" />
+          <img id="boot-logo" src="/brand/arha-logo.png?v=7" alt="" width="700" height="620" decoding="async" fetchpriority="high" />
         </div>
         <div class="boot-dots" aria-hidden="true">
           <span></span><span></span><span></span>
         </div>
       </div>
     </div>
+    <script>
+      /* Swap boot lockup to match theme before the mark paints */
+      (function () {
+        var t = window.__arhaBootTheme || 'light'
+        var img = document.getElementById('boot-logo')
+        if (img && t === 'dark') img.src = '/brand/arha-logo-on-dark.png?v=7'
+      })()
+    </script>
     <div id="root"></div>
     <noscript>
       <p style="padding: 2rem; font-family: serif; color: #e8e0d2; background: #171717">

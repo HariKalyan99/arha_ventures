@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { LOGO_SRC } from '../../data/brand'
+import { ThemeLogo } from '../ui/ThemeLogo'
 import { media } from '../../data/media'
 import { studio } from '../../data/site'
 import { useReveal } from '../../animations/reveal'
@@ -120,9 +120,7 @@ export function Philosophy() {
           style={{ opacity: 0 }}
           aria-hidden
         >
-          <img
-            src={LOGO_SRC}
-            alt=""
+          <ThemeLogo
             width={700}
             height={620}
             decoding="async"

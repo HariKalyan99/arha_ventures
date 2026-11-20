@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
-import { LOGO_SRC } from '../../data/brand'
+import { ThemeLogo } from './ThemeLogo'
 
 const HOLD_MS = 1000
 const FADE_MS = 650
@@ -50,15 +50,13 @@ export function PageLoader() {
       role="status"
       aria-live="polite"
       aria-label="Loading"
-      className={`page-loader fixed inset-0 z-[10000] flex items-center justify-center bg-parchment transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`page-loader fixed inset-0 z-[10000] flex items-center justify-center bg-ink transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         leaving ? 'pointer-events-none invisible opacity-0' : 'visible opacity-100'
       }`}
     >
       <div className="relative flex flex-col items-center">
         <div className="page-loader-mark flex size-[clamp(8rem,28vw,14rem)] items-center justify-center">
-          <img
-            src={LOGO_SRC}
-            alt=""
+          <ThemeLogo
             width={700}
             height={620}
             decoding="async"
