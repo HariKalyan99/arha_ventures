@@ -34,7 +34,7 @@ function GoogleStars({ rating }: { rating: number }) {
             {fill > 0 && (
               <path
                 className="google-star-fill"
-                style={{ ['--star-i' as string]: i, fill: '#f5b400' }}
+                style={{ ['--star-i' as string]: i }}
                 clipPath={`url(#${clipId})`}
                 d={STAR_PATH}
               />

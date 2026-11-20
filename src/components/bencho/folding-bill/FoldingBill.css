@@ -6,20 +6,25 @@
   position: relative;
   z-index: 2;
   overflow: visible;
+  contain: none;
+  touch-action: none;
+  cursor: default;
+}
+
+.fbill[data-over='true'] {
+  cursor: grab;
+}
+
+.fbill[data-held='true'] {
+  cursor: grabbing;
 }
 
 .fbill-gl {
   display: block;
   position: absolute;
+  /* Hits go to the host; this layer is visual spill only. */
+  pointer-events: none;
   touch-action: none;
   cursor: default;
   z-index: 5;
-}
-
-.fbill-gl[data-over='true'] {
-  cursor: grab;
-}
-
-.fbill-gl[data-held='true'] {
-  cursor: grabbing;
 }

@@ -59,7 +59,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     if (sun.current) {
       sun.current.color.copy(m.sunColor)
-      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.9)
+      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.88)
       sun.current.position.copy(m.sunPosition).multiplyScalar(1.1)
     }
     if (windowKey.current) {
@@ -67,21 +67,23 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         windowKey.current.color.copy(m.sunColor).lerp(coolFill.current, 0.5)
         windowKey.current.intensity = THREE.MathUtils.lerp(1.1, 0.55, lamp)
       } else {
-        windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.45)
-        windowKey.current.intensity = THREE.MathUtils.lerp(2.0, 0.75, lamp)
+        /* Day: directional window key — warm, not a white flood. */
+        windowKey.current.color.copy(m.sunColor).lerp(warmFill.current, 0.5)
+        windowKey.current.intensity = THREE.MathUtils.lerp(1.45, 0.85, lamp)
       }
     }
     if (hemi.current) {
       hemi.current.color.copy(m.hemiSky)
       hemi.current.groundColor.copy(m.hemiGround)
-      hemi.current.intensity = m.hemiIntensity * (ink ? 1.05 : 1.25)
+      hemi.current.intensity = m.hemiIntensity * (ink ? 1.05 : 1.15)
     }
     if (ambient.current) {
-      ambient.current.intensity = ink ? 0.22 : 0.4
+      ambient.current.intensity = ink ? 0.22 : THREE.MathUtils.lerp(0.38, 0.28, lamp)
       ambient.current.color.set(ink ? '#1c222e' : '#e2d4c2')
     }
 
-    const lampBoost = ink ? 1.15 : 1
+    /* Day keeps lamps quiet; night leans on them. */
+    const lampBoost = ink ? 1.15 : 0.45 + lamp * 0.65
     if (lounge.current) lounge.current.intensity = (2.8 + lamp * 4.2) * lampBoost
     if (loungeSpot.current) {
       loungeSpot.current.intensity = (4.5 + lamp * 6.5) * lampBoost
@@ -91,7 +93,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
     if (mezzanine.current) mezzanine.current.intensity = (2.4 + lamp * 4.0) * lampBoost
     if (stairRail.current) stairRail.current.intensity = (0.9 + lamp * 1.6) * lampBoost
     if (underMezz.current) underMezz.current.intensity = (2.0 + lamp * 3.2) * lampBoost
-    if (ceiling.current) ceiling.current.intensity = (0.85 + lamp * 1.3) * (ink ? 0.75 : 1)
+    if (ceiling.current) ceiling.current.intensity = (0.85 + lamp * 1.3) * (ink ? 0.75 : 0.35 + lamp * 0.55)
 
     if (sheenKey.current) {
       sheenKey.current.intensity = ink ? 1.35 + lamp * 0.9 : 0
@@ -100,8 +102,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     scene.environmentIntensity = ink
       ? Math.max(0.7, m.envIntensity * 1.35)
-      : Math.max(0.62, m.envIntensity * 1.25)
-    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.12)
+      : Math.max(0.48, m.envIntensity * 0.95)
+    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.0)
   })
 
   return (
@@ -109,19 +111,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       <hemisphereLight ref={hemi} intensity={0.9} />
       <ambientLight ref={ambient} intensity={0.4} color="#e2d4c2" />
 
-      <directionalLight
-        ref={sun}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-near={0.5}
-        shadow-camera-far={50}
-        shadow-camera-left={-14}
-        shadow-camera-right={14}
-        shadow-camera-top={14}
-        shadow-camera-bottom={-14}
-        shadow-bias={-0.00025}
-        shadow-normalBias={0.035}
-      />
+      {/* No castShadow — sticky tour needs every frame; contact shadows cover the floor. */}
+      <directionalLight ref={sun} castShadow={false} />
 
       <directionalLight ref={windowKey} position={[1.4, 3.6, -6]} intensity={1.7} color="#e8d2b0" />
       <directionalLight ref={sheenKey} position={[-4.5, 4.2, 5.5]} intensity={0} color="#c8d0e0" />
@@ -155,11 +146,11 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         </Environment>
       ) : (
         <Environment frames={1} resolution={384} key="env-day">
-          <Lightformer form="rect" intensity={3.6} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
-          <Lightformer form="rect" intensity={1.5} position={[-7, 2.5, 2]} scale={[3, 8, 1]} color="#b69b75" />
-          <Lightformer form="rect" intensity={0.9} position={[7, 2.2, 1]} scale={[3, 7, 1]} color="#d4c0a8" />
-          <Lightformer form="ring" intensity={0.75} position={[0, 7, 0]} scale={10} color="#e8e0d2" />
-          <Lightformer form="rect" intensity={0.45} position={[0, 1, 8]} scale={[12, 4, 1]} color="#604a3b" />
+          <Lightformer form="rect" intensity={3.2} position={[0, 3, -9]} scale={[14, 5, 1]} color="#f0e4d2" />
+          <Lightformer form="rect" intensity={1.4} position={[-7, 2.8, 2]} scale={[3, 8, 1]} color="#c8b49a" />
+          <Lightformer form="rect" intensity={0.95} position={[7, 2.4, 1]} scale={[3, 7, 1]} color="#d4c0a8" />
+          <Lightformer form="ring" intensity={0.7} position={[0, 7, 0]} scale={10} color="#e8e0d2" />
+          <Lightformer form="rect" intensity={0.4} position={[0, 1, 8]} scale={[12, 4, 1]} color="#604a3b" />
         </Environment>
       )}
     </>

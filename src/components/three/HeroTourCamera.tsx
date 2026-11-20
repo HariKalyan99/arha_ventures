@@ -15,16 +15,15 @@ interface HeroTourCameraProps {
 }
 
 /**
- * Scroll moves between interior stations; mouse gently steers look inside the loft.
- * Horizon stays level — no Dutch-angle lean.
- * Below lg (phone + md tablet), stations swap to compact poses — teapoys / plaque in frame.
+ * Scroll drives the camera 1:1 through stations (linear blend — no ease that
+ * decelerates at every stop). Mouse only adds a light look offset on desktop.
  */
 export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
   const size = useThree((s) => s.size)
   const gl = useThree((s) => s.gl)
   const pointer = useRef({ x: 0, y: 0, armed: false })
-  const smooth = useRef({ x: 0, y: 0, p: 0, fov: houseTourStops[0].fov })
+  const smooth = useRef({ x: 0, y: 0, fov: houseTourStops[0].fov })
   const pos = useMemo(() => new THREE.Vector3(), [])
   const look = useMemo(() => new THREE.Vector3(), [])
   const fromPos = useMemo(() => new THREE.Vector3(), [])
@@ -77,7 +76,6 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
         pointer.current.y *= 0.92
         return
       }
-      // Ignore the first sample so a resting cursor doesn't bias the opening pose.
       if (!pointer.current.armed) {
         pointer.current.armed = true
         pointer.current.x = 0
@@ -99,15 +97,14 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     const s = smooth.current
     s.x += (pointer.current.x - s.x) * k
     s.y += (pointer.current.y - s.y) * k
-    const targetP = reducedMotion ? 0 : mapTourScrollProgress(progress.current ?? 0)
-    s.p += (targetP - s.p) * (1 - Math.exp(-dt * 5.2))
 
-    const t = THREE.MathUtils.clamp(s.p, 0, 1)
+    /* Lock to scroll progress — a second lerp here stacked on Lenis and felt stuck. */
+    const t = THREE.MathUtils.clamp(reducedMotion ? 0 : mapTourScrollProgress(progress.current ?? 0), 0, 1)
     const n = stations.length
     const scaled = t * (n - 1)
     const i = Math.min(n - 2, Math.floor(scaled))
-    const local = scaled - i
-    const e = local * local * (3 - 2 * local)
+    /* Linear blend between stations — smoothstep paused at every stop boundary. */
+    const e = scaled - i
 
     fromPos.copy(stations[i].pos)
     toPos.copy(stations[i + 1].pos)
@@ -116,11 +113,10 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     pos.lerpVectors(fromPos, toPos, e)
     look.lerpVectors(fromLook, toLook, e)
 
-    // Portrait already sees more vertical — keep the boost small on phones so the ceiling doesn’t dominate.
     const portraitBoost = portrait ? (mobile ? 2 : 8) : 0
     const desiredFov = THREE.MathUtils.lerp(stations[i].fov, stations[i + 1].fov, e) + portraitBoost
-    s.fov += (desiredFov - s.fov) * (1 - Math.exp(-dt * 3.5))
-    if (Math.abs(camera.fov - s.fov) > 0.05) {
+    s.fov += (desiredFov - s.fov) * (1 - Math.exp(-dt * 5))
+    if (Math.abs(camera.fov - s.fov) > 0.04) {
       camera.fov = s.fov
       camera.updateProjectionMatrix()
     }
@@ -131,12 +127,11 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     else forward.normalize()
     right.crossVectors(forward, worldUp).normalize()
 
-    // Soft look / step — lighter on touch so the composed mobile frame stays put.
-    const lookYaw = mobile ? 0.55 : 1.15
-    const lookPitch = mobile ? 0.22 : 0.45
-    const walkSide = mobile ? 0.18 : 0.38
-    const walkFwd = mobile ? 0.1 : 0.22
-    const walkUp = mobile ? 0.06 : 0.12
+    const lookYaw = mobile ? 0.45 : 1.0
+    const lookPitch = mobile ? 0.18 : 0.4
+    const walkSide = mobile ? 0.14 : 0.32
+    const walkFwd = mobile ? 0.08 : 0.18
+    const walkUp = mobile ? 0.05 : 0.1
 
     offset
       .set(0, 0, 0)

@@ -72,7 +72,8 @@
 @layer base {
   :root {
     --gutter: clamp(1.25rem, 0.6rem + 3.2vw, 4.5rem);
-    --section-y: clamp(6rem, 4rem + 9vw, 13rem);
+    /* Tight enough to avoid empty bands; roomy enough that sticky/section handoffs stay clear */
+    --section-y: clamp(4rem, 2.75rem + 5vw, 8rem);
     --header-h: clamp(4.25rem, 3.8rem + 1.2vw, 5.5rem);
     color-scheme: light;
   }
@@ -298,29 +299,35 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Google rating stars — shine only the filled portion (keeps partials readable) */
+  /* Google rating stars — shine via transform/fill (filter anims often no-op on mobile) */
   @keyframes google-star-shine {
     0%,
-    12%,
+    18%,
     100% {
-      filter: brightness(0.95) drop-shadow(0 0 0 transparent);
+      fill: #f5b400;
+      transform: scale(1);
     }
-    4%,
-    8% {
-      filter: brightness(1.35) drop-shadow(0 0 6px rgb(245 180 0 / 0.75));
+    6%,
+    12% {
+      fill: #ffd666;
+      transform: scale(1.14);
     }
   }
 
   .google-star-fill {
+    fill: #f5b400;
+    transform-box: fill-box;
+    transform-origin: center;
     animation: google-star-shine 2.5s ease-in-out infinite;
     animation-delay: calc(var(--star-i, 0) * 0.5s);
-    will-change: filter;
+    will-change: transform, fill;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .google-star-fill {
       animation: none;
-      filter: none;
+      fill: #f5b400;
+      transform: none;
     }
   }
 
@@ -397,6 +404,14 @@
     text-shadow:
       0 1px 1px rgba(0, 0, 0, 0.45),
       0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Hero supporting line — readable over bright loft props on small screens */
+  .hero-lead-on-media {
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.85),
+      0 0 18px rgba(0, 0, 0, 0.55),
+      0 8px 28px rgba(0, 0, 0, 0.45);
   }
 
   /* Quiet section fields — flat warm paper (no edge vignette) */

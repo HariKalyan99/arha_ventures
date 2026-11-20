@@ -22,17 +22,17 @@ export function AtelierTeaser({ index }: { index: string }) {
 
   return (
     <section ref={ref} aria-labelledby="atelier-title" className="relative overflow-hidden surface-espresso section-y">
-      <div className="shell grid items-center gap-16 lg:grid-cols-12">
+      <div className="shell grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
           <SectionLabel index={index} label="The Atelier" />
-          <h2 id="atelier-title" className="display mt-8 text-display-xl text-cream">
+          <h2 id="atelier-title" className="display mt-6 text-display-xl text-cream">
             <Lines lines={['Learn', <>how materials <em>belong together.</em></>]} />
           </h2>
-          <p data-reveal="fade" className="mt-8 max-w-md text-cream/60">
+          <p data-reveal="fade" className="mt-5 max-w-md text-cream/60">
             Step inside a living room rendered live in your browser. Change a finish, see what pairs with it, and watch the same space move from daylight to
             firelight — a quiet education in how rooms hold together.
           </p>
-          <div data-reveal="fade" className="mt-10">
+          <div data-reveal="fade" className="mt-8">
             <ArrowLink to="/atelier" variant="outline">
               Enter the study
             </ArrowLink>

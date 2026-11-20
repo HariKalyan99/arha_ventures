@@ -1,9 +1,10 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from '../../lib/gsap'
 import { getQualityTier, hasWebGL } from '../../lib/device'
 import { useInViewport } from '../../hooks/useInViewport'
 import { usePrefersReducedMotion } from '../../hooks/useMediaQuery'
+import { useTheme } from '../../hooks/useTheme'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { EASE_LUXE } from '../../lib/motion'
 import { media } from '../../data/media'
@@ -27,6 +28,7 @@ function StaticHeroImage() {
 
 export function Hero() {
   const section = useRef<HTMLElement>(null)
+  const pin = useRef<HTMLDivElement>(null)
   const progress = useRef(0)
   const [ready, setReady] = useState(false)
   const [stopIndex, setStopIndex] = useState(0)
@@ -34,6 +36,7 @@ export function Hero() {
   const [holding, setHolding] = useState(false)
   const [holdReveal, setHoldReveal] = useState(0)
   const reducedMotion = usePrefersReducedMotion()
+  const { isDark } = useTheme()
   const visible = useInViewport(section, '0px')
   const webgl = useMemo(() => hasWebGL(), [])
   const tier = useMemo(() => getQualityTier(), [])
@@ -41,23 +44,52 @@ export function Hero() {
   const stop = houseTourStops[stopIndex]
   const isConclusion = isTour && stopIndex === houseTourStops.length - 1
 
+  /*
+    iOS / Android chrome show-hide changes the visual viewport while `100svh` stays
+    fixed — the sticky tour pane then leaves a strip of section background (the
+    “blank” under the loft). Track visualViewport so the pin always fills the screen.
+  */
+  useEffect(() => {
+    const el = pin.current
+    if (!el) return
+
+    const sync = () => {
+      const h = Math.round(window.visualViewport?.height ?? window.innerHeight)
+      el.style.height = `${h}px`
+    }
+
+    sync()
+    const vv = window.visualViewport
+    vv?.addEventListener('resize', sync)
+    vv?.addEventListener('scroll', sync)
+    window.addEventListener('resize', sync)
+    return () => {
+      vv?.removeEventListener('resize', sync)
+      vv?.removeEventListener('scroll', sync)
+      window.removeEventListener('resize', sync)
+    }
+  }, [])
+
   useGSAP(
     () => {
       ScrollTrigger.create({
         trigger: section.current,
         start: 'top top',
         end: 'bottom bottom',
+        invalidateOnRefresh: true,
         onUpdate: (self) => {
           progress.current = self.progress
-          if (isTour) {
-            const mapped = mapTourScrollProgress(self.progress)
-            const { displayIndex } = tourStopAt(mapped)
-            setStopIndex((prev) => (prev === displayIndex ? prev : displayIndex))
-            setTouring(self.progress > 0.05)
-            setHolding(isTourHold(self.progress))
-            const nextReveal = Math.round(tourHoldReveal(self.progress) * 100) / 100
-            setHoldReveal((prev) => (prev === nextReveal ? prev : nextReveal))
-          }
+          if (!isTour) return
+          const mapped = mapTourScrollProgress(self.progress)
+          const { displayIndex } = tourStopAt(mapped)
+          /* Only commit React state when values change — avoids scroll-frame re-renders. */
+          setStopIndex((prev) => (prev === displayIndex ? prev : displayIndex))
+          const nextTouring = self.progress > 0.05
+          setTouring((prev) => (prev === nextTouring ? prev : nextTouring))
+          const nextHolding = isTourHold(self.progress)
+          setHolding((prev) => (prev === nextHolding ? prev : nextHolding))
+          const nextReveal = Math.round(tourHoldReveal(self.progress) * 50) / 50
+          setHoldReveal((prev) => (prev === nextReveal ? prev : nextReveal))
         },
       })
 
@@ -97,13 +129,22 @@ export function Hero() {
       ref={section}
       id="top"
       aria-labelledby="hero-title"
-      className={`relative bg-[#111111] motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'}`}
+      className={`relative motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'} ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
     >
-      <div className="sticky top-0 h-svh overflow-hidden">
+      <div
+        ref={pin}
+        className={`sticky top-0 h-dvh min-h-svh overflow-hidden ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
+      >
         <div className="absolute inset-0" aria-hidden>
           {webgl ? (
             <>
-              <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]" />
+              <div
+                className={`absolute inset-0 ${
+                  isDark
+                    ? 'bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]'
+                    : 'bg-[radial-gradient(120%_80%_at_70%_40%,#e8dfd2_0%,#d2c4b4_55%,#c8bdb0_100%)]'
+                }`}
+              />
               <SceneErrorBoundary fallback={<StaticHeroImage />}>
                 <Suspense fallback={null}>
                   <div className={`absolute inset-0 transition-opacity duration-[2400ms] ease-[var(--ease-luxe)] ${ready ? 'opacity-100' : 'opacity-0'}`}>
@@ -117,11 +158,21 @@ export function Hero() {
           )}
         </div>
 
-        {/* Cinematic veils — light enough that the loft stays readable */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
+        {/* Cinematic veils — lighter in Day so the loft can read as daylight */}
+        {isDark ? (
+          <>
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.72)_0%,rgba(16,16,15,0.42)_28%,rgba(16,16,15,0.12)_48%,rgba(16,16,15,0)_62%)] md:bg-[linear-gradient(90deg,rgba(16,16,15,0.48)_0%,rgba(16,16,15,0.22)_22%,rgba(16,16,15,0.06)_40%,rgba(16,16,15,0)_56%)]" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-gradient-to-t from-[#111111]/75 via-[#111111]/28 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#111111]/45 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(75%_65%_at_70%_45%,transparent_42%,rgba(16,16,15,0.1)_100%)]" />
+          </>
+        ) : (
+          <>
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(28,22,18,0.42)_0%,rgba(28,22,18,0.18)_30%,rgba(28,22,18,0.04)_52%,rgba(28,22,18,0)_68%)] md:bg-[linear-gradient(90deg,rgba(28,22,18,0.28)_0%,rgba(28,22,18,0.1)_24%,rgba(28,22,18,0)_50%)]" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[22%] bg-gradient-to-t from-[#2a221e]/35 via-[#2a221e]/12 to-transparent" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#2a221e]/22 to-transparent" />
+          </>
+        )}
 
         {/* Opening copy — optically centered between header and bottom chrome */}
         <div className="pointer-events-none relative z-10 flex h-full flex-col justify-center pt-[var(--header-h)] pb-[clamp(3.5rem,8vh,7.5rem)]">
@@ -129,7 +180,7 @@ export function Hero() {
             <p data-hero-fade className="eyebrow mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-gold sm:mb-5">
               <span>{studio.name}</span>
               <span aria-hidden className="hidden h-px w-10 bg-gold/60 sm:block" />
-              <span className="text-parchment/70">{studio.tagline}</span>
+              <span className="text-parchment/80">{studio.tagline}</span>
             </p>
             <h1 id="hero-title" className="display display-on-media max-w-[18ch] text-display-hero text-parchment sm:max-w-[22ch] md:max-w-none">
               <span className="block overflow-hidden pb-[0.05em]">
@@ -143,12 +194,13 @@ export function Hero() {
             </h1>
             <div data-hero-rule className="hairline mt-4 max-w-md bg-gold/40 sm:mt-7" />
             <div className="mt-4 flex max-w-[36rem] flex-col gap-4 sm:mt-7 sm:gap-6">
-              <p data-hero-fade className="max-w-[28rem] text-[0.875rem] leading-relaxed text-parchment/75 sm:text-[0.95rem] md:text-lead">
-                {isTour
-                  ? 'Scroll the loft. Each pause is a thought about height, gathering, ritual — and what a room might ask of you.'
-                  : 'An architecture and interior design studio shaping residences, villas and hospitality spaces with patience, precision and a reverence for material.'}
+              <p
+                data-hero-fade
+                className="hero-lead-on-media max-w-[28rem] text-[0.9375rem] font-medium leading-relaxed text-parchment sm:text-[0.95rem] md:text-lead md:font-normal md:text-parchment/80"
+              >
+                Architecture and interiors, shaped with patience and a reverence for material.
               </p>
-              <div data-hero-fade className="pointer-events-auto flex flex-wrap gap-3">
+              <div data-hero-fade className="pointer-events-auto flex flex-wrap gap-2 sm:gap-3">
                 <ArrowButton variant="solid" onClick={() => scrollTo('projects')}>
                   View the work
                 </ArrowButton>
@@ -168,17 +220,17 @@ export function Hero() {
             aria-live="polite"
           >
             <div className="shell">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="sync">
                 <motion.div
                   key={stop.id}
-                  initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                  initial={reducedMotion ? false : { opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={reducedMotion ? undefined : { opacity: 0, y: -12 }}
-                  transition={{ duration: 0.7, ease: EASE_LUXE }}
+                  exit={reducedMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.28, ease: EASE_LUXE }}
                   className={`relative max-w-[min(34rem,100%)] rounded-sm px-3 py-3 shadow-[inset_0_1px_0_rgba(232,223,208,0.06),0_24px_48px_-28px_rgba(0,0,0,0.7)] sm:px-4 sm:py-4 md:max-w-[36rem] ${
                     isConclusion
-                      ? 'bg-[#171717]/80 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md'
-                      : 'bg-[#171717]/65 backdrop-blur-sm'
+                      ? 'bg-[#171717]/80 shadow-[0_0_0_1px_rgba(182,155,117,0.28),inset_0_1px_0_rgba(232,224,210,0.08),0_24px_48px_-28px_rgba(0,0,0,0.7)]'
+                      : 'bg-[#171717]/65'
                   }`}
                 >
                   <p className={`eyebrow ${isConclusion || holding ? 'text-gold' : 'text-gold/80'}`}>{stop.eyebrow}</p>

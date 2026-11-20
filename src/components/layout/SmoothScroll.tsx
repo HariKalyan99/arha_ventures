@@ -10,26 +10,45 @@ function resolveTarget(target: string | number | HTMLElement): HTMLElement | num
   return document.getElementById(id)
 }
 
+function isCoarsePointer() {
+  return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window
+}
+
 /**
- * Lenis smooth scrolling driven by GSAP's ticker, so ScrollTrigger and Lenis
- * share one animation frame and never disagree about the scroll position.
- * Disabled entirely when the visitor prefers reduced motion.
+ * Scroll-driven hero tours need the browser’s native scroll clock.
+ * Lenis only runs on fine-pointer desktops (wheel), with a high lerp so it
+ * barely lags ScrollTrigger. Touch / stylus always use native scroll.
  */
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion()
   const [lenis, setLenis] = useState<Lenis | null>(null)
 
   useEffect(() => {
-    if (reduced) return
-    const instance = new Lenis({ lerp: 0.095, wheelMultiplier: 0.9, touchMultiplier: 1.2 })
+    ScrollTrigger.config({ ignoreMobileResize: true })
+
+    if (reduced || isCoarsePointer()) {
+      setLenis(null)
+      return
+    }
+
+    const instance = new Lenis({
+      /* High lerp ≈ native wheel; keep wheel gentle so the long tour doesn’t rush. */
+      lerp: 0.18,
+      wheelMultiplier: 0.72,
+      touchMultiplier: 1,
+      syncTouch: false,
+      autoRaf: false,
+    })
+
     instance.on('scroll', ScrollTrigger.update)
     const tick = (time: number) => instance.raf(time * 1000)
     gsap.ticker.add(tick)
     gsap.ticker.lagSmoothing(0)
-    // Lenis attaches to window, so it can only be created after mount and then published to consumers.
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLenis(instance)
     if (import.meta.env.DEV) (window as unknown as { __lenis?: Lenis }).__lenis = instance
+
     return () => {
       gsap.ticker.remove(tick)
       instance.destroy()
@@ -47,8 +66,8 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
           lenis.scrollTo(resolved, {
             immediate: options.immediate,
             offset: options.offset ?? 0,
-            duration: 1.6,
-            easing: (t: number) => 1 - Math.pow(1 - t, 4),
+            duration: 1.2,
+            easing: (t: number) => 1 - Math.pow(1 - t, 3),
           })
           return
         }
