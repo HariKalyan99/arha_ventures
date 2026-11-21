@@ -93,8 +93,8 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
       active={active}
       onReady={onReady}
       className="!absolute inset-0"
-      /* HTML CTAs own hits — canvas must not steal vertical pans on iOS */
-      pointerEvents={false}
+      /* Hits for plaque + telephone; SceneCanvas keeps touch-action: pan-y so iOS scroll still wins. */
+      pointerEvents
       stabilizeDpr
       dprCap={1.5}
       shadows={false}
