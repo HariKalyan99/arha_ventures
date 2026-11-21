@@ -4,6 +4,7 @@ import { ProjectsShowcase } from '../components/portfolio/ProjectsShowcase'
 import { Services } from '../components/sections/Services'
 import { AtelierTeaser } from '../components/sections/AtelierTeaser'
 import { Testimonials } from '../components/sections/Testimonials'
+import { SiteFilm } from '../components/sections/SiteFilm'
 import { ArrowLink } from '../components/ui/ArrowButton'
 import { usePageMeta } from '../hooks/usePageMeta'
 
@@ -25,6 +26,7 @@ export default function HomePage() {
       />
       <AtelierTeaser index="04" />
       <Testimonials index="05" />
+      <SiteFilm index="06" />
     </>
   )
 }
