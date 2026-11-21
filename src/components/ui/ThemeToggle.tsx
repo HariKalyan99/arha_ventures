@@ -9,7 +9,7 @@ const ROLL_MS = 650
 /**
  * Day / Night theme control — magnetic text-scroll button with icon.
  * The label roll runs on click across every pointer; hover still previews on desktop.
- * Default site theme remains light (Day).
+ * Default site theme is dark (Night).
  */
 export function ThemeToggle({ onMedia = false }: { onMedia?: boolean }) {
   const { theme, toggle, ready } = useTheme()

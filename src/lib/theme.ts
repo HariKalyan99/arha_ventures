@@ -19,7 +19,7 @@ export function readStoredTheme(): Theme {
   } catch {
     /* private mode / blocked storage */
   }
-  return 'light'
+  return 'dark'
 }
 
 const BOOT_LOGO_LIGHT = '/brand/arha-logo.png?v=7'

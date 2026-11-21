@@ -1,11 +1,80 @@
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { LIVING_ROOM_GLB, LIVING_ROOM_TARGET_SPAN, LIVING_ROOM_YAW } from './roomSource'
 import { ContactPhone } from './ContactPhone'
 import { WallLogo } from './WallLogo'
 
-/** Materials used by the free_loft city towers / exterior blocks — kept out of the hero. */
+/**
+ * Day: blue sky billboards ONLY outside the window wall (through the panes).
+ * Unlit + not surrounding the room — so leather / walls don’t pick up a blue cast.
+ * Clear color stays warm/neutral like the hero plate.
+ */
+function ExteriorSky({ noir }: { noir: boolean }) {
+  const { gl } = useThree()
+  const mat = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 4
+    canvas.height = 64
+    const ctx = canvas.getContext('2d')!
+    const g = ctx.createLinearGradient(0, 0, 0, 64)
+    g.addColorStop(0, '#5a9ad4')
+    g.addColorStop(0.5, '#8eb8e0')
+    g.addColorStop(0.82, '#c5d8ec')
+    g.addColorStop(1, '#d8e4f0')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 4, 64)
+    const map = new THREE.CanvasTexture(canvas)
+    map.colorSpace = THREE.SRGBColorSpace
+    map.needsUpdate = true
+    return new THREE.MeshBasicMaterial({
+      map,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      fog: false,
+      toneMapped: false,
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    const prev = gl.getClearColor(new THREE.Color())
+    const prevA = gl.getClearAlpha()
+    /* Neutral clear — never blue (that was washing the interior). */
+    gl.setClearColor(noir ? '#0a0c12' : '#c8bdb0', 1)
+    return () => gl.setClearColor(prev, prevA)
+  }, [gl, noir])
+
+  useLayoutEffect(
+    () => () => {
+      mat.map?.dispose()
+      mat.dispose()
+    },
+    [mat],
+  )
+
+  if (noir) return null
+
+  return (
+    <group>
+      {/* Primary window wall — left / −X (Sketchfab panes) */}
+      <mesh position={[-14, 4.5, 1.5]} rotation={[0, Math.PI / 2, 0]} frustumCulled={false} renderOrder={-10}>
+        <planeGeometry args={[28, 16]} />
+        <primitive object={mat} attach="material" />
+      </mesh>
+      {/* Far corner peek through the same glass run */}
+      <mesh position={[-10, 5.5, -8]} rotation={[0, Math.PI * 0.35, 0]} frustumCulled={false} renderOrder={-10}>
+        <planeGeometry args={[18, 12]} />
+        <primitive object={mat} attach="material" />
+      </mesh>
+    </group>
+  )
+}
+
+/**
+ * City / exterior blocks — keep them visible (Sketchfab look) but exclude from
+ * the fit span so the loft doesn’t shrink to the skyline.
+ */
 const EXTERIOR_MATERIALS = new Set([
   'Material.023',
   'Material.024',
@@ -25,13 +94,14 @@ function isExteriorMesh(mesh: THREE.Mesh) {
   return false
 }
 
-/** Bounds from visible meshes only (skips hidden city geometry). */
+/** Interior-only bounds for framing. */
 function interiorBox(root: THREE.Object3D) {
   const box = new THREE.Box3()
   const temp = new THREE.Box3()
   root.updateMatrixWorld(true)
   root.traverse((obj) => {
     if (!(obj instanceof THREE.Mesh) || !obj.visible) return
+    if (isExteriorMesh(obj)) return
     const geom = obj.geometry
     if (!geom.boundingBox) geom.computeBoundingBox()
     if (!geom.boundingBox) return
@@ -41,133 +111,31 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
-/** Beyond the glass — warm day bounce (not white), cooler ink for Night. */
-function InteriorEnclosure({ noir }: { noir: boolean }) {
-  const shell = noir ? '#0a0a0e' : '#2a2420'
-  const far = noir ? '#12151e' : '#6a7a8c'
-  const left = noir ? '#0e1016' : '#3d342c'
-  const right = noir ? '#0c0e14' : '#352e28'
-  const near = noir ? '#08090c' : '#221e1a'
-
-  return (
-    <group>
-      <mesh receiveShadow={false} castShadow={false}>
-        <boxGeometry args={[28, 14, 28]} />
-        <meshStandardMaterial
-          color={shell}
-          roughness={1}
-          metalness={0}
-          side={THREE.BackSide}
-          envMapIntensity={noir ? 0.22 : 0.18}
-        />
-      </mesh>
-      <mesh position={[0, 3.2, -8.5]} receiveShadow={false} castShadow={false}>
-        <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color={far} toneMapped={false} />
-      </mesh>
-      <mesh position={[-8.5, 3.2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
-        <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color={left} toneMapped={false} />
-      </mesh>
-      <mesh position={[8.5, 3.2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow={false} castShadow={false}>
-        <planeGeometry args={[18, 10]} />
-        <meshBasicMaterial color={right} toneMapped={false} />
-      </mesh>
-      <mesh position={[0, 3.2, 8.5]} rotation={[0, Math.PI, 0]} receiveShadow={false} castShadow={false}>
-        <planeGeometry args={[20, 10]} />
-        <meshBasicMaterial color={near} toneMapped={false} />
-      </mesh>
-    </group>
-  )
-}
-
-/** Night: deepen toward charcoal + soft sheen — keep maps readable. */
+/** Night theme only — gentle charcoal deepen. Day keeps the GLB as authored. */
 function applyNoirLook(std: THREE.MeshStandardMaterial) {
   const next = std.clone() as THREE.MeshStandardMaterial
-
-  next.color.lerp(new THREE.Color('#121216'), 0.28)
-  next.color.multiplyScalar(0.78)
-
+  next.color.lerp(new THREE.Color('#121216'), 0.22)
+  next.color.multiplyScalar(0.82)
   if (typeof next.roughness === 'number') {
-    next.roughness = Math.max(0.22, Math.min(0.85, next.roughness * 0.78))
+    next.roughness = Math.max(0.22, Math.min(0.85, next.roughness * 0.82))
   }
-  next.metalness = Math.min(0.55, next.metalness + 0.06)
-  next.envMapIntensity = Math.min(1.15, Math.max(0.7, (next.envMapIntensity ?? 1) * 1.15))
-
-  if (next instanceof THREE.MeshPhysicalMaterial) {
-    next.sheen = 0.65
-    next.sheenColor.set('#d8d4cc')
-    next.sheenRoughness = 0.32
-    next.clearcoat = Math.min(0.2, next.clearcoat + 0.08)
-    next.clearcoatRoughness = 0.35
-  }
-
-  if (next.name === 'Material.001' || next.name === 'Material.006') {
-    next.color.set('#2a2622')
-    next.roughness = 0.55
-    next.metalness = 0.08
-    next.envMapIntensity = 0.55
-    if ('emissive' in next) next.emissive.set('#000000')
-  }
-
-  if (next.metalness > 0.55) {
-    const goldish = next.color.r > 0.35 && next.color.g > 0.22 && next.color.b < 0.24
-    if (goldish) {
-      next.color.multiplyScalar(0.55)
-      next.metalness = Math.min(next.metalness, 0.8)
-      next.roughness = Math.max(0.28, next.roughness * 0.85)
-      next.envMapIntensity = Math.min(1.1, next.envMapIntensity * 1.1)
-    }
-  }
-
-  next.needsUpdate = true
-  return next
-}
-
-function applyDayLook(std: THREE.MeshStandardMaterial) {
-  const next = std.clone() as THREE.MeshStandardMaterial
-  /* Keep albedo honest — dull hot speculars so daylight doesn’t clip white. */
-  next.envMapIntensity = Math.min(0.85, Math.max(0.55, (next.envMapIntensity ?? 1) * 0.82))
-  if (typeof next.roughness === 'number') {
-    next.roughness = Math.min(1, Math.max(0.28, next.roughness * 1.04))
-  }
-  if (next.metalness < 0.35 && typeof next.roughness === 'number' && next.roughness < 0.45) {
-    next.roughness = Math.min(0.62, next.roughness + 0.12)
-  }
-
-  if (next.metalness > 0.55) {
-    const goldish = next.color.r > 0.4 && next.color.g > 0.28 && next.color.b < 0.26
-    if (goldish) {
-      next.metalness = Math.min(next.metalness, 0.72)
-      next.roughness = Math.max(next.roughness, 0.32)
-      next.color.multiplyScalar(0.9)
-      next.envMapIntensity = Math.min(next.envMapIntensity, 0.8)
-    }
-  }
-
-  if (next.name === 'Material.001' || next.name === 'Material.006') {
-    next.color.set(next.map ? '#948c82' : '#a09890')
-    next.roughness = Math.max(next.roughness, 0.82)
-    next.metalness = 0
-    next.envMapIntensity = Math.min(next.envMapIntensity, 0.35)
-    if ('emissive' in next) next.emissive.set('#000000')
-  }
-
+  next.envMapIntensity = Math.min(1.1, Math.max(0.65, (next.envMapIntensity ?? 1) * 1.1))
   next.needsUpdate = true
   return next
 }
 
 interface LivingRoomModelProps {
-  /** Site Night theme — darker plate + soft sheen */
+  /** Site Night theme — darker plate */
   noir?: boolean
 }
 
 /**
- * Imported loft GLB — Day keeps a warm cinematic plate;
- * Night deepens toward black with a quiet sheen (still fully readable).
+ * free_loft_17 as on Sketchfab — city through the panes, no fake enclosure.
+ * Plaque + telephone stay. Day uses original materials; lighting carries morning.
  */
 export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
-  const { scene, animations } = useGLTF(LIVING_ROOM_GLB)
+  /* false = no Draco, true = Meshopt (matches optimized free_loft_17.glb) */
+  const { scene, animations } = useGLTF(LIVING_ROOM_GLB, false, true)
   const root = useRef<THREE.Group>(null)
 
   const prepared = useMemo(() => {
@@ -176,20 +144,28 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
     clone.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return
 
-      if (isExteriorMesh(obj)) {
-        obj.visible = false
-        obj.castShadow = false
-        obj.receiveShadow = false
-        return
-      }
-
-      obj.castShadow = true
-      obj.receiveShadow = true
+      obj.visible = true
+      const exterior = isExteriorMesh(obj)
+      obj.castShadow = !exterior
+      obj.receiveShadow = !exterior
 
       const source = Array.isArray(obj.material) ? obj.material : [obj.material]
       const next = source.map((mat) => {
         if (!(mat instanceof THREE.MeshStandardMaterial || mat instanceof THREE.MeshPhysicalMaterial)) return mat
-        return noir ? applyNoirLook(mat) : applyDayLook(mat)
+
+        if (!noir) {
+          /* Day — keep the loft as authored; soften night-city emissives for morning. */
+          if (!exterior) return mat
+          const day = mat.clone() as THREE.MeshStandardMaterial
+          if ('emissiveIntensity' in day && typeof day.emissiveIntensity === 'number') {
+            day.emissiveIntensity *= 0.35
+          }
+          if ('emissive' in day) day.emissive.multiplyScalar(0.4)
+          day.needsUpdate = true
+          return day
+        }
+
+        return applyNoirLook(mat)
       })
       obj.material = next.length === 1 ? next[0]! : next
     })
@@ -224,10 +200,10 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
 
   return (
     <group>
+      <ExteriorSky noir={noir} />
       <group ref={root}>
         <primitive object={prepared} />
       </group>
-      <InteriorEnclosure noir={noir} />
       <Suspense fallback={null}>
         <ContactPhone />
         <WallLogo />
@@ -236,4 +212,4 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
   )
 }
 
-useGLTF.preload(LIVING_ROOM_GLB)
+useGLTF.preload(LIVING_ROOM_GLB, false, true)
