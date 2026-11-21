@@ -15,7 +15,7 @@ export const ATELIER_ROOM_SOURCE: RoomSource = 'procedural'
 export const ROOM_SOURCE: RoomSource = HERO_ROOM_SOURCE
 
 /**
- * Active hero model — free loft (city exterior meshes are stripped at load).
+ * Active hero model — free loft 17 (city through the panes, as on Sketchfab).
  * Alternatives: '/models/loft_interior_6_for_free.glb' | '/models/living_room_interior_free_v2.glb'
  */
 export const LIVING_ROOM_GLB = '/models/free_loft_17.glb'

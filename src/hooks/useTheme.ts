@@ -19,7 +19,7 @@ function getSnapshot(): Theme {
 }
 
 function getServerSnapshot(): Theme {
-  return 'light'
+  return 'dark'
 }
 
 /** Live site theme — light paper (default) or the earlier dark opulent plate. */

@@ -1,7 +1,8 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from '../../lib/gsap'
 import { getQualityTier, hasWebGL } from '../../lib/device'
+import { signalHeroReady } from '../../lib/heroBoot'
 import { useInViewport } from '../../hooks/useInViewport'
 import { usePrefersReducedMotion } from '../../hooks/useMediaQuery'
 import { useTheme } from '../../hooks/useTheme'
@@ -18,10 +19,20 @@ import { SceneErrorBoundary } from '../three/SceneErrorBoundary'
 const HeroScene = lazy(() => import('../three/HeroScene'))
 const isTour = ROOM_SOURCE === 'glb'
 
-function StaticHeroImage() {
+/** Still under the canvas — visible while the loft loads, or if WebGL fails. */
+function HeroFallbackImage({ className = '' }: { className?: string }) {
   return (
-    <div className="absolute inset-0">
-      <Img media={media['living-stone']} priority className="size-full object-cover" sizes="100vw" />
+    <div className={`absolute inset-0 ${className}`}>
+      <Img
+        media={media['loft-lounge']}
+        priority
+        className="size-full object-cover"
+        sizes="100vw"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,16,15,0.55)_0%,rgba(16,16,15,0.2)_40%,transparent_70%)]"
+      />
     </div>
   )
 }
@@ -30,6 +41,7 @@ export function Hero() {
   const section = useRef<HTMLElement>(null)
   const progress = useRef(0)
   const [ready, setReady] = useState(false)
+  const [sceneFailed, setSceneFailed] = useState(false)
   const [stopIndex, setStopIndex] = useState(0)
   const [touring, setTouring] = useState(false)
   const [holding, setHolding] = useState(false)
@@ -43,6 +55,24 @@ export function Hero() {
   const stop = houseTourStops[stopIndex]
   const isConclusion = isTour && stopIndex === houseTourStops.length - 1
   const plate = isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'
+
+  useEffect(() => {
+    /* No WebGL — still photo is the hero; release the splash. */
+    if (!webgl) signalHeroReady()
+  }, [webgl])
+
+  const onSceneReady = () => {
+    setReady(true)
+    /* Two frames so the loft is in the buffer under #boot, then open the site. */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => signalHeroReady())
+    })
+  }
+
+  const onSceneError = () => {
+    setSceneFailed(true)
+    signalHeroReady()
+  }
 
   useGSAP(
     () => {
@@ -113,25 +143,27 @@ export function Hero() {
       {/* Sticky stage — same plate as runway so chrome shortfall never flashes blank */}
       <div className={`hero-viewport sticky top-0 w-full overflow-hidden ${plate}`}>
         <div className="absolute inset-0" aria-hidden>
-          {webgl ? (
-            <>
-              <div
-                className={`absolute inset-0 ${
-                  isDark
-                    ? 'bg-[radial-gradient(120%_80%_at_70%_40%,#2d2420_0%,#171717_60%,#111111_100%)]'
-                    : 'bg-[radial-gradient(120%_80%_at_70%_40%,#e8dfd2_0%,#d2c4b4_55%,#c8bdb0_100%)]'
-                }`}
-              />
-              <SceneErrorBoundary fallback={<StaticHeroImage />}>
-                <Suspense fallback={null}>
-                  <div className={`absolute inset-0 transition-opacity duration-[2400ms] ease-[var(--ease-luxe)] ${ready ? 'opacity-100' : 'opacity-0'}`}>
-                    <HeroScene progress={progress} active={visible} reducedMotion={reducedMotion} tier={tier} onReady={() => setReady(true)} />
-                  </div>
-                </Suspense>
-              </SceneErrorBoundary>
-            </>
-          ) : (
-            <StaticHeroImage />
+          {/* Always under the canvas — covers load gaps and WebGL failure */}
+          <HeroFallbackImage />
+
+          {webgl && !sceneFailed && (
+            <SceneErrorBoundary fallback={null} onError={onSceneError}>
+              <Suspense fallback={null}>
+                <div
+                  className={`absolute inset-0 transition-opacity duration-700 ease-[var(--ease-luxe)] ${
+                    ready ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <HeroScene
+                    progress={progress}
+                    active={visible}
+                    reducedMotion={reducedMotion}
+                    tier={tier}
+                    onReady={onSceneReady}
+                  />
+                </div>
+              </Suspense>
+            </SceneErrorBoundary>
           )}
         </div>
 
@@ -270,6 +302,9 @@ export function Hero() {
           </div>
         )}
 
+        {/* Black wash — sticky stage only; leaves with the tour */}
+        <div aria-hidden className="vignette-bottom" />
+
         <div
           className={`pointer-events-none absolute inset-x-0 bottom-0 z-10 transition-opacity duration-700 ${
             isConclusion ? 'opacity-0 md:opacity-40' : 'opacity-100'
@@ -277,7 +312,11 @@ export function Hero() {
         >
           <div className="shell relative flex items-end justify-between pb-5 sm:pb-6">
             <p data-hero-fade className="eyebrow hidden text-parchment/55 lg:block">
-              {webgl ? (isTour ? 'Live 3D tour · Loft interior' : 'Live 3D render · A living room at dusk') : 'A living room in stone and timber'}
+              {webgl && !sceneFailed
+                ? isTour
+                  ? 'Live 3D tour · Loft interior'
+                  : 'Live 3D render · A living room at dusk'
+                : 'Loft interior'}
             </p>
             <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-parchment/60 sm:bottom-6 short:hidden">
               <span className="eyebrow">{holding ? 'Continue' : touring ? 'Continue' : 'Scroll'}</span>

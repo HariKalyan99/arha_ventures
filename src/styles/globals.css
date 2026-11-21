@@ -379,57 +379,45 @@
     }
   }
 
-  /* Sticky terracotta vignette — soft brand wash pinned to the bottom edge */
-  .terracotta-vignette-bottom {
-    position: fixed;
-    inset-inline: 0;
-    bottom: 0;
-    z-index: 55;
-    height: min(58vh, 28rem);
-    pointer-events: none;
-    background:
-      radial-gradient(140% 120% at 50% 110%, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.12) 34%, rgba(147, 66, 54, 0.04) 62%, transparent 78%),
-      linear-gradient(0deg, rgba(147, 66, 54, 0.18) 0%, rgba(147, 66, 54, 0.08) 40%, rgba(147, 66, 54, 0.02) 68%, transparent 100%);
-    mix-blend-mode: multiply;
-    opacity: 0.85;
-    transform: scaleY(1);
-    transform-origin: bottom center;
-    transition:
-      opacity 0.75s var(--ease-luxe),
-      transform 0.75s var(--ease-luxe);
-    will-change: opacity, transform;
-  }
-
-  /* Shake inhale — quick brighten, then the long transition exhales */
-  .terracotta-vignette-bottom.is-inhaling {
-    opacity: 1;
-    transform: scaleY(1.1);
-    transition-duration: 0.2s;
-  }
-
-  html[data-theme='dark'] .terracotta-vignette-bottom {
-    mix-blend-mode: soft-light;
-    opacity: 0.7;
-    background:
-      radial-gradient(140% 120% at 50% 110%, rgba(147, 66, 54, 0.42) 0%, rgba(147, 66, 54, 0.18) 34%, rgba(147, 66, 54, 0.06) 62%, transparent 78%),
-      linear-gradient(0deg, rgba(147, 66, 54, 0.28) 0%, rgba(147, 66, 54, 0.12) 40%, rgba(147, 66, 54, 0.03) 68%, transparent 100%);
-  }
-
-  html[data-theme='dark'] .terracotta-vignette-bottom.is-inhaling {
-    opacity: 0.95;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .terracotta-vignette-bottom,
-    .terracotta-vignette-bottom.is-inhaling {
-      transition: none;
-      transform: none;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce), (pointer: coarse) {
     .grain::after {
       opacity: 0.05;
+    }
+  }
+
+  /* Soft black wash — hero sticky stage only (not sitewide) */
+  .vignette-bottom {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 5;
+    height: min(28vh, 14rem);
+    pointer-events: none;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.22) 42%,
+      rgba(0, 0, 0, 0.06) 72%,
+      transparent 100%
+    );
+    opacity: 0.95;
+  }
+
+  html[data-theme='light'] .vignette-bottom {
+    opacity: 0.5;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.1) 48%,
+      transparent 100%
+    );
+  }
+
+  @media (max-width: 767px) {
+    .vignette-bottom {
+      height: min(18vh, 9rem);
+      opacity: 0.75;
     }
   }
 

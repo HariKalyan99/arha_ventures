@@ -6,8 +6,8 @@
     <link rel="shortcut icon" type="image/png" href="/brand/arha-mark.png?v=10" />
     <link rel="apple-touch-icon" href="/brand/arha-mark.png?v=10" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f3eee6" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#171717" />
+    <meta name="color-scheme" content="dark" />
     <meta
       name="description"
       content="ARHA — an architecture and interior design studio composing residences, villas and hospitality spaces in stone, timber and light."
@@ -18,11 +18,11 @@
     <meta property="og:image" content="/brand/arha-logo.png?v=7" />
     <title>ARHA — Architecture & Interiors</title>
     <script>
-      /* Apply stored theme before paint to avoid a light→dark flash */
+      /* Apply stored theme before paint — default dark (Night) */
       (function () {
         try {
           var t = localStorage.getItem('arha-theme')
-          if (t !== 'light' && t !== 'dark') t = 'light'
+          if (t !== 'light' && t !== 'dark') t = 'dark'
           document.documentElement.setAttribute('data-theme', t)
           document.documentElement.style.colorScheme = t
           var meta = document.querySelector('meta[name="theme-color"]')
@@ -31,8 +31,8 @@
           if (scheme) scheme.setAttribute('content', t)
           window.__arhaBootTheme = t
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light')
-          window.__arhaBootTheme = 'light'
+          document.documentElement.setAttribute('data-theme', 'dark')
+          window.__arhaBootTheme = 'dark'
         }
       })()
     </script>
@@ -157,7 +157,7 @@
     <div id="boot" role="status" aria-live="polite" aria-label="Loading ARHA">
       <div class="boot-inner">
         <div class="boot-mark">
-          <img id="boot-logo" src="/brand/arha-logo.png?v=7" alt="" width="700" height="620" decoding="async" fetchpriority="high" />
+          <img id="boot-logo" src="/brand/arha-logo-on-dark.png?v=7" alt="" width="700" height="620" decoding="async" fetchpriority="high" />
         </div>
         <div class="boot-dots" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -167,9 +167,9 @@
     <script>
       /* Swap boot lockup to match theme before the mark paints */
       (function () {
-        var t = window.__arhaBootTheme || 'light'
+        var t = window.__arhaBootTheme || 'dark'
         var img = document.getElementById('boot-logo')
-        if (img && t === 'dark') img.src = '/brand/arha-logo-on-dark.png?v=7'
+        if (img) img.src = t === 'dark' ? '/brand/arha-logo-on-dark.png?v=7' : '/brand/arha-logo.png?v=7'
       })()
     </script>
     <div id="root"></div>
@@ -200,8 +200,8 @@
           var root = document.getElementById('root')
           var mounted = root && root.childNodes.length > 0
           var elapsed = Date.now() - started
-          /* Prefer BootLoader dismiss; only force after mount + grace, or hard timeout */
-          if (mounted && elapsed > 12000) {
+          /* Prefer BootLoader dismiss; allow loft load (~22s) before forcing */
+          if (mounted && elapsed > 26000) {
             dismiss(boot)
             return
           }
