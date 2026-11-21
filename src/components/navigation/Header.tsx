@@ -72,10 +72,11 @@ export function Header() {
     (y: number, delta: number) => {
       const onHome = pathnameRef.current === '/'
       const hero = onHome ? document.getElementById('top') : null
-      // Sticky tour spans the hero height; stay in “on media” mode until it releases.
-      const heroTravel = hero ? Math.max(0, hero.offsetHeight - window.innerHeight) : 0
+      // Match sticky stage (--app-height / layout viewport), not visualViewport chrome.
+      const stageH = document.documentElement.clientHeight || window.innerHeight
+      const heroTravel = hero ? Math.max(0, hero.offsetHeight - stageH) : 0
       const inHeroTour = Boolean(hero && y < heroTravel)
-      const solidAfter = window.innerHeight * (onHome ? 0.85 : 0.35)
+      const solidAfter = stageH * (onHome ? 0.85 : 0.35)
       // Paper solid chrome over the dark loft reads as a flash — keep it off during the tour.
       setSolid(!inHeroTour && y > solidAfter)
 

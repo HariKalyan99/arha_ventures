@@ -78,7 +78,19 @@
     /* Tight enough to avoid empty bands; roomy enough that sticky/section handoffs stay clear */
     --section-y: clamp(4rem, 2.75rem + 5vw, 8rem);
     --header-h: clamp(4.25rem, 3.8rem + 1.2vw, 5.5rem);
+    /*
+      Layout-viewport height for sticky tours (same model as Magical Works).
+      Touch keeps 100lvh so address-bar show/hide never reflows the runway.
+      Desktop may override with a measured px value via lib/layout.ts.
+    */
+    --app-height: 100vh;
     color-scheme: light;
+  }
+
+  @supports (height: 100lvh) {
+    :root {
+      --app-height: 100lvh;
+    }
   }
 
   /* Dark Opulent Luxury — earlier site plate (toggle via data-theme) */
@@ -125,6 +137,14 @@
     overscroll-behavior: contain;
   }
 
+  html.native-scroll {
+    scroll-behavior: auto;
+  }
+  html.native-scroll body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
   html {
     overflow-x: clip;
   }
@@ -134,8 +154,29 @@
     font-size: 1rem;
     line-height: 1.6;
     overflow-x: clip;
-    min-height: 100svh;
+    min-height: var(--app-height, 100lvh);
     background: var(--color-ink);
+  }
+
+  /*
+    Hero sticky tour — runway + stage share --app-height and the same plate colour
+    so any sub-pixel shortfall while scrolling never flashes a different background.
+    No transform on the sticky node (iOS recomposite judder).
+  */
+  .hero-runway {
+    height: calc(var(--app-height, 100lvh) * 7.8);
+  }
+  .hero-runway--brief {
+    height: calc(var(--app-height, 100lvh) * 1.8);
+  }
+  .hero-viewport {
+    height: var(--app-height, 100lvh);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-runway,
+    .hero-runway--brief {
+      height: var(--app-height, 100lvh);
+    }
   }
 
   html.is-booting,
