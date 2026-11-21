@@ -200,8 +200,8 @@
           var root = document.getElementById('root')
           var mounted = root && root.childNodes.length > 0
           var elapsed = Date.now() - started
-          /* Prefer BootLoader dismiss; only force after mount + grace, or hard timeout */
-          if (mounted && elapsed > 12000) {
+          /* Prefer BootLoader dismiss; allow loft load (~22s) before forcing */
+          if (mounted && elapsed > 26000) {
             dismiss(boot)
             return
           }

@@ -1,7 +1,8 @@
-import { lazy, Suspense, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from '../../lib/gsap'
 import { getQualityTier, hasWebGL } from '../../lib/device'
+import { signalHeroReady } from '../../lib/heroBoot'
 import { useInViewport } from '../../hooks/useInViewport'
 import { usePrefersReducedMotion } from '../../hooks/useMediaQuery'
 import { useTheme } from '../../hooks/useTheme'
@@ -43,6 +44,19 @@ export function Hero() {
   const stop = houseTourStops[stopIndex]
   const isConclusion = isTour && stopIndex === houseTourStops.length - 1
   const plate = isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'
+
+  useEffect(() => {
+    /* No WebGL — static plate is the home; release the splash. */
+    if (!webgl) signalHeroReady()
+  }, [webgl])
+
+  const onSceneReady = () => {
+    setReady(true)
+    /* Two frames so the loft is in the buffer under #boot, then open the site. */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => signalHeroReady())
+    })
+  }
 
   useGSAP(
     () => {
@@ -122,10 +136,23 @@ export function Hero() {
                     : 'bg-[radial-gradient(120%_80%_at_70%_40%,#e8dfd2_0%,#d2c4b4_55%,#c8bdb0_100%)]'
                 }`}
               />
-              <SceneErrorBoundary fallback={<StaticHeroImage />}>
+              <SceneErrorBoundary
+                fallback={<StaticHeroImage />}
+                onError={() => signalHeroReady()}
+              >
                 <Suspense fallback={null}>
-                  <div className={`absolute inset-0 transition-opacity duration-[2400ms] ease-[var(--ease-luxe)] ${ready ? 'opacity-100' : 'opacity-0'}`}>
-                    <HeroScene progress={progress} active={visible} reducedMotion={reducedMotion} tier={tier} onReady={() => setReady(true)} />
+                  <div
+                    className={`absolute inset-0 transition-opacity duration-700 ease-[var(--ease-luxe)] ${
+                      ready ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <HeroScene
+                      progress={progress}
+                      active={visible}
+                      reducedMotion={reducedMotion}
+                      tier={tier}
+                      onReady={onSceneReady}
+                    />
                   </div>
                 </Suspense>
               </SceneErrorBoundary>
