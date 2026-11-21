@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { gsap, MOTION_QUERY, ScrollTrigger, useGSAP } from '../../lib/gsap'
 import { getQualityTier, hasWebGL } from '../../lib/device'
@@ -28,7 +28,6 @@ function StaticHeroImage() {
 
 export function Hero() {
   const section = useRef<HTMLElement>(null)
-  const pin = useRef<HTMLDivElement>(null)
   const progress = useRef(0)
   const [ready, setReady] = useState(false)
   const [stopIndex, setStopIndex] = useState(0)
@@ -43,39 +42,19 @@ export function Hero() {
   const { scrollTo } = useSmoothScroll()
   const stop = houseTourStops[stopIndex]
   const isConclusion = isTour && stopIndex === houseTourStops.length - 1
-
-  /*
-    iOS / Android chrome show-hide changes the visual viewport while `100svh` stays
-    fixed — the sticky tour pane then leaves a strip of section background (the
-    “blank” under the loft). Track visualViewport so the pin always fills the screen.
-  */
-  useEffect(() => {
-    const el = pin.current
-    if (!el) return
-
-    const sync = () => {
-      const h = Math.round(window.visualViewport?.height ?? window.innerHeight)
-      el.style.height = `${h}px`
-    }
-
-    sync()
-    const vv = window.visualViewport
-    vv?.addEventListener('resize', sync)
-    vv?.addEventListener('scroll', sync)
-    window.addEventListener('resize', sync)
-    return () => {
-      vv?.removeEventListener('resize', sync)
-      vv?.removeEventListener('scroll', sync)
-      window.removeEventListener('resize', sync)
-    }
-  }, [])
+  const plate = isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'
 
   useGSAP(
     () => {
+      /*
+        Magical Works pattern: CSS sticky + scrubbed progress, no visualViewport
+        height chase (that reflows the runway mid-swipe and feels stuck on iOS).
+      */
       ScrollTrigger.create({
         trigger: section.current,
         start: 'top top',
         end: 'bottom bottom',
+        scrub: 0.65,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           progress.current = self.progress
@@ -129,12 +108,10 @@ export function Hero() {
       ref={section}
       id="top"
       aria-labelledby="hero-title"
-      className={`relative motion-reduce:h-svh ${isTour ? 'h-[780svh]' : 'h-[180svh]'} ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
+      className={`hero-runway relative ${isTour ? '' : 'hero-runway--brief'} ${plate}`}
     >
-      <div
-        ref={pin}
-        className={`sticky top-0 h-dvh min-h-svh overflow-hidden ${isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'}`}
-      >
+      {/* Sticky stage — same plate as runway so chrome shortfall never flashes blank */}
+      <div className={`hero-viewport sticky top-0 w-full overflow-hidden ${plate}`}>
         <div className="absolute inset-0" aria-hidden>
           {webgl ? (
             <>

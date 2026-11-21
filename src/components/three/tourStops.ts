@@ -147,8 +147,8 @@ export function tourPoseFor(stop: TourStop, compact: boolean, width = 0): TourPo
  * Tour travels through stops for most of the scroll, then holds on the final
  * shelf / question so the ending can breathe before the page continues down.
  */
-/** Tour travels through stops for most of the scroll, then holds on the final shelf. */
-export const TOUR_TRAVEL_END = 0.72
+/** Tour travels through stops for most of the scroll, then holds briefly on the final shelf. */
+export const TOUR_TRAVEL_END = 0.82
 
 export function mapTourScrollProgress(raw: number) {
   const p = Math.min(1, Math.max(0, raw))

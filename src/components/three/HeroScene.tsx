@@ -93,7 +93,8 @@ export default function HeroScene({ progress, active, reducedMotion, tier, onRea
       active={active}
       onReady={onReady}
       className="!absolute inset-0"
-      pointerEvents
+      /* HTML CTAs own hits — canvas must not steal vertical pans on iOS */
+      pointerEvents={false}
       stabilizeDpr
       dprCap={1.5}
       shadows={false}
