@@ -385,6 +385,42 @@
     }
   }
 
+  /* Soft black wash — hero sticky stage only (not sitewide) */
+  .vignette-bottom {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 5;
+    height: min(28vh, 14rem);
+    pointer-events: none;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.22) 42%,
+      rgba(0, 0, 0, 0.06) 72%,
+      transparent 100%
+    );
+    opacity: 0.95;
+  }
+
+  html[data-theme='light'] .vignette-bottom {
+    opacity: 0.5;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.1) 48%,
+      transparent 100%
+    );
+  }
+
+  @media (max-width: 767px) {
+    .vignette-bottom {
+      height: min(18vh, 9rem);
+      opacity: 0.75;
+    }
+  }
+
   .display {
     font-family: var(--font-display);
     font-weight: 300;

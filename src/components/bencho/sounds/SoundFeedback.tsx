@@ -12,7 +12,7 @@ function isInteractive(target: EventTarget | null) {
 /**
  * Global UI audio — Paid on links/buttons.
  * Keyboard activation of interactive controls also plays Paid (click detail === 0).
- * Particles ([data-bencho-sound]) and 3D plaque/phone play their own cues.
+ * Particles ([data-bencho-sound]), plaque (glide), and phone (nib) play their own cues.
  */
 export function SoundFeedback() {
   useEffect(() => {

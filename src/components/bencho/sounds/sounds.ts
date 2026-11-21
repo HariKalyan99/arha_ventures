@@ -18,7 +18,7 @@ export type Note = {
 }
 
 export const SOUNDS = {
-  /* Nib · Actions — https://bencho.dev/sounds/nib — plaque + telephone */
+  /* Nib · Actions — https://bencho.dev/sounds/nib — telephone click */
   nib: [
     { hz: 1900, ms: 12, gain: 0.058, noise: 'bandpass' as const, q: 2.5, atk: 1 },
     { hz: 2250, to: 2000, ms: 12, gain: 0.046, atk: 1 },
@@ -32,7 +32,7 @@ export const SOUNDS = {
   ],
   /* Latch · Selection — https://bencho.dev/sounds/latch */
   latch: [{ hz: 256, ms: 90, gain: 0.058, wave: 'square' as const, cut: 2400, atk: 10 }],
-  /* Glide · Navigation — https://bencho.dev/sounds/glide — footer ARHA mark */
+  /* Glide · Navigation — https://bencho.dev/sounds/glide — plaque + footer ARHA mark */
   glide: [{ hz: 397, to: 276, ms: 205, gain: 0.065, wave: 'sine' as const, cut: 820, atk: 90 }],
   /* Clack · Selection — https://bencho.dev/sounds/clack */
   clack: [

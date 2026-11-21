@@ -111,7 +111,8 @@ export function WallLogo() {
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation()
-    play('nib')
+    /* Soft brand glide — nib is too sharp for glass. */
+    play('glide')
     dragging.current = true
     lastX.current = e.clientX
     ;(e.target as HTMLElement)?.setPointerCapture?.(e.pointerId)
