@@ -385,6 +385,101 @@
     }
   }
 
+  /* Theme music — bottom-left on phones; bottom-right from md (clears Live 3D / tour index) */
+  .music-toggle {
+    left: max(1rem, env(safe-area-inset-left, 0px));
+    right: auto;
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .music-toggle {
+      left: auto;
+      right: max(1rem, env(safe-area-inset-right, 0px));
+      bottom: max(3.75rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem));
+    }
+  }
+
+  /* Theme music equalizer — Bencho / qdigital-style bars; live = dancing */
+  .music-wave {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 18px;
+    width: 22px;
+  }
+
+  .music-wave-bar {
+    display: block;
+    width: 2.5px;
+    height: 18px;
+    border-radius: 999px;
+    transform: scaleY(0.22);
+    transform-origin: center bottom;
+    background: linear-gradient(to top, var(--color-brass-soft), var(--color-parchment));
+    transition:
+      transform 0.35s var(--ease-luxe),
+      background 0.35s ease,
+      opacity 0.35s ease;
+  }
+
+  .music-wave--muted .music-wave-bar {
+    transform: scaleY(0.28);
+    opacity: 0.55;
+    background: linear-gradient(to top, rgba(232, 224, 210, 0.35), rgba(232, 224, 210, 0.65));
+  }
+
+  .music-toggle:hover .music-wave--muted .music-wave-bar {
+    transform: scaleY(0.4);
+    opacity: 0.85;
+  }
+
+  .music-wave--live .music-wave-bar {
+    animation: music-eq 0.85s ease-in-out infinite alternate;
+    opacity: 1;
+    background: linear-gradient(to top, var(--color-brass-soft), var(--color-parchment));
+  }
+
+  .music-wave--live .music-wave-bar:nth-child(1) {
+    animation-duration: 0.62s;
+    animation-delay: -0.2s;
+  }
+  .music-wave--live .music-wave-bar:nth-child(2) {
+    animation-duration: 0.78s;
+    animation-delay: -0.45s;
+  }
+  .music-wave--live .music-wave-bar:nth-child(3) {
+    animation-duration: 0.54s;
+    animation-delay: -0.1s;
+  }
+  .music-wave--live .music-wave-bar:nth-child(4) {
+    animation-duration: 0.92s;
+    animation-delay: -0.6s;
+  }
+  .music-wave--live .music-wave-bar:nth-child(5) {
+    animation-duration: 0.68s;
+    animation-delay: -0.3s;
+  }
+
+  @keyframes music-eq {
+    0% {
+      transform: scaleY(0.25);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .music-wave--live .music-wave-bar {
+      animation: none;
+      transform: scaleY(0.62);
+    }
+  }
+
   /* Soft black wash — hero sticky stage only (not sitewide) */
   .vignette-bottom {
     position: absolute;

@@ -1,70 +1,71 @@
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
-import { useGLTF, useAnimations } from '@react-three/drei'
+import { useGLTF, useAnimations, useTexture } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { LIVING_ROOM_GLB, LIVING_ROOM_TARGET_SPAN, LIVING_ROOM_YAW } from './roomSource'
 import { ContactPhone } from './ContactPhone'
 import { WallLogo } from './WallLogo'
 
+/* night = 1.svg (dark night), day = 2.svg (morning/dusk sky) — H&M framing locked */
+const CITY_NIGHT = '/images/skyscraper/night.webp?v=canva25'
+const CITY_DAY = '/images/skyscraper/day.webp?v=canva25'
+/* H&M v differs (day plate has extra sky) — offset so mid-pane (uv.y=0.5) hits H&M */
+const CITY_UV_Y = { night: -0.096, day: -0.151 } as const
+
 /**
- * Day: blue sky billboards ONLY outside the window wall (through the panes).
- * Unlit + not surrounding the room — so leather / walls don’t pick up a blue cast.
- * Clear color stays warm/neutral like the hero plate.
+ * Photo skyline behind the panes — unlit so leather / walls don’t pick up a cast.
+ * Angle locked; only replaces Sketchfab city blocks (interior stays as authored).
  */
-function ExteriorSky({ noir }: { noir: boolean }) {
+function ExteriorCity({ noir }: { noir: boolean }) {
   const { gl } = useThree()
-  const mat = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 4
-    canvas.height = 64
-    const ctx = canvas.getContext('2d')!
-    const g = ctx.createLinearGradient(0, 0, 0, 64)
-    g.addColorStop(0, '#5a9ad4')
-    g.addColorStop(0.5, '#8eb8e0')
-    g.addColorStop(0.82, '#c5d8ec')
-    g.addColorStop(1, '#d8e4f0')
-    ctx.fillStyle = g
-    ctx.fillRect(0, 0, 4, 64)
-    const map = new THREE.CanvasTexture(canvas)
+  const map = useTexture(noir ? CITY_NIGHT : CITY_DAY)
+
+  useLayoutEffect(() => {
     map.colorSpace = THREE.SRGBColorSpace
+    map.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy())
+    map.wrapS = map.wrapT = THREE.ClampToEdgeWrapping
+    map.offset.set(0, noir ? CITY_UV_Y.night : CITY_UV_Y.day)
+    map.repeat.set(1, 1)
     map.needsUpdate = true
-    return new THREE.MeshBasicMaterial({
-      map,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      fog: false,
-      toneMapped: false,
-    })
-  }, [])
+  }, [map, gl, noir])
+
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        map,
+        color: noir ? '#ffffff' : '#fff4e8',
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        fog: false,
+        toneMapped: false,
+      }),
+    [map, noir],
+  )
 
   useLayoutEffect(() => {
     const prev = gl.getClearColor(new THREE.Color())
     const prevA = gl.getClearAlpha()
-    /* Neutral clear — never blue (that was washing the interior). */
+    /* Neutral clear — same as pre-photo loft (never wash the interior). */
     gl.setClearColor(noir ? '#0a0c12' : '#c8bdb0', 1)
     return () => gl.setClearColor(prev, prevA)
   }, [gl, noir])
 
   useLayoutEffect(
     () => () => {
-      mat.map?.dispose()
       mat.dispose()
     },
     [mat],
   )
 
-  if (noir) return null
-
   return (
     <group>
-      {/* Primary window wall — left / −X (Sketchfab panes) */}
-      <mesh position={[-14, 4.5, 1.5]} rotation={[0, Math.PI / 2, 0]} frustumCulled={false} renderOrder={-10}>
-        <planeGeometry args={[28, 16]} />
+      {/* Locked window angle — H&M on long-pane Y midline */}
+      <mesh position={[-13.5, 0.1, 0]} rotation={[0, Math.PI / 2, 0]} frustumCulled={false} renderOrder={-10}>
+        <planeGeometry args={[34, 26]} />
         <primitive object={mat} attach="material" />
       </mesh>
-      {/* Far corner peek through the same glass run */}
-      <mesh position={[-10, 5.5, -8]} rotation={[0, Math.PI * 0.35, 0]} frustumCulled={false} renderOrder={-10}>
-        <planeGeometry args={[18, 12]} />
+      <mesh position={[-12.2, 0.4, -6.8]} rotation={[0, Math.PI * 0.4, 0]} frustumCulled={false} renderOrder={-10}>
+        <planeGeometry args={[24, 20]} />
         <primitive object={mat} attach="material" />
       </mesh>
     </group>
@@ -72,10 +73,10 @@ function ExteriorSky({ noir }: { noir: boolean }) {
 }
 
 /**
- * City / exterior blocks — keep them visible (Sketchfab look) but exclude from
- * the fit span so the loft doesn’t shrink to the skyline.
+ * Sketchfab city blocks only — hide these for the photo backdrop.
+ * Glass / frames / loft materials stay visible (original aesthetics).
  */
-const EXTERIOR_MATERIALS = new Set([
+const CITY_BLOCK_MATERIALS = new Set([
   'Material.023',
   'Material.024',
   'Material.025',
@@ -87,11 +88,16 @@ const EXTERIOR_MATERIALS = new Set([
   'Material.031',
 ])
 
-function isExteriorMesh(mesh: THREE.Mesh) {
+function isCityBlockMesh(mesh: THREE.Mesh) {
   const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-  if (mats.some((m) => m && EXTERIOR_MATERIALS.has(m.name))) return true
+  if (mats.some((m) => m && CITY_BLOCK_MATERIALS.has(m.name))) return true
   if (/^Plane007_/.test(mesh.name)) return true
   return false
+}
+
+/** Same set used for fit-span exclusion (loft framing, not skyline). */
+function isExteriorMesh(mesh: THREE.Mesh) {
+  return isCityBlockMesh(mesh)
 }
 
 /** Interior-only bounds for framing. */
@@ -130,7 +136,7 @@ interface LivingRoomModelProps {
 }
 
 /**
- * free_loft_17 as on Sketchfab — city through the panes, no fake enclosure.
+ * free_loft_17 interior as authored — photo skyline replaces city blocks only.
  * Plaque + telephone stay. Day uses original materials; lighting carries morning.
  */
 export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
@@ -144,7 +150,9 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
     clone.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return
 
-      obj.visible = true
+      const cityBlock = isCityBlockMesh(obj)
+      /* Hide blocky Sketchfab scrapers only — keep glass + loft aesthetics. */
+      obj.visible = !cityBlock
       const exterior = isExteriorMesh(obj)
       obj.castShadow = !exterior
       obj.receiveShadow = !exterior
@@ -200,7 +208,9 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
 
   return (
     <group>
-      <ExteriorSky noir={noir} />
+      <Suspense fallback={null}>
+        <ExteriorCity noir={noir} />
+      </Suspense>
       <group ref={root}>
         <primitive object={prepared} />
       </group>
@@ -213,3 +223,5 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
 }
 
 useGLTF.preload(LIVING_ROOM_GLB, false, true)
+useTexture.preload(CITY_NIGHT)
+useTexture.preload(CITY_DAY)
