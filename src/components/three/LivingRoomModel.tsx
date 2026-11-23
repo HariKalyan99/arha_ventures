@@ -4,6 +4,7 @@ import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { LIVING_ROOM_GLB, LIVING_ROOM_TARGET_SPAN, LIVING_ROOM_YAW } from './roomSource'
 import { ContactPhone } from './ContactPhone'
+import { LoftPlants } from './LoftPlants'
 import { WallLogo } from './WallLogo'
 
 /* night = 1.svg (dark night), day = 2.svg (morning/dusk sky) — H&M framing locked */
@@ -95,6 +96,12 @@ function isCityBlockMesh(mesh: THREE.Mesh) {
   return false
 }
 
+/** Repeated branch cards in the vases — replaced by LoftPlants. Pots stay. */
+function isSketchfabFoliage(mesh: THREE.Mesh) {
+  const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+  return mats.some((m) => m && m.name === 'Material.022')
+}
+
 /** Same set used for fit-span exclusion (loft framing, not skyline). */
 function isExteriorMesh(mesh: THREE.Mesh) {
   return isCityBlockMesh(mesh)
@@ -151,11 +158,12 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
       if (!(obj instanceof THREE.Mesh)) return
 
       const cityBlock = isCityBlockMesh(obj)
+      const foliage = isSketchfabFoliage(obj)
       /* Hide blocky Sketchfab scrapers only — keep glass + loft aesthetics. */
-      obj.visible = !cityBlock
+      obj.visible = !cityBlock && !foliage
       const exterior = isExteriorMesh(obj)
-      obj.castShadow = !exterior
-      obj.receiveShadow = !exterior
+      obj.castShadow = !exterior && !foliage
+      obj.receiveShadow = !exterior && !foliage
 
       const source = Array.isArray(obj.material) ? obj.material : [obj.material]
       const next = source.map((mat) => {
@@ -217,6 +225,7 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
       <Suspense fallback={null}>
         <ContactPhone />
         <WallLogo />
+        <LoftPlants />
       </Suspense>
     </group>
   )
