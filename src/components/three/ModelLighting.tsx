@@ -78,7 +78,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       } else {
         /* Through the left window wall — warm morning key. */
         windowKey.current.color.copy(m.sunColor).lerp(morning.current, 0.55)
-        windowKey.current.intensity = THREE.MathUtils.lerp(2.6, 1.1, lamp) * (0.85 + morningAmt * 0.25)
+        windowKey.current.intensity = THREE.MathUtils.lerp(2.4, 1.05, lamp) * (0.9 + morningAmt * 0.15)
       }
     }
 
@@ -90,7 +90,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     if (windowSpot.current) {
       windowSpot.current.visible = !ink
-      windowSpot.current.intensity = ink ? 0 : 14 * morningAmt
+      windowSpot.current.intensity = ink ? 0 : 11 * morningAmt
       windowSpot.current.color.copy(morning.current)
       windowSpot.current.target.updateMatrixWorld()
     }
@@ -127,7 +127,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
     scene.environmentIntensity = ink
       ? Math.max(0.55, m.envIntensity * 1.05)
       : Math.max(0.42, m.envIntensity * 0.88)
-    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.02)
+    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.08)
   })
 
   return (
