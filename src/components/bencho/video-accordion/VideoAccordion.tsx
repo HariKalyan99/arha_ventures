@@ -26,7 +26,10 @@ type Props = {
 export function VideoAccordion({ clips, className = '' }: Props) {
   const [open, setOpen] = useState<number | null>(null)
   const [coarse, setCoarse] = useState(false)
+  /** Bytes stay off the wire until the row is near — posters paint the panels first. */
+  const [near, setNear] = useState(false)
   const videos = useRef<(HTMLVideoElement | null)[]>([])
+  const row = useRef<HTMLDivElement>(null)
 
   const isMd = useMediaQuery('(min-width: 768px)')
   const isLg = useMediaQuery('(min-width: 1024px)')
@@ -48,6 +51,21 @@ export function VideoAccordion({ clips, className = '' }: Props) {
   }, [visible.length])
 
   useEffect(() => {
+    const el = row.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        setNear(true)
+        io.disconnect()
+      },
+      { rootMargin: '720px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
     videos.current.forEach((el, i) => {
       if (!el) return
       if (i === open) {
@@ -62,7 +80,7 @@ export function VideoAccordion({ clips, className = '' }: Props) {
         }
       }
     })
-  }, [open, visible])
+  }, [open, visible, near])
 
   const flexFor = useCallback(
     (index: number) => {
@@ -89,6 +107,7 @@ export function VideoAccordion({ clips, className = '' }: Props) {
 
   return (
     <div
+      ref={row}
       className={`mx-auto flex h-[min(72vh,36rem)] w-[92vw] max-w-[90rem] md:h-[min(70vh,36rem)] md:w-[85vw] lg:w-[80vw] ${className}`}
       style={{ gap: GAP_PX }}
       onMouseLeave={() => {
@@ -116,16 +135,28 @@ export function VideoAccordion({ clips, className = '' }: Props) {
               if (coarse) setOpen((prev) => (prev === i ? null : i))
             }}
           >
+            <img
+              src={clip.poster}
+              alt=""
+              width={640}
+              height={1138}
+              decoding="async"
+              className="absolute inset-0 size-full object-cover"
+            />
             <video
               ref={(el) => {
                 videos.current[i] = el
               }}
-              src={clip.src}
+              src={near ? clip.src : undefined}
+              poster={clip.poster}
               muted
               loop
               playsInline
-              preload="metadata"
-              className="absolute inset-0 size-full object-cover"
+              preload={near ? 'auto' : 'none'}
+              onLoadedData={(e) => {
+                e.currentTarget.dataset.ready = 'true'
+              }}
+              className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-500 data-[ready=true]:opacity-100"
             />
             <span
               aria-hidden

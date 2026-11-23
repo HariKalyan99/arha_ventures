@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { ThemeLogo } from '../ui/ThemeLogo'
 import { media } from '../../data/media'
-import { studio } from '../../data/site'
+import { company, studio } from '../../data/site'
 import { useReveal } from '../../animations/reveal'
 import { gsap, MOTION_QUERY, useGSAP } from '../../lib/gsap'
 import { Img } from '../ui/Img'
@@ -52,12 +52,12 @@ export function Philosophy() {
           </div>
           <div className="lg:col-span-9">
             <h2 id="studio-title" className="sr-only">
-              Studio philosophy
+              About ARHA Ventures
             </h2>
             <Words
               className="display text-display-lg text-balance text-cream"
-              text="Architecture is the art of restraint. We shape interiors where light, material and proportion are allowed to speak — and nothing else needs to."
-              emphasis={['light', 'material', 'proportion']}
+              text={company.belief}
+              emphasis={['inspire', 'connect', 'time']}
             />
           </div>
         </div>
@@ -85,18 +85,15 @@ export function Philosophy() {
             </div>
             <div className="flex flex-col gap-6 text-cream/60">
               <p data-reveal="fade" className="text-lead text-cream/90">
-                ARHA is an architecture and interior design studio working across private residences, villas and hospitality.
+                {company.paragraphs[0]}
               </p>
-              <p data-reveal="fade">
-                We work with a small number of clients at a time, from the first site visit to the day the last piece of furniture is placed —
-                designing the architecture, the interior and the objects within it as one continuous idea.
-              </p>
+              <p data-reveal="fade">{company.paragraphs[1]}</p>
               <dl data-reveal="fade" className="mt-2 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-6">
                 {[
-                  ['Disciplines', 'Architecture · Interiors'],
-                  ['Also', 'Furniture · Lighting'],
-                  ['Scale', 'Apartments to resorts'],
-                  ['Approach', 'Concept to handover'],
+                  ['Practice', 'Construction · Interiors'],
+                  ['Services', 'Planning · Turnkey'],
+                  ['Approach', 'Design · Craft · Detail'],
+                  ['Delivery', 'Transparent · On time'],
                 ].map(([term, value]) => (
                   <div key={term}>
                     <dt className="eyebrow text-gold">{term}</dt>

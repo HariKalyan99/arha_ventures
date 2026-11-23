@@ -12,15 +12,6 @@ Browse this folder to see what still needs a licensed substitute.
 
 After you drop replacements into `/public/images/` (same filename), update the paths in `src/data/media.ts` and delete the copies here.
 
-## Removed from the site (not used)
-
-Wrong subject matter — kept only as a reminder if you want these slots later.
-
-| File | Why it was removed | Suggested subject if you re-add |
-| --- | --- | --- |
-| `plans.webp` | Electronics / maker schematics, not architectural plans | Overhead measured drawings / furniture layouts |
-| `samples.webp` | Craft / washi tools on teal, not material samples | Stone, timber and textile sample board |
-
 ## Note
 
 Remaining files under `/public/images/` are also sample stock (Unsplash-sourced). Prefer swapping them for ARHA project photography when you have rights-cleared plates; this folder is only the clear mismatches.

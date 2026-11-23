@@ -67,7 +67,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     if (sun.current) {
       sun.current.color.copy(m.sunColor)
-      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.9)
+      sun.current.intensity = m.sunIntensity * (ink ? 0.75 : 0.68)
       sun.current.position.copy(m.sunPosition).multiplyScalar(1.05)
     }
 
@@ -76,21 +76,21 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         windowKey.current.color.copy(m.sunColor).lerp(coolFill.current, 0.5)
         windowKey.current.intensity = THREE.MathUtils.lerp(0.9, 0.45, lamp)
       } else {
-        /* Through the left window wall — warm morning key. */
+        /* Through the left window wall — warm, but not hot enough to clip the leather. */
         windowKey.current.color.copy(m.sunColor).lerp(morning.current, 0.55)
-        windowKey.current.intensity = THREE.MathUtils.lerp(2.6, 1.1, lamp) * (0.85 + morningAmt * 0.25)
+        windowKey.current.intensity = THREE.MathUtils.lerp(1.55, 0.85, lamp) * (0.9 + morningAmt * 0.1)
       }
     }
 
     if (windowFill.current) {
       windowFill.current.visible = !ink
-      windowFill.current.intensity = ink ? 0 : THREE.MathUtils.lerp(1.35, 0.4, lamp)
+      windowFill.current.intensity = ink ? 0 : THREE.MathUtils.lerp(0.48, 0.22, lamp)
       windowFill.current.color.copy(morning.current)
     }
 
     if (windowSpot.current) {
       windowSpot.current.visible = !ink
-      windowSpot.current.intensity = ink ? 0 : 14 * morningAmt
+      windowSpot.current.intensity = ink ? 0 : 2.6 * morningAmt
       windowSpot.current.color.copy(morning.current)
       windowSpot.current.target.updateMatrixWorld()
     }
@@ -127,7 +127,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
     scene.environmentIntensity = ink
       ? Math.max(0.55, m.envIntensity * 1.05)
       : Math.max(0.42, m.envIntensity * 0.88)
-    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 1.02)
+    gl.toneMappingExposure = m.exposure * (ink ? 1.05 : 0.94)
   })
 
   return (
@@ -151,7 +151,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
         decay={1.7}
         castShadow={false}
       />
-      <object3D ref={windowSpotTarget} position={[-1.2, 0.9, 1.8]} />
+      {/* Floor inside the panes — not the cushion faces. */}
+      <object3D ref={windowSpotTarget} position={[-3.6, 0.2, 1.15]} />
 
       <directionalLight ref={sheenKey} position={[-4.5, 4.2, 5.5]} intensity={0} color="#e2d6c4" />
 
@@ -185,8 +186,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       ) : (
         <Environment frames={1} resolution={384} background={false} key="env-day">
           {/* Warm morning only — blue sky is a window billboard, not env. */}
-          <Lightformer form="rect" intensity={4.8} position={[-8.5, 3.2, 1.5]} scale={[3.2, 9, 1]} color="#ffe8c8" />
-          <Lightformer form="rect" intensity={2.6} position={[-7.5, 5.2, 2.2]} scale={[2.4, 3.5, 1]} color="#fff0d0" />
+          <Lightformer form="rect" intensity={2.15} position={[-8.5, 3.2, 1.5]} scale={[3.2, 9, 1]} color="#ffe8c8" />
+          <Lightformer form="rect" intensity={1.15} position={[-7.5, 5.2, 2.2]} scale={[2.4, 3.5, 1]} color="#fff0d0" />
           <Lightformer form="rect" intensity={1.2} position={[0, 7, -3]} scale={[14, 4, 1]} color="#f0e6d8" />
           <Lightformer form="rect" intensity={0.85} position={[7, 2.4, 1]} scale={[3, 7, 1]} color="#c8b49a" />
           <Lightformer form="ring" intensity={0.55} position={[0, 7, 0]} scale={10} color="#efe6da" />

@@ -6,6 +6,7 @@ import { EASE_CURTAIN, EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
+import { SiteMusic } from '../audio/SiteMusic'
 import { SoundFeedback } from '../bencho/sounds/SoundFeedback'
 import { CustomCursor } from '../ui/CustomCursor'
 import { PageLoader } from '../ui/PageLoader'
@@ -65,7 +66,7 @@ export function Layout() {
   }, [location.pathname, scrollReady, scrollTo])
 
   return (
-    <>
+    <SiteMusic>
       <PageLoader />
       <CustomCursor />
       <SoundFeedback />
@@ -106,6 +107,6 @@ export function Layout() {
           />
         </motion.div>
       </AnimatePresence>
-    </>
+    </SiteMusic>
   )
 }

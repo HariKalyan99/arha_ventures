@@ -3,6 +3,7 @@ import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import { useLocation } from 'react-router'
 import { EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
+import { MusicToggle } from '../audio/SiteMusic'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { SiteMenu } from './SiteMenu'
 import { Wordmark } from './Wordmark'
@@ -174,8 +175,16 @@ export function Header() {
         />
         <div className="shell relative flex h-[var(--header-h)] items-center justify-between gap-6">
           <Wordmark onNavigate={menuOpen ? closeMenu : undefined} />
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Frosted cluster over the loft — parchment ink alone fails on the light mezzanine */}
+          <div
+            className={`flex items-center gap-0.5 sm:gap-1 ${
+              pathname === '/' && !solid && !menuOpen
+                ? 'rounded-full border border-parchment/18 bg-[#111111]/62 px-1.5 shadow-[0_8px_28px_rgba(0,0,0,0.28)] backdrop-blur-md sm:px-2'
+                : ''
+            }`}
+          >
             <ThemeToggle onMedia={pathname === '/' && !solid && !menuOpen} />
+            <MusicToggle onMedia={pathname === '/' && !solid && !menuOpen} />
             <MenuToggle open={menuOpen} onClick={toggleMenu} onMedia={pathname === '/' && !solid && !menuOpen} />
           </div>
         </div>

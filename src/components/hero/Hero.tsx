@@ -207,7 +207,7 @@ export function Hero() {
                 data-hero-fade
                 className="hero-lead-on-media max-w-[28rem] text-[0.9375rem] font-medium leading-relaxed text-parchment sm:text-[0.95rem] md:text-lead md:font-normal md:text-parchment/80 short:hidden"
               >
-                Architecture and interiors, shaped with patience and a reverence for material.
+                We bring together creativity, technical expertise, quality craftsmanship, and professional execution.
               </p>
               <div data-hero-fade className="pointer-events-auto flex flex-wrap gap-2 sm:gap-3">
                 <ArrowButton variant="solid" onClick={() => scrollTo('projects')}>
