@@ -16,10 +16,10 @@ export function SiteFilm({ index }: { index: string }) {
         <div className="mx-auto max-w-3xl text-center">
           <SectionLabel index={index} label="On site" className="justify-center" />
           <h2 id="film-title" className="display mt-6 text-display-lg text-cream">
-            <Lines lines={['Rooms', <>in <em>motion.</em></>]} />
+            <Lines lines={['As', <em>built.</em>]} />
           </h2>
           <p data-reveal="fade" className="mx-auto mt-5 max-w-md text-cream/55">
-            A few finished moments from recent work — hover a panel to open it and watch the space breathe.
+            Finished moments from recent projects — hover a panel to open one.
           </p>
         </div>
       </div>
