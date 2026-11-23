@@ -385,27 +385,12 @@
     }
   }
 
-  /* Theme music — bottom-left on phones; bottom-right from md (clears Live 3D / tour index) */
-  .music-toggle {
-    left: max(1rem, env(safe-area-inset-left, 0px));
-    right: auto;
-    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  }
-
-  @media (min-width: 768px) {
-    .music-toggle {
-      left: auto;
-      right: max(1rem, env(safe-area-inset-right, 0px));
-      bottom: max(3.75rem, calc(env(safe-area-inset-bottom, 0px) + 2.5rem));
-    }
-  }
-
-  /* Theme music equalizer — Bencho / qdigital-style bars; live = dancing */
+  /* Theme music equalizer — header, between theme toggle and menu */
   .music-wave {
     position: relative;
     z-index: 1;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     gap: 3px;
     height: 18px;
@@ -418,8 +403,8 @@
     height: 18px;
     border-radius: 999px;
     transform: scaleY(0.22);
-    transform-origin: center bottom;
-    background: linear-gradient(to top, var(--color-brass-soft), var(--color-parchment));
+    transform-origin: center;
+    background: currentColor;
     transition:
       transform 0.35s var(--ease-luxe),
       background 0.35s ease,
@@ -427,20 +412,20 @@
   }
 
   .music-wave--muted .music-wave-bar {
-    transform: scaleY(0.28);
-    opacity: 0.55;
-    background: linear-gradient(to top, rgba(232, 224, 210, 0.35), rgba(232, 224, 210, 0.65));
+    transform: scaleY(0.42);
+    opacity: 0.7;
+    background: currentColor;
   }
 
   .music-toggle:hover .music-wave--muted .music-wave-bar {
-    transform: scaleY(0.4);
-    opacity: 0.85;
+    transform: scaleY(0.55);
+    opacity: 0.95;
   }
 
   .music-wave--live .music-wave-bar {
     animation: music-eq 0.85s ease-in-out infinite alternate;
     opacity: 1;
-    background: linear-gradient(to top, var(--color-brass-soft), var(--color-parchment));
+    background: currentColor;
   }
 
   .music-wave--live .music-wave-bar:nth-child(1) {

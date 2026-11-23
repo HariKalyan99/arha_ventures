@@ -3,6 +3,7 @@ import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import { useLocation } from 'react-router'
 import { EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
+import { MusicToggle } from '../audio/SiteMusic'
 import { ThemeToggle } from '../ui/ThemeToggle'
 import { SiteMenu } from './SiteMenu'
 import { Wordmark } from './Wordmark'
@@ -183,6 +184,7 @@ export function Header() {
             }`}
           >
             <ThemeToggle onMedia={pathname === '/' && !solid && !menuOpen} />
+            <MusicToggle onMedia={pathname === '/' && !solid && !menuOpen} />
             <MenuToggle open={menuOpen} onClick={toggleMenu} onMedia={pathname === '/' && !solid && !menuOpen} />
           </div>
         </div>
