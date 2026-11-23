@@ -124,6 +124,19 @@ function interiorBox(root: THREE.Object3D) {
   return box
 }
 
+/** Sectional + lounge leather. Roughness ~0.2 was clipping to white in morning light. */
+const DAY_LEATHER = new Set(['Material.012', 'Material.013'])
+
+function settleDayLeather(std: THREE.MeshStandardMaterial) {
+  if (!DAY_LEATHER.has(std.name)) return std
+  const next = std.clone() as THREE.MeshStandardMaterial
+  next.roughness = Math.max(next.roughness, 0.62)
+  next.metalness = Math.min(next.metalness ?? 0, 0.02)
+  next.envMapIntensity = 0.42
+  next.needsUpdate = true
+  return next
+}
+
 /** Night theme only — gentle charcoal deepen. Day keeps the GLB as authored. */
 function applyNoirLook(std: THREE.MeshStandardMaterial) {
   const next = std.clone() as THREE.MeshStandardMaterial
@@ -144,7 +157,7 @@ interface LivingRoomModelProps {
 
 /**
  * free_loft_17 interior as authored — photo skyline replaces city blocks only.
- * Plaque + telephone stay. Day uses original materials; lighting carries morning.
+ * Plaque + telephone stay. Day keeps the loft, with the sofa leather settled so morning light does not clip it.
  */
 export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
   /* false = no Draco, true = Meshopt (matches optimized free_loft_17.glb) */
@@ -171,7 +184,7 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
 
         if (!noir) {
           /* Day — keep the loft as authored; soften night-city emissives for morning. */
-          if (!exterior) return mat
+          if (!exterior) return settleDayLeather(mat)
           const day = mat.clone() as THREE.MeshStandardMaterial
           if ('emissiveIntensity' in day && typeof day.emissiveIntensity === 'number') {
             day.emissiveIntensity *= 0.35
