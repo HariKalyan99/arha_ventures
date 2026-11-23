@@ -1,50 +1,44 @@
 import { useRef } from 'react'
+import { company } from '../../data/site'
 import { useReveal } from '../../animations/reveal'
 import { SectionLabel } from '../ui/SectionLabel'
 import { Lines } from '../ui/Text'
 
-const principles = [
-  {
-    numeral: 'I',
-    title: 'Material honesty',
-    body: 'Stone that looks like stone, timber that ages like timber. We specify fewer materials and let each one carry its full weight.',
-  },
-  {
-    numeral: 'II',
-    title: 'Light as structure',
-    body: 'Daylight is the first material we design with. Artificial light follows it — concealed, layered and tuned to the hour.',
-  },
-  {
-    numeral: 'III',
-    title: 'Crafted restraint',
-    body: 'Every junction is drawn, every edge considered. Restraint is not absence; it is the confidence to stop at enough.',
-  },
-]
-
+/** Vision, mission and core values — the client’s own wording. */
 export function Principles() {
   const ref = useRef<HTMLElement>(null)
   useReveal(ref)
   return (
     <section ref={ref} aria-labelledby="principles-title" className="bg-obsidian section-y">
-      <div className="shell grid gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-4">
-          <SectionLabel index="02" label="Principles" />
-          <h2 id="principles-title" className="display mt-8 text-display-lg text-cream">
-            <Lines lines={['Three ideas', <em key="e">we return to.</em>]} />
-          </h2>
+      <div className="shell">
+        <SectionLabel index="02" label="Purpose" />
+        <h2 id="principles-title" className="display mt-8 max-w-3xl text-display-lg text-cream">
+          <Lines lines={['What guides', <em key="e">every project.</em>]} />
+        </h2>
+
+        <div className="mt-[clamp(3rem,6vw,5rem)] grid gap-12 border-t border-line pt-12 lg:grid-cols-2 lg:gap-16">
+          <div data-reveal="fade">
+            <h3 className="eyebrow text-gold">Our Vision</h3>
+            <p className="mt-4 max-w-xl text-lead text-cream/90">{company.vision}</p>
+          </div>
+          <div data-reveal="fade" data-delay={0.08}>
+            <h3 className="eyebrow text-gold">Our Mission</h3>
+            <p className="mt-4 max-w-xl text-lead text-cream/90">{company.mission}</p>
+          </div>
         </div>
-        <ol className="flex flex-col lg:col-span-7 lg:col-start-6">
-          {principles.map((p, i) => (
-            <li key={p.title} data-reveal="fade" data-delay={i * 0.1} className="relative grid gap-4 py-10 sm:grid-cols-[6rem_1fr]">
-              <span data-reveal="rule" aria-hidden className="absolute inset-x-0 top-0 h-px bg-line" />
-              <p className="font-display text-4xl text-gold italic">{p.numeral}.</p>
-              <div>
-                <h3 className="display text-display-sm text-cream">{p.title}</h3>
-                <p className="mt-4 max-w-lg text-cream/70">{p.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+
+        <div className="mt-[clamp(3.5rem,7vw,6rem)]">
+          <h3 className="eyebrow text-gold">Our Core Values</h3>
+          <ol className="mt-4 grid gap-x-12 sm:grid-cols-2">
+            {company.values.map((value, i) => (
+              <li key={value.title} data-reveal="fade" data-delay={i * 0.06} className="relative py-8">
+                <span data-reveal="rule" aria-hidden className="absolute inset-x-0 top-0 h-px bg-line" />
+                <h4 className="display text-display-sm text-cream">{value.title}</h4>
+                <p className="mt-3 max-w-md text-cream/70">{value.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   )

@@ -8,8 +8,8 @@ import type { InquiryConfig, NavItem, StudioConfig } from '../types/content'
 export const studio: StudioConfig = {
   name: 'ARHA',
   legalName: 'Arha Ventures',
-  tagline: 'Architecture & Interiors',
-  descriptor: 'Interiors composed in stone, timber and light.',
+  tagline: 'Construction & Interiors',
+  descriptor: 'Spaces that inspire, connect, and stand the test of time.',
   email: 'studio@example.com', // PLACEHOLDER — not listed on Google Business Profile
   phone: '+91 91136 16705',
   location:
@@ -23,6 +23,32 @@ export const studio: StudioConfig = {
   ],
   /** Email is still a placeholder; address and phone are live from Google. */
   contactIsPlaceholder: true,
+}
+
+/**
+ * Company narrative as shared by the client.
+ * Keep the wording — the site presents it, it does not rewrite it.
+ */
+export const company = {
+  paragraphs: [
+    'ARHA Ventures is a design-driven construction and interior solutions company committed to transforming ideas into exceptional spaces. We bring together creativity, technical expertise, quality craftsmanship, and professional execution to deliver projects that reflect our clients’ vision and aspirations.',
+    'From architectural planning and building construction to sophisticated interior design and turnkey solutions, we offer comprehensive services tailored to meet the unique requirements of every project.',
+    'Our approach combines innovative design, intelligent space planning, premium materials, and attention to detail to create spaces that are not only visually appealing but also functional, sustainable, and built to last.',
+    'At ARHA Ventures, we believe every project is an opportunity to create something meaningful. We focus on building lasting relationships through transparency, reliability, quality, and timely project delivery.',
+  ],
+  belief:
+    'We don’t just build structures; we create spaces that inspire, connect, and stand the test of time.',
+  vision:
+    'To become a trusted name in the construction and design industry by setting new standards in innovation, quality, and excellence.',
+  mission:
+    'To deliver exceptional construction and interior solutions through creative thinking, professional expertise, quality execution, and customer-focused service.',
+  values: [
+    { title: 'Quality', body: 'Maintaining high standards in every detail.' },
+    { title: 'Innovation', body: 'Embracing modern design and construction techniques.' },
+    { title: 'Integrity', body: 'Building trust through transparency and commitment.' },
+    { title: 'Excellence', body: 'Delivering beyond expectations.' },
+    { title: 'Client Satisfaction', body: 'Turning our clients’ visions into reality.' },
+  ],
 }
 
 /** Public Google reviews listing for Arha Ventures (Shivakote). */
