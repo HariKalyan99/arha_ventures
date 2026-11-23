@@ -7,7 +7,7 @@ import { ContactPhone } from './ContactPhone'
 import { LoftPlants } from './LoftPlants'
 import { WallLogo } from './WallLogo'
 
-/* night = 1.svg (dark night), day = 2.svg (morning/dusk sky) — H&M framing locked */
+/* night.webp = dark skyline, day.webp = morning/dusk sky — H&M framing locked */
 const CITY_NIGHT = '/images/skyscraper/night.webp?v=canva25'
 const CITY_DAY = '/images/skyscraper/day.webp?v=canva25'
 /* H&M v differs (day plate has extra sky) — offset so mid-pane (uv.y=0.5) hits H&M */
