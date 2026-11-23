@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { play } from '../bencho/sounds/sounds'
-import { readMusicMuted, SITE_MUSIC_SRC, writeMusicMuted } from '../../lib/siteMusic'
+import { hasExplicitMute, readMusicMuted, SITE_MUSIC_SRC, writeMusicMuted } from '../../lib/siteMusic'
 
 const BAR_COUNT = 5
 const VOLUME = 0.38
@@ -50,7 +50,7 @@ export function MusicToggle({ onMedia = false }: { onMedia?: boolean }) {
 /**
  * Background theme — native HTMLAudioElement (qdigital99 pattern).
  * No Web Audio graph: reliable on iOS Safari / Android Chrome.
- * Starts muted; the header equalizer is the only gesture that plays.
+ * Starts on the first click anywhere. An explicit mute this session is left alone.
  */
 export function SiteMusic({ children }: { children?: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -117,6 +117,27 @@ export function SiteMusic({ children }: { children?: ReactNode }) {
       audio.pause()
     }
   }, [])
+
+  /* First click anywhere starts the theme. The equalizer keeps its own toggle. */
+  useEffect(() => {
+    if (hasExplicitMute()) return
+
+    let done = false
+    const detach = () => document.removeEventListener('click', onDocumentClick)
+
+    const onDocumentClick = (event: MouseEvent) => {
+      if (done) return
+      const target = event.target
+      if (target instanceof Element && target.closest('[data-audio-toggle]')) return
+      done = true
+      detach()
+      syncMuted(false)
+      playTheme().catch(() => {})
+    }
+
+    document.addEventListener('click', onDocumentClick)
+    return () => detach()
+  }, [playTheme, syncMuted])
 
   /* Pause when the tab is hidden — resumes only if user left music on. */
   useEffect(() => {
