@@ -46,8 +46,8 @@ function ExteriorCity({ noir }: { noir: boolean }) {
   useLayoutEffect(() => {
     const prev = gl.getClearColor(new THREE.Color())
     const prevA = gl.getClearAlpha()
-    /* Neutral clear — same as pre-photo loft (never wash the interior). */
-    gl.setClearColor(noir ? '#0a0c12' : '#c8bdb0', 1)
+    /* Same plaster family as the day wall, darkened. A blue clear reads as a blue wall. */
+    gl.setClearColor(noir ? '#141210' : '#c8bdb0', 1)
     return () => gl.setClearColor(prev, prevA)
   }, [gl, noir])
 
@@ -140,7 +140,7 @@ function settleDayLeather(std: THREE.MeshStandardMaterial) {
 /** Night theme only — gentle charcoal deepen. Day keeps the GLB as authored. */
 function applyNoirLook(std: THREE.MeshStandardMaterial) {
   const next = std.clone() as THREE.MeshStandardMaterial
-  next.color.lerp(new THREE.Color('#121216'), 0.22)
+  next.color.lerp(new THREE.Color('#161412'), 0.22)
   next.color.multiplyScalar(0.82)
   if (typeof next.roughness === 'number') {
     next.roughness = Math.max(0.22, Math.min(0.85, next.roughness * 0.82))

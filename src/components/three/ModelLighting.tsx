@@ -9,7 +9,7 @@ import type { MoodBlend } from './Lighting'
 interface ModelLightingProps {
   mood: LightingMood
   blend?: MoodBlend
-  /** Site Night theme — cooler plate + specular punches for sheen */
+  /** Site Night theme — warm shadow plate + specular punches for sheen */
   noir?: boolean
 }
 
@@ -39,6 +39,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
   const target = useRef(cloneMood(moods[mood]))
   const morning = useRef(new THREE.Color('#ffe7c4'))
   const coolFill = useRef(new THREE.Color('#c4b8a8'))
+  const warmShadow = useRef(new THREE.Color('#2a241c'))
   const noirRef = useRef(noir)
   noirRef.current = noir
 
@@ -73,7 +74,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
 
     if (windowKey.current) {
       if (ink) {
-        windowKey.current.color.copy(m.sunColor).lerp(coolFill.current, 0.5)
+        /* Warm stone. The night sun is steel blue and was painting the end wall. */
+        windowKey.current.color.copy(coolFill.current)
         windowKey.current.intensity = THREE.MathUtils.lerp(0.9, 0.45, lamp)
       } else {
         /* Through the left window wall — warm, but not hot enough to clip the leather. */
@@ -96,13 +98,13 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
     }
 
     if (hemi.current) {
-      hemi.current.color.copy(m.hemiSky)
+      hemi.current.color.copy(ink ? warmShadow.current : m.hemiSky)
       hemi.current.groundColor.copy(m.hemiGround)
       hemi.current.intensity = m.hemiIntensity * (ink ? 1.05 : 1.1)
     }
     if (ambient.current) {
       ambient.current.intensity = ink ? 0.22 : THREE.MathUtils.lerp(0.32, 0.24, lamp)
-      ambient.current.color.set(ink ? '#1c222e' : '#efe4d4')
+      ambient.current.color.set(ink ? '#1a1612' : '#efe4d4')
     }
 
     /* Day keeps lamps quiet so window light reads; night leans on them. */
@@ -181,7 +183,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
           <Lightformer form="rect" intensity={2.2} position={[-6, 3.5, 3]} scale={[2.5, 9, 1]} color="#e0d4c4" />
           <Lightformer form="rect" intensity={1.2} position={[7, 2.8, 2]} scale={[2.5, 7, 1]} color="#a89888" />
           <Lightformer form="ring" intensity={0.9} position={[0, 7, 0]} scale={10} color="#c8bca8" />
-          <Lightformer form="rect" intensity={0.3} position={[0, 1, 8]} scale={[12, 4, 1]} color="#1a1c24" />
+          <Lightformer form="rect" intensity={0.3} position={[0, 1, 8]} scale={[12, 4, 1]} color="#1a1612" />
         </Environment>
       ) : (
         <Environment frames={1} resolution={384} background={false} key="env-day">
