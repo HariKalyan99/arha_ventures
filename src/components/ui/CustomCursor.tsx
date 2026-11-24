@@ -200,7 +200,7 @@ export function CustomCursor() {
   return (
     <div
       aria-hidden
-      className={`pointer-events-none fixed inset-0 z-[120] hidden lg:block ${show ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+      className={`pointer-events-none fixed inset-0 z-[200] hidden lg:block ${show ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
     >
       {/* Centre crosshair — tracks 1:1 */}
       <span ref={cross} className="absolute top-0 left-0 size-4 will-change-transform">

@@ -3,7 +3,8 @@ import { PageHeader } from '../components/ui/PageHeader'
 import { InquiryForm } from '../components/contact/InquiryForm'
 import { StudioMap } from '../components/contact/StudioMap'
 import { Particles } from '../components/bencho/particles/Particles'
-import { studio } from '../data/site'
+import { ArrowExternalLink } from '../components/ui/ArrowButton'
+import { studio, whatsappHref } from '../data/site'
 import { useReveal } from '../animations/reveal'
 import { usePageMeta } from '../hooks/usePageMeta'
 
@@ -49,7 +50,7 @@ export default function ContactPage() {
                   <div key={d.label} data-reveal="fade" className="flex flex-col gap-1 border-b border-line py-5">
                     <dt className="eyebrow text-cream/50">{d.label}</dt>
                     <dd className="text-cream">
-                      {d.href && !studio.contactIsPlaceholder ? (
+                      {d.label === 'Telephone' || (d.href && !studio.contactIsPlaceholder) ? (
                         <a href={d.href} className="link-line">
                           {d.value}
                         </a>
@@ -60,6 +61,17 @@ export default function ContactPage() {
                   </div>
                 ))}
               </dl>
+              <div data-reveal="fade" className="flex w-full flex-col items-stretch gap-3 sm:items-start">
+                <ArrowExternalLink
+                  href={whatsappHref()}
+                  variant="solid"
+                  className="w-full justify-center sm:w-auto"
+                  aria-label={`Connect over WhatsApp at ${studio.phone}`}
+                >
+                  Connect over WhatsApp
+                </ArrowExternalLink>
+                <p className="text-xs text-cream/45">Opens a chat with a short introduction ready to send.</p>
+              </div>
               <StudioMap />
               {studio.contactIsPlaceholder && (
                 <p data-reveal="fade" className="border-l border-gold/50 pl-4 text-sm text-gold/90">

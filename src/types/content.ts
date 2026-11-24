@@ -127,6 +127,6 @@ export interface Testimonial {
 export interface InquiryConfig {
   projectTypes: string[]
   budgets: string[]
-  /** Endpoint is read from VITE_INQUIRY_ENDPOINT at build time */
-  endpoint: string | undefined
+  /** Enquiry POST URL — VITE_INQUIRY_ENDPOINT or /api/inquiry */
+  endpoint: string
 }
