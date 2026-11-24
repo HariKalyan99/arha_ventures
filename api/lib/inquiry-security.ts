@@ -10,6 +10,19 @@ const DEFAULT_ORIGINS = [
   'http://127.0.0.1:3000',
 ]
 
+/** Keep in sync with `inquiry.projectTypes` in `src/data/site.ts`. */
+export const ALLOWED_PROJECT_TYPES = [
+  'Private residence',
+  'Villa',
+  'Apartment / penthouse',
+  'Hospitality',
+  'Commercial / workplace',
+  'Consultation only',
+] as const
+
+/** Server-owned copy — do not trust a client `guide` field. */
+export const LEAD_MAGNET_GUIDE = 'Five questions before you begin a home interiors project'
+
 export const EMAIL_LIMIT = 3
 export const EMAIL_WINDOW_MS = 24 * 60 * 60 * 1000
 export const IP_LIMIT = 10
@@ -77,9 +90,21 @@ export function applyCors(
   return false
 }
 
+/**
+ * Resolve client IP behind a trusted edge (Vercel).
+ * Prefer platform header; fall back to standard proxy headers.
+ * Do not host these handlers without a proxy that overwrites forwarded headers.
+ */
 export function getClientIp(req: { headers: HeaderBag; socket?: { remoteAddress?: string } }): string {
-  const forwarded = headerValue(req.headers, 'x-forwarded-for') || headerValue(req.headers, 'x-real-ip')
+  const vercel = headerValue(req.headers, 'x-vercel-forwarded-for')
+  if (vercel) return vercel.split(',')[0]?.trim() || 'unknown'
+
+  const realIp = headerValue(req.headers, 'x-real-ip')
+  if (realIp) return realIp.split(',')[0]?.trim() || 'unknown'
+
+  const forwarded = headerValue(req.headers, 'x-forwarded-for')
   if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown'
+
   return req.socket?.remoteAddress || 'unknown'
 }
 
@@ -109,12 +134,16 @@ export function validateInquiryPayload(body: Record<string, unknown>): Validatio
   const location = asString(body.location, 120)
   const budget = asString(body.budget, 60)
   const message = asString(body.message, 5000)
-  const source = asString(body.source, 40) || 'website'
+  /* Ignore client-supplied source — only first-party enquiry form. */
+  const source = 'website'
 
   if (name.length < 2) return { ok: false, error: 'Please tell us your name.' }
   if (!EMAIL_RE.test(email)) return { ok: false, error: 'Please enter a valid email address.' }
   if (phone && !PHONE_RE.test(phone)) return { ok: false, error: 'Please use digits, spaces and + only.' }
   if (!projectType) return { ok: false, error: 'Please choose the type of project.' }
+  if (!(ALLOWED_PROJECT_TYPES as readonly string[]).includes(projectType)) {
+    return { ok: false, error: 'Please choose a valid project type.' }
+  }
   if (message.length < 20) {
     return { ok: false, error: 'A few sentences about the project help us prepare (20 characters minimum).' }
   }
@@ -132,7 +161,6 @@ export function validateLeadMagnetPayload(body: Record<string, unknown>): Valida
 
   const name = asString(body.name, 100)
   const email = asString(body.email, 254).toLowerCase()
-  const guide = asString(body.guide, 200) || 'Planning guide'
 
   if (name.length < 2) return { ok: false, error: 'Please tell us your name.' }
   if (!EMAIL_RE.test(email)) return { ok: false, error: 'Please enter a valid email address.' }
@@ -146,7 +174,7 @@ export function validateLeadMagnetPayload(body: Record<string, unknown>): Valida
       projectType: 'Lead magnet',
       location: '',
       budget: '',
-      message: `Lead magnet request — ${guide}`,
+      message: `Lead magnet request — ${LEAD_MAGNET_GUIDE}`,
       source: 'lead_magnet',
       website: '',
     },
@@ -169,12 +197,16 @@ type CountClient = {
   }
 }
 
+type CountResult =
+  | { ok: true; count: number }
+  | { ok: false; message: string }
+
 async function countRecent(
   supabase: CountClient,
   column: string,
   value: string,
   windowMs: number,
-): Promise<number> {
+): Promise<CountResult> {
   const since = new Date(Date.now() - windowMs).toISOString()
   const { count, error } = await supabase
     .from('inquiries')
@@ -184,9 +216,9 @@ async function countRecent(
 
   if (error) {
     console.error('Rate-limit lookup failed:', error.message)
-    return 0
+    return { ok: false, message: error.message }
   }
-  return count ?? 0
+  return { ok: true, count: count ?? 0 }
 }
 
 export async function enforceRateLimits({
@@ -199,7 +231,14 @@ export async function enforceRateLimits({
   supabase: CountClient
 }): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
   const emailCount = await countRecent(supabase, 'email', email, EMAIL_WINDOW_MS)
-  if (emailCount >= EMAIL_LIMIT) {
+  if (!emailCount.ok) {
+    return {
+      ok: false,
+      status: 503,
+      error: 'Unable to process request right now. Please try again.',
+    }
+  }
+  if (emailCount.count >= EMAIL_LIMIT) {
     return {
       ok: false,
       status: 429,
@@ -209,7 +248,14 @@ export async function enforceRateLimits({
 
   if (clientIp && clientIp !== 'unknown') {
     const ipCount = await countRecent(supabase, 'client_ip', clientIp, IP_WINDOW_MS)
-    if (ipCount >= IP_LIMIT) {
+    if (!ipCount.ok) {
+      return {
+        ok: false,
+        status: 503,
+        error: 'Unable to process request right now. Please try again.',
+      }
+    }
+    if (ipCount.count >= IP_LIMIT) {
       return {
         ok: false,
         status: 429,

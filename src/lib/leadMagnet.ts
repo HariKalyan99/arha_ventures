@@ -21,7 +21,6 @@ export async function submitLeadMagnet(payload: LeadMagnetPayload): Promise<Lead
         name: payload.name,
         email: payload.email,
         website: payload.website ?? '',
-        guide: LEAD_MAGNET_GUIDE,
         source: 'lead_magnet',
       }),
     })

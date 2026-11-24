@@ -15,6 +15,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Local Supabase schema notes — keep off remote
+supabase/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

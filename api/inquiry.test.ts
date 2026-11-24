@@ -1,15 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const insertSelect = vi.fn()
+const insertMock = vi.fn()
 const fromMock = vi.fn(() => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
       gte: vi.fn(async () => ({ count: 0, error: null })),
     })),
   })),
-  insert: vi.fn(() => ({
-    select: insertSelect,
-  })),
+  insert: insertMock,
 }))
 
 vi.mock('@supabase/supabase-js', () => ({
@@ -70,7 +68,7 @@ describe('POST /api/inquiry', () => {
     vi.clearAllMocks()
     process.env.SUPABASE_URL = 'https://example.supabase.co'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-test'
-    insertSelect.mockResolvedValue({ data: [{ id: 'inq_123' }], error: null })
+    insertMock.mockResolvedValue({ data: null, error: null })
   })
 
   it('rejects non-POST methods', async () => {
@@ -113,6 +111,17 @@ describe('POST /api/inquiry', () => {
     expect(res.statusCode).toBe(400)
   })
 
+  it('returns 400 for non-allowlisted project types', async () => {
+    const res = mockRes()
+    await handler(
+      { method: 'POST', headers: {}, body: validBody({ projectType: 'NotARealType' }) },
+      res,
+    )
+    expect(res.statusCode).toBe(400)
+    expect(res.body).toEqual({ error: 'Please choose a valid project type.' })
+    expect(insertMock).not.toHaveBeenCalled()
+  })
+
   it('silently accepts honeypot submissions without inserting', async () => {
     const res = mockRes()
     await handler(
@@ -128,7 +137,7 @@ describe('POST /api/inquiry', () => {
     expect(fromMock).not.toHaveBeenCalled()
   })
 
-  it('inserts a valid enquiry and returns the id', async () => {
+  it('inserts a valid enquiry without returning a row id', async () => {
     const res = mockRes()
     await handler(
       {
@@ -137,13 +146,22 @@ describe('POST /api/inquiry', () => {
           'x-forwarded-for': '203.0.113.9',
           'user-agent': 'vitest',
         },
-        body: validBody(),
+        body: validBody({ source: 'spoofed' }),
       },
       res,
     )
     expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true, id: 'inq_123' })
+    expect(res.body).toEqual({ success: true })
+    expect(res.body).not.toHaveProperty('id')
     expect(fromMock).toHaveBeenCalledWith('inquiries')
+    expect(insertMock).toHaveBeenCalledWith([
+      expect.objectContaining({
+        email: 'hari@example.com',
+        project_type: 'Villa',
+        source: 'website',
+        client_ip: '203.0.113.9',
+      }),
+    ])
   })
 
   it('returns 429 when the email rate limit is hit', async () => {
@@ -153,19 +171,33 @@ describe('POST /api/inquiry', () => {
           gte: vi.fn(async () => ({ count: 3, error: null })),
         })),
       })),
-      insert: vi.fn(() => ({
-        select: insertSelect,
-      })),
+      insert: insertMock,
     }))
 
     const res = mockRes()
     await handler({ method: 'POST', headers: {}, body: validBody() }, res)
     expect(res.statusCode).toBe(429)
-    expect(insertSelect).not.toHaveBeenCalled()
+    expect(insertMock).not.toHaveBeenCalled()
+  })
+
+  it('returns 503 when rate-limit lookup fails (fail-closed)', async () => {
+    fromMock.mockImplementationOnce(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          gte: vi.fn(async () => ({ count: null, error: { message: 'timeout' } })),
+        })),
+      })),
+      insert: insertMock,
+    }))
+
+    const res = mockRes()
+    await handler({ method: 'POST', headers: {}, body: validBody() }, res)
+    expect(res.statusCode).toBe(503)
+    expect(insertMock).not.toHaveBeenCalled()
   })
 
   it('returns 500 when Supabase insert fails', async () => {
-    insertSelect.mockResolvedValueOnce({ data: null, error: { message: 'db down' } })
+    insertMock.mockResolvedValueOnce({ data: null, error: { message: 'db down' } })
     const res = mockRes()
     await handler({ method: 'POST', headers: {}, body: validBody() }, res)
     expect(res.statusCode).toBe(500)

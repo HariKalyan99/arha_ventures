@@ -72,30 +72,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(rateLimit.status).json({ error: rateLimit.error })
     }
 
-    const { data: rows, error } = await supabase
-      .from('inquiries')
-      .insert([
-        {
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          project_type: data.projectType,
-          location: data.location,
-          budget: data.budget,
-          message: data.message,
-          source: data.source,
-          client_ip: clientIp,
-          user_agent: userAgent,
-        },
-      ])
-      .select('id')
+    const { error } = await supabase.from('inquiries').insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        project_type: data.projectType,
+        location: data.location,
+        budget: data.budget,
+        message: data.message,
+        source: data.source,
+        client_ip: clientIp,
+        user_agent: userAgent,
+      },
+    ])
 
     if (error) {
       console.error('Supabase insert failed:', error.message)
       return res.status(500).json({ error: 'Server error' })
     }
 
-    return res.status(200).json({ success: true, id: rows?.[0]?.id ?? null })
+    return res.status(200).json({ success: true })
   } catch (err) {
     console.error('Server error:', err)
     return res.status(500).json({ error: 'Server error' })

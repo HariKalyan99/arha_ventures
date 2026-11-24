@@ -1,15 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { LEAD_MAGNET_GUIDE } from './lib/inquiry-security'
 
-const insertSelect = vi.fn()
+const insertMock = vi.fn()
 const fromMock = vi.fn(() => ({
   select: vi.fn(() => ({
     eq: vi.fn(() => ({
       gte: vi.fn(async () => ({ count: 0, error: null })),
     })),
   })),
-  insert: vi.fn(() => ({
-    select: insertSelect,
-  })),
+  insert: insertMock,
 }))
 
 vi.mock('@supabase/supabase-js', () => ({
@@ -55,10 +54,10 @@ describe('POST /api/lead-magnet', () => {
     vi.clearAllMocks()
     process.env.SUPABASE_URL = 'https://example.supabase.co'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-test'
-    insertSelect.mockResolvedValue({ data: [{ id: 'lead_1' }], error: null })
+    insertMock.mockResolvedValue({ data: null, error: null })
   })
 
-  it('inserts a name + email lead with source lead_magnet', async () => {
+  it('inserts a name + email lead with server-owned guide copy', async () => {
     const res = mockRes()
     await handler(
       {
@@ -67,15 +66,25 @@ describe('POST /api/lead-magnet', () => {
         body: {
           name: 'Hari',
           email: 'hari@example.com',
-          guide: 'Five questions before you begin a home interiors project',
+          guide: '../../../etc/passwd',
           website: '',
         },
       },
       res,
     )
     expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true, id: 'lead_1' })
+    expect(res.body).toEqual({ success: true })
+    expect(res.body).not.toHaveProperty('id')
     expect(fromMock).toHaveBeenCalledWith('inquiries')
+    expect(insertMock).toHaveBeenCalledWith([
+      expect.objectContaining({
+        email: 'hari@example.com',
+        project_type: 'Lead magnet',
+        source: 'lead_magnet',
+        message: `Lead magnet request — ${LEAD_MAGNET_GUIDE}`,
+        client_ip: '203.0.113.9',
+      }),
+    ])
   })
 
   it('rejects invalid email', async () => {
@@ -97,5 +106,28 @@ describe('POST /api/lead-magnet', () => {
     expect(res.statusCode).toBe(200)
     expect(res.body).toEqual({ success: true })
     expect(fromMock).not.toHaveBeenCalled()
+  })
+
+  it('returns 503 when rate-limit lookup fails', async () => {
+    fromMock.mockImplementationOnce(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          gte: vi.fn(async () => ({ count: null, error: { message: 'timeout' } })),
+        })),
+      })),
+      insert: insertMock,
+    }))
+
+    const res = mockRes()
+    await handler(
+      {
+        method: 'POST',
+        headers: {},
+        body: { name: 'Hari', email: 'hari@example.com', website: '' },
+      },
+      res,
+    )
+    expect(res.statusCode).toBe(503)
+    expect(insertMock).not.toHaveBeenCalled()
   })
 })

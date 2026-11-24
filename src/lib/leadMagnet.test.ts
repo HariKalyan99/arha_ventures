@@ -14,9 +14,11 @@ describe('submitLeadMagnet', () => {
     const result = await submitLeadMagnet({ name: 'Hari', email: 'hari@example.com', website: '' })
     expect(result).toEqual({ status: 'sent' })
     const init = fetchMock.mock.calls[0]?.[1] as RequestInit
-    const body = JSON.parse(String(init.body)) as { source: string; guide: string }
+    const body = JSON.parse(String(init.body)) as { source: string; name: string; email: string; guide?: string }
     expect(body.source).toBe('lead_magnet')
-    expect(body.guide.length).toBeGreaterThan(10)
+    expect(body.name).toBe('Hari')
+    expect(body.email).toBe('hari@example.com')
+    expect(body.guide).toBeUndefined()
   })
 
   it('surfaces API errors', async () => {

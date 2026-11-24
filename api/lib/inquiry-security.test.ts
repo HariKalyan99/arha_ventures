@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   EMAIL_LIMIT,
   IP_LIMIT,
+  LEAD_MAGNET_GUIDE,
   applyCors,
   enforceRateLimits,
   getClientIp,
@@ -51,6 +52,7 @@ describe('validateInquiryPayload', () => {
     if (result.ok) {
       expect(result.data.email).toBe('hari@example.com')
       expect(result.data.projectType).toBe('Villa')
+      expect(result.data.source).toBe('website')
     }
   })
 
@@ -58,6 +60,12 @@ describe('validateInquiryPayload', () => {
     const result = validateInquiryPayload(validBody({ email: 'Hari@Example.COM' }))
     expect(result.ok).toBe(true)
     if (result.ok) expect(result.data.email).toBe('hari@example.com')
+  })
+
+  it('forces source to website even if client sends another value', () => {
+    const result = validateInquiryPayload(validBody({ source: 'attacker_source' }))
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data.source).toBe('website')
   })
 
   it('rejects short names', () => {
@@ -85,11 +93,30 @@ describe('validateInquiryPayload', () => {
     expect(result).toEqual({ ok: false, error: 'Please choose the type of project.' })
   })
 
+  it('rejects project types outside the allowlist', () => {
+    const result = validateInquiryPayload(validBody({ projectType: 'TotallyMadeUpType!!!' }))
+    expect(result).toEqual({ ok: false, error: 'Please choose a valid project type.' })
+  })
+
   it('rejects short messages', () => {
     const result = validateInquiryPayload(validBody({ message: 'Too short' }))
     expect(result.ok).toBe(false)
     if (!result.ok && 'error' in result) {
       expect(result.error).toContain('20 characters')
+    }
+  })
+
+  it('truncates overlong fields', () => {
+    const result = validateInquiryPayload(
+      validBody({
+        name: 'A'.repeat(500),
+        message: 'm'.repeat(10000),
+      }),
+    )
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.name).toHaveLength(100)
+      expect(result.data.message).toHaveLength(5000)
     }
   })
 
@@ -104,14 +131,15 @@ describe('validateLeadMagnetPayload', () => {
     const result = validateLeadMagnetPayload({
       name: 'Hari',
       email: 'Hari@Example.com',
-      guide: 'Five questions before you begin a home interiors project',
+      guide: '../../../etc/passwd',
     })
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.data.email).toBe('hari@example.com')
       expect(result.data.source).toBe('lead_magnet')
       expect(result.data.projectType).toBe('Lead magnet')
-      expect(result.data.message).toContain('Five questions')
+      expect(result.data.message).toBe(`Lead magnet request — ${LEAD_MAGNET_GUIDE}`)
+      expect(result.data.message).not.toContain('etc/passwd')
     }
   })
 
@@ -120,6 +148,16 @@ describe('validateLeadMagnetPayload', () => {
       ok: false,
       error: 'Please tell us your name.',
     })
+  })
+
+  it('trips honeypot', () => {
+    expect(
+      validateLeadMagnetPayload({
+        name: 'Bot',
+        email: 'bot@example.com',
+        website: 'http://spam',
+      }),
+    ).toEqual({ ok: false, honeypot: true })
   })
 })
 
@@ -164,7 +202,18 @@ describe('applyCors / getClientIp', () => {
     expect(ok).toBe(true)
   })
 
-  it('reads the first forwarded IP', () => {
+  it('prefers x-vercel-forwarded-for over x-forwarded-for', () => {
+    expect(
+      getClientIp({
+        headers: {
+          'x-vercel-forwarded-for': '198.51.100.10',
+          'x-forwarded-for': '203.0.113.9, 10.0.0.1',
+        },
+      }),
+    ).toBe('198.51.100.10')
+  })
+
+  it('falls back to the first forwarded IP', () => {
     expect(
       getClientIp({
         headers: { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' },
@@ -230,6 +279,27 @@ describe('enforceRateLimits', () => {
     if (!result.ok) {
       expect(result.status).toBe(429)
       expect(result.error).toMatch(/Too many requests/i)
+    }
+  })
+
+  it('fails closed when the rate-limit lookup errors', async () => {
+    const result = await enforceRateLimits({
+      email: 'hari@example.com',
+      clientIp: '203.0.113.9',
+      supabase: {
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              gte: async () => ({ count: null, error: { message: 'boom' } }),
+            }),
+          }),
+        }),
+      },
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(result.status).toBe(503)
+      expect(result.error).toMatch(/Unable to process/i)
     }
   })
 
