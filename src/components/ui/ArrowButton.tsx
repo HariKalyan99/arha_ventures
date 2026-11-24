@@ -91,3 +91,34 @@ export function ArrowLink({ to, variant = 'outline', className = '', children }:
   if (variant === 'ghost') return el
   return <Magnetic strength={0.26}>{el}</Magnetic>
 }
+
+interface ArrowExternalLinkProps {
+  href: string
+  variant?: Variant
+  className?: string
+  children: ReactNode
+  'aria-label'?: string
+}
+
+/** Same CTA treatment for off-site links (WhatsApp, mailto, etc.). */
+export function ArrowExternalLink({
+  href,
+  variant = 'outline',
+  className = '',
+  children,
+  'aria-label': ariaLabel,
+}: ArrowExternalLinkProps) {
+  const el = (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={ariaLabel}
+      className={`${base} ${variants[variant]} ${className}`}
+    >
+      <Inner variant={variant}>{children}</Inner>
+    </a>
+  )
+  if (variant === 'ghost') return el
+  return <Magnetic strength={0.26}>{el}</Magnetic>
+}

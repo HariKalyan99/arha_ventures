@@ -8,6 +8,8 @@ export interface InquiryPayload {
   location: string
   budget: string
   message: string
+  /** Honeypot — leave empty. Bots that fill it are silently discarded server-side. */
+  website?: string
 }
 
 export type SubmitResult =
@@ -17,8 +19,8 @@ export type SubmitResult =
 
 /**
  * Integration point for enquiries.
- * Set VITE_INQUIRY_ENDPOINT to any URL that accepts a JSON POST (Formspree, a serverless
- * function, a CRM webhook…). Without it, nothing is sent and the UI says so explicitly.
+ * Defaults to `/api/inquiry` (Vercel serverless → Supabase).
+ * Override with VITE_INQUIRY_ENDPOINT when needed.
  */
 export async function submitInquiry(payload: InquiryPayload): Promise<SubmitResult> {
   if (!inquiry.endpoint) return { status: 'not-configured' }
@@ -27,9 +29,42 @@ export async function submitInquiry(payload: InquiryPayload): Promise<SubmitResu
     const response = await fetch(inquiry.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ ...payload, source: 'website', submittedAt: new Date().toISOString() }),
+      body: JSON.stringify({
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        projectType: payload.projectType,
+        location: payload.location,
+        budget: payload.budget,
+        message: payload.message,
+        website: payload.website ?? '',
+        source: 'website',
+        submittedAt: new Date().toISOString(),
+      }),
     })
-    if (!response.ok) return { status: 'error', message: `The server responded with ${response.status}.` }
+
+    if (response.status === 429) {
+      let detail = 'Too many submissions. Please try again later.'
+      try {
+        const json = (await response.json()) as { error?: string }
+        if (json.error) detail = json.error
+      } catch {
+        /* keep default */
+      }
+      return { status: 'error', message: detail }
+    }
+
+    if (!response.ok) {
+      let detail = `The server responded with ${response.status}.`
+      try {
+        const json = (await response.json()) as { error?: string }
+        if (json.error) detail = json.error
+      } catch {
+        /* keep default */
+      }
+      return { status: 'error', message: detail }
+    }
+
     return { status: 'sent' }
   } catch {
     return { status: 'error', message: 'The enquiry could not reach the server. Please check your connection.' }

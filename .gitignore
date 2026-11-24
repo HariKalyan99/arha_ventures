@@ -11,6 +11,12 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+
+# Local Supabase schema notes — keep off remote
+supabase/
 
 # Editor directories and files
 .vscode/*

@@ -25,6 +25,21 @@ export const studio: StudioConfig = {
   contactIsPlaceholder: true,
 }
 
+/** Digits only — for tel: / WhatsApp links. */
+export function studioPhoneDigits() {
+  return studio.phone.replace(/\D/g, '')
+}
+
+/**
+ * WhatsApp chat URL with a pre-filled opening message.
+ * Uses the same studio phone as the Contact page.
+ */
+export function whatsappHref(
+  message = `Hello ${studio.legalName}, I’d like to discuss a construction / interiors project.`,
+) {
+  return `https://wa.me/${studioPhoneDigits()}?text=${encodeURIComponent(message)}`
+}
+
 /**
  * Company narrative as shared by the client.
  * Keep the wording — the site presents it, it does not rewrite it.
@@ -92,5 +107,5 @@ export const inquiry: InquiryConfig = {
     '500k – 1M',
     'Above 1M',
   ],
-  endpoint: import.meta.env.VITE_INQUIRY_ENDPOINT || undefined,
+  endpoint: import.meta.env.VITE_INQUIRY_ENDPOINT || '/api/inquiry',
 }

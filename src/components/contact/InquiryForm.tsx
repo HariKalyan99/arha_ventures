@@ -82,6 +82,7 @@ export function InquiryForm() {
     location: '',
     budget: inquiry.budgets[0],
     message: initialMessage(params),
+    website: '',
   }))
   const [consent, setConsent] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
@@ -138,10 +139,24 @@ export function InquiryForm() {
   }
 
   return (
-    <form ref={form} noValidate onSubmit={onSubmit} aria-describedby={`${uid}-required`} className="flex flex-col gap-10">
+    <form ref={form} noValidate onSubmit={onSubmit} aria-describedby={`${uid}-required`} className="relative flex flex-col gap-10">
       <p id={`${uid}-required`} className="text-xs text-cream/50">
         Fields marked <span className="text-gold">*</span> are required.
       </p>
+
+      {/* Honeypot — visually hidden; leave empty. */}
+      <div className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden>
+        <label htmlFor={`${uid}-website`}>Company website</label>
+        <input
+          id={`${uid}-website`}
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={values.website ?? ''}
+          onChange={(e) => update('website', e.target.value)}
+        />
+      </div>
 
       <div aria-live="assertive" className="empty:hidden">
         {submitted && errorCount > 0 && (
@@ -151,7 +166,7 @@ export function InquiryForm() {
         )}
       </div>
 
-      <div className="grid gap-x-8 gap-y-9 sm:grid-cols-2">
+      <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-9">
         <FieldShell id={id('name')} label="Name" required error={errors.name}>
           <input
             id={id('name')}
@@ -222,7 +237,7 @@ export function InquiryForm() {
                 aria-invalid={!!errors.projectType}
                 className="peer sr-only"
               />
-              <span className="inline-flex min-h-11 items-center border border-cream/20 px-4 text-sm text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/50">
+              <span className="inline-flex min-h-11 max-w-full items-center border border-line px-3 text-sm text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/40 sm:px-4">
                 {type}
               </span>
             </label>
@@ -290,7 +305,13 @@ export function InquiryForm() {
 
       <div className="flex flex-col gap-6">
         <div>
-          <ArrowButton type="submit" variant="solid" disabled={status === 'submitting'} aria-describedby={`${uid}-status`}>
+          <ArrowButton
+            type="submit"
+            variant="solid"
+            disabled={status === 'submitting'}
+            aria-describedby={`${uid}-status`}
+            className="w-full justify-center sm:w-auto"
+          >
             {status === 'submitting' ? 'Sending…' : 'Send enquiry'}
           </ArrowButton>
         </div>

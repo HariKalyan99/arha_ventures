@@ -8,6 +8,7 @@ import { Header } from '../navigation/Header'
 import { Footer } from './Footer'
 import { SiteMusic } from '../audio/SiteMusic'
 import { SoundFeedback } from '../bencho/sounds/SoundFeedback'
+import { LeadMagnetHost } from '../lead/LeadMagnetHost'
 import { CustomCursor } from '../ui/CustomCursor'
 import { PageLoader } from '../ui/PageLoader'
 
@@ -77,6 +78,7 @@ export function Layout() {
         Skip to content
       </a>
       <Header />
+      <LeadMagnetHost enabled={location.pathname === '/'} />
       <AnimatePresence mode="wait" initial={false}>
         <motion.div key={location.pathname} className="relative">
           <motion.div
