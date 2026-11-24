@@ -1,16 +1,51 @@
-# React + Vite
+# ARHA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Marketing site for **ARHA** (Arha Ventures) — construction and interiors studio based in Bengaluru.
 
-Currently, two official plugins are available:
+Built with React, Vite, TypeScript, Tailwind, GSAP, and React Three Fiber. Enquiry and lead-magnet submissions go through Vercel serverless functions into a Supabase `inquiries` table (no email delivery yet).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- **Frontend:** React 19, Vite, React Router, Tailwind CSS 4
+- **Motion / 3D:** GSAP, Framer Motion, Three.js / R3F
+- **APIs:** Vercel serverless (`/api/inquiry`, `/api/lead-magnet`)
+- **Data:** Supabase (service role on the server only)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Scripts
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev        # Vite app (UI only — /api needs Vercel)
+npm run build
+npm run preview
+npm run test
+npm run typecheck
+npm run lint
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For local API testing, use `vercel dev` (or a deployed Preview) so `/api/inquiry` and `/api/lead-magnet` run. Plain `npm run dev` serves the SPA only.
+
+## Environment
+
+Copy `.env.example` → `.env` for local work. Never put Supabase secrets under `VITE_*`.
+
+| Variable | Where | Notes |
+| --- | --- | --- |
+| `SUPABASE_URL` | Server (Vercel + local `.env`) | Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Never commit; never expose to the client |
+| `VITE_INQUIRY_ENDPOINT` | Optional client | Defaults to `/api/inquiry` |
+| `VITE_LEAD_MAGNET_ENDPOINT` | Optional client | Defaults to `/api/lead-magnet` |
+| `PUBLIC_BASE_URL` / `ALLOWED_ORIGINS` | Optional server | Extra CORS allowlist for production domains |
+
+On Vercel, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for Production and Preview.
+
+## Enquiry flow
+
+1. Contact form → `POST /api/inquiry` → row with `source = website`
+2. Lead magnet → `POST /api/lead-magnet` → row with `source = lead_magnet`
+
+Server-side controls include CORS allowlisting, honeypot, field validation / allowlists, and DB-backed rate limits (email + IP). The browser never receives the service-role key.
+
+## Deploy
+
+Configured for Vercel (`vercel.json` keeps `/api/*` off the SPA rewrite). Static assets live under `public/`.
