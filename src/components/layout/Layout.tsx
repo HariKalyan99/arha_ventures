@@ -10,6 +10,7 @@ import { SiteMusic } from '../audio/SiteMusic'
 import { SoundFeedback } from '../bencho/sounds/SoundFeedback'
 import { LeadMagnetHost } from '../lead/LeadMagnetHost'
 import { CustomCursor } from '../ui/CustomCursor'
+import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { PageLoader } from '../ui/PageLoader'
 
 function PageFallback() {
@@ -87,16 +88,18 @@ export function Layout() {
             exit={{ opacity: 0, transition: { duration: 0.45, ease: EASE_CURTAIN } }}
           >
             <main id="main" tabIndex={-1} className="outline-none">
-              <Suspense fallback={<PageFallback />}>
-                {scrollReady ? (
-                  <>
-                    {outlet}
-                    <PageReady />
-                  </>
-                ) : (
-                  <PageFallback />
-                )}
-              </Suspense>
+              <ErrorBoundary variant="section" resetKeys={[location.pathname]}>
+                <Suspense fallback={<PageFallback />}>
+                  {scrollReady ? (
+                    <>
+                      {outlet}
+                      <PageReady />
+                    </>
+                  ) : (
+                    <PageFallback />
+                  )}
+                </Suspense>
+              </ErrorBoundary>
             </main>
             <Footer />
           </motion.div>

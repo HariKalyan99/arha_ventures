@@ -1,13 +1,14 @@
 import { useRef, type PointerEvent as ReactPointerEvent } from 'react'
 import { Link, useLocation } from 'react-router'
 import { ArrowUp } from 'lucide-react'
-import { legalNavigation, navigation, studio } from '../../data/site'
+import { legalNavigation, modelCredits, navigation, studio } from '../../data/site'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { useReveal } from '../../animations/reveal'
 import { play } from '../bencho/sounds/sounds'
 import { Particles } from '../bencho/particles/Particles'
 import { ArrowLink } from '../ui/ArrowButton'
 import { Lines } from '../ui/Text'
+import { TronzlabsAttribution } from '../ui/TronzlabsAttribution'
 
 /** Glide on desktop hover; touch/pen use pointerdown (no reliable hover). */
 function onMarkEnter(e: ReactPointerEvent<HTMLSpanElement>) {
@@ -118,14 +119,12 @@ export function Footer() {
         </p>
       </div>
 
-      <div className="shell flex flex-col gap-4 border-t border-line py-6 text-xs text-cream/50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="shell flex flex-col items-center gap-4 border-t border-line py-6 text-center text-xs text-cream/50 sm:flex-row sm:items-center sm:justify-between sm:text-left">
         <p>
           © {year} {studio.legalName}. All rights reserved.
         </p>
-        {studio.contactIsPlaceholder && (
-          <p className="text-gold/80">Projects, journal entries and studio email are still sample content.</p>
-        )}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <TronzlabsAttribution />
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-end">
           {legalNavigation.map((item) => (
             <Link key={item.to} to={item.to} className="link-line hover:text-cream">
               {item.label}
@@ -137,6 +136,36 @@ export function Footer() {
           </button>
         </div>
       </div>
+
+      {modelCredits.length > 0 && (
+        <div className="shell pb-6">
+          <p className="mx-auto max-w-prose text-center text-[0.65rem] leading-relaxed text-cream/25 sm:mx-0 sm:max-w-none sm:text-left">
+            {modelCredits.map((c, i) => (
+              <span key={c.url}>
+                {i > 0 ? ' ' : null}
+                <a
+                  href={c.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-cream/40 hover:underline"
+                >
+                  &ldquo;{c.name}&rdquo;
+                </a>{' '}
+                by {c.author} is licensed under{' '}
+                <a
+                  href={c.licenseUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-cream/40 hover:underline"
+                >
+                  Creative Commons Attribution ({c.license})
+                </a>
+                .
+              </span>
+            ))}
+          </p>
+        </div>
+      )}
     </footer>
   )
 }
