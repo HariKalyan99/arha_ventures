@@ -90,6 +90,23 @@ export const legalNavigation: NavItem[] = [
   { label: 'Terms', to: '/terms' },
 ]
 
+/** Footer credit — Developed by TronzLabs. */
+export const studioCredit = {
+  label: 'Developed by',
+  url: 'https://www.tronzlabs.com',
+}
+
+/** Hero loft GLB — Sketchfab / CC BY attribution. */
+export const modelCredits = [
+  {
+    name: 'free Loft 17 interior floors, view of the city.',
+    author: 'dasy444',
+    url: 'https://skfb.ly/pNSxt',
+    license: 'CC BY 4.0',
+    licenseUrl: 'http://creativecommons.org/licenses/by/4.0/',
+  },
+]
+
 export const inquiry: InquiryConfig = {
   projectTypes: [
     'Private residence',

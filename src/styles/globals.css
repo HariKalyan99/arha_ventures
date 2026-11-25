@@ -755,6 +755,13 @@
       color: color-mix(in srgb, var(--color-cream) 16%, transparent);
     }
   }
+
+  .studio-logo-glow {
+    filter:
+      drop-shadow(0 0 6px color-mix(in srgb, #ef4444 58%, transparent))
+      drop-shadow(0 0 14px color-mix(in srgb, #f87171 42%, transparent))
+      drop-shadow(0 0 26px color-mix(in srgb, #ef4444 26%, transparent));
+  }
 }
 
 /* OpenFreeMap (MapLibre) embed on Contact — follows site theme */
