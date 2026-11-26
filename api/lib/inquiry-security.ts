@@ -54,17 +54,26 @@ function headerValue(headers: HeaderBag, name: string): string {
   return typeof raw === 'string' ? raw : ''
 }
 
+function addOrigin(origins: Set<string>, value?: string) {
+  if (!value) return
+  const cleaned = value.trim().replace(/\/$/, '')
+  if (!cleaned) return
+  if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+    origins.add(cleaned)
+    return
+  }
+  origins.add(`https://${cleaned}`)
+}
+
 export function getAllowedOrigins(): Set<string> {
   const origins = new Set(DEFAULT_ORIGINS)
-  if (process.env.PUBLIC_BASE_URL) {
-    origins.add(process.env.PUBLIC_BASE_URL.replace(/\/$/, ''))
-  }
-  if (process.env.VERCEL_URL) {
-    origins.add(`https://${process.env.VERCEL_URL.replace(/^https?:\/\//, '')}`)
-  }
+  /* Production alias is often not the same as VERCEL_URL (deployment hostname). */
+  addOrigin(origins, process.env.PUBLIC_BASE_URL)
+  addOrigin(origins, process.env.VERCEL_URL)
+  addOrigin(origins, process.env.VERCEL_BRANCH_URL)
+  addOrigin(origins, process.env.VERCEL_PROJECT_PRODUCTION_URL)
   for (const origin of (process.env.ALLOWED_ORIGINS || '').split(',')) {
-    const trimmed = origin.trim()
-    if (trimmed) origins.add(trimmed)
+    addOrigin(origins, origin)
   }
   return origins
 }
@@ -80,25 +89,54 @@ function headersToMap(headers: Headers | HeaderBag): HeaderBag {
   return headers
 }
 
-/** Whether the request Origin is allowlisted (or omitted for same-origin / server calls). */
-export function isOriginAllowed(req: { headers: Headers | HeaderBag } | Request): boolean {
+function readOrigin(headers: Headers | HeaderBag): string {
+  if (headers instanceof Headers) return headers.get('origin') ?? ''
+  return headerValue(headers, 'origin')
+}
+
+/** True when browser Origin host matches this request’s host (production alias safe). */
+export function isSameOriginRequest(req: Request | { headers: Headers | HeaderBag; url?: string }): boolean {
   const headers = req instanceof Request ? req.headers : headersToMap(req.headers)
-  const origin = headers instanceof Headers ? (headers.get('origin') ?? '') : headerValue(headers, 'origin')
+  const origin = readOrigin(headers)
   if (!origin) return true
+
+  try {
+    const originHost = new URL(origin).host
+    if (req instanceof Request) {
+      return originHost === new URL(req.url).host
+    }
+    const host =
+      headerValue(headersToMap(req.headers), 'x-forwarded-host') ||
+      headerValue(headersToMap(req.headers), 'host')
+    if (host) return originHost === host.split(',')[0]?.trim()
+    if (req.url) return originHost === new URL(req.url).host
+  } catch {
+    return false
+  }
+  return false
+}
+
+/** Whether the request Origin is allowlisted (or omitted for same-origin / server calls). */
+export function isOriginAllowed(req: { headers: Headers | HeaderBag; url?: string } | Request): boolean {
+  const headers = req instanceof Request ? req.headers : headersToMap(req.headers)
+  const origin = readOrigin(headers)
+  if (!origin) return true
+  if (isSameOriginRequest(req)) return true
   return getAllowedOrigins().has(origin)
 }
 
 /** Write CORS headers onto a Headers object; returns whether the origin is allowed. */
-export function applyCorsHeaders(req: Request | { headers: Headers | HeaderBag }, out: Headers): boolean {
+export function applyCorsHeaders(req: Request | { headers: Headers | HeaderBag; url?: string }, out: Headers): boolean {
   const headers = req instanceof Request ? req.headers : headersToMap(req.headers)
-  const origin = headers instanceof Headers ? (headers.get('origin') ?? '') : headerValue(headers, 'origin')
+  const origin = readOrigin(headers)
   const allowed = getAllowedOrigins()
+  const ok = !origin || isSameOriginRequest(req) || allowed.has(origin)
 
   out.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
   out.set('Access-Control-Allow-Headers', 'Content-Type')
   out.set('Vary', 'Origin')
 
-  if (origin && allowed.has(origin)) {
+  if (origin && ok) {
     out.set('Access-Control-Allow-Origin', origin)
     return true
   }
