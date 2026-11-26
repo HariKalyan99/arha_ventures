@@ -103,7 +103,8 @@ export function WallLogo() {
   const plateW = width + 0.07
   const plateH = height + 0.07
   const depth = 0.018
-  const base = useMemo(() => ({ x: -2.84, y: 0.82, z: 2.38 }), [])
+  /* Just above the telephone on this teapoy — clear of the handset, still grounded. */
+  const base = useMemo(() => ({ x: -2.84, y: 0.98, z: 2.38 }), [])
 
   const firePulse = () => {
     pulse.current = 1

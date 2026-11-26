@@ -44,9 +44,9 @@ export const houseTourStops: TourStop[] = [
     target: [-2.95, 1.42, 1.45],
     fov: 48,
     mobile: {
-      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 0.82, 2.38).
+      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 1.18, 2.38).
       position: [0.55, 1.58, 5.55],
-      target: [-2.84, 0.92, 2.25],
+      target: [-2.84, 1.05, 2.25],
       fov: 40,
     },
   },
@@ -104,10 +104,9 @@ export const houseTourStops: TourStop[] = [
     target: [-2.4, 1.15, 0.2],
     fov: 50,
     mobile: {
-      // Close 3/4 on the telephone teapoy — Call Us handset readable + tappable.
-      // Phone world ≈ (1.77, 0.45, 0.76)
-      position: [3.35, 1.55, 2.85],
-      target: [1.77, 0.55, 0.76],
+      // Close 3/4 on the lounge teapoy — Call Us handset + plaque readable.
+      position: [-0.35, 1.45, 4.15],
+      target: [-2.84, 0.7, 2.38],
       fov: 40,
     },
   },
