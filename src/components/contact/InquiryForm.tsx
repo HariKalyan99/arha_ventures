@@ -1,10 +1,11 @@
-import { useId, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Mail } from 'lucide-react'
 import { inquiry, studio } from '../../data/site'
 import { buildMailto, submitInquiry, type InquiryPayload } from '../../lib/inquiry'
 import { EASE_LUXE } from '../../lib/motion'
+import { useSmoothScroll } from '../../lib/scroll-context'
 import { ArrowButton } from '../ui/ArrowButton'
 
 type Field = keyof InquiryPayload | 'consent'
@@ -74,6 +75,7 @@ export function InquiryForm() {
   const uid = useId()
   const id = (f: Field) => `${uid}-${f}`
   const [params] = useSearchParams()
+  const { scrollTo, stop, start } = useSmoothScroll()
   const [values, setValues] = useState<InquiryPayload>(() => ({
     name: '',
     email: '',
@@ -90,6 +92,45 @@ export function InquiryForm() {
   const [status, setStatus] = useState<Status>('idle')
   const [serverError, setServerError] = useState('')
   const form = useRef<HTMLFormElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
+  const lenisPaused = useRef(false)
+
+  /* Lenis + browser focus scrolling fight — pause smooth scroll while typing. */
+  useEffect(() => {
+    const root = form.current
+    if (!root) return
+
+    const onFocusIn = () => {
+      if (lenisPaused.current) return
+      lenisPaused.current = true
+      stop()
+    }
+    const onFocusOut = (e: FocusEvent) => {
+      const next = e.relatedTarget
+      if (next instanceof Node && root.contains(next)) return
+      if (!lenisPaused.current) return
+      lenisPaused.current = false
+      start()
+    }
+
+    root.addEventListener('focusin', onFocusIn)
+    root.addEventListener('focusout', onFocusOut)
+    return () => {
+      root.removeEventListener('focusin', onFocusIn)
+      root.removeEventListener('focusout', onFocusOut)
+      if (lenisPaused.current) {
+        lenisPaused.current = false
+        start()
+      }
+    }
+  }, [start, stop, status])
+
+  useLayoutEffect(() => {
+    if (status !== 'sent' || !successRef.current) return
+    const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 80
+    scrollTo(successRef.current, { immediate: true, offset: -(header + 16) })
+    successRef.current.focus({ preventScroll: true })
+  }, [status, scrollTo])
 
   const update = <K extends keyof InquiryPayload>(key: K, value: InquiryPayload[K]) => {
     const next = { ...values, [key]: value }
@@ -107,7 +148,8 @@ export function InquiryForm() {
     const first = Object.keys(found)[0] as Field | undefined
     if (first) {
       const target = form.current?.querySelector<HTMLElement>(`[name="${first}"]`)
-      target?.focus()
+      target?.focus({ preventScroll: true })
+      target?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
       return
     }
     setStatus('submitting')
@@ -122,11 +164,13 @@ export function InquiryForm() {
     const firstName = values.name.trim().split(/\s+/)[0] || 'there'
     return (
       <motion.div
+        ref={successRef}
+        tabIndex={-1}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: EASE_LUXE }}
         role="status"
-        className="flex flex-col items-start gap-5 border border-gold/40 p-5 sm:gap-6 sm:p-8 md:p-12"
+        className="flex flex-col items-start gap-5 border border-gold/40 p-5 outline-none sm:gap-6 sm:p-8 md:p-12"
       >
         <span className="flex size-11 items-center justify-center rounded-full border border-gold text-gold sm:size-12">
           <Check className="size-5" strokeWidth={1.25} aria-hidden />
@@ -238,7 +282,7 @@ export function InquiryForm() {
         </legend>
         <div className="mt-4 flex flex-wrap gap-2">
           {inquiry.projectTypes.map((type) => (
-            <label key={type} className="max-w-full cursor-pointer">
+            <label key={type} className="relative max-w-full cursor-pointer">
               <input
                 type="radio"
                 name="projectType"
@@ -246,7 +290,8 @@ export function InquiryForm() {
                 checked={values.projectType === type}
                 onChange={() => update('projectType', type)}
                 aria-invalid={!!errors.projectType}
-                className="peer sr-only"
+                /* Keep the control on the chip — sr-only radios make the browser scroll-jump on focus. */
+                className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0"
               />
               <span className="inline-flex min-h-11 max-w-full items-center break-words border border-line px-3 py-2 text-left text-sm leading-snug text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/40 sm:px-4">
                 {type}
