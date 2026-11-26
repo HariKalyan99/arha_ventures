@@ -627,10 +627,15 @@
     padding: 0.85rem 0 0.75rem;
     color: var(--color-cream);
     caret-color: var(--color-terracotta);
-    font-size: 1.05rem;
+    font-size: 1rem;
     line-height: 1.45;
     border-radius: 0;
     transition: border-color 0.4s var(--ease-luxe);
+  }
+  @media (min-width: 640px) {
+    .field-input {
+      font-size: 1.05rem;
+    }
   }
   .field-input::placeholder {
     color: color-mix(in srgb, var(--color-cream) 42%, transparent);

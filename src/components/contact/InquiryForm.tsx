@@ -119,27 +119,38 @@ export function InquiryForm() {
   const errorCount = Object.keys(errors).length
 
   if (status === 'sent') {
+    const firstName = values.name.trim().split(/\s+/)[0] || 'there'
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: EASE_LUXE }}
         role="status"
-        className="flex flex-col items-start gap-6 border border-gold/40 p-8 sm:p-12"
+        className="flex flex-col items-start gap-5 border border-gold/40 p-5 sm:gap-6 sm:p-8 md:p-12"
       >
-        <span className="flex size-12 items-center justify-center rounded-full border border-gold text-gold">
+        <span className="flex size-11 items-center justify-center rounded-full border border-gold text-gold sm:size-12">
           <Check className="size-5" strokeWidth={1.25} aria-hidden />
         </span>
-        <h3 className="display text-display-md text-cream">
-          Thank you, <em>{values.name.split(' ')[0]}.</em>
-        </h3>
-        <p className="max-w-md text-cream/75">Your enquiry has been received. We read every message personally and will reply by email.</p>
+        <div>
+          <p className="eyebrow text-gold">Enquiry received</p>
+          <h3 className="display mt-3 text-display-sm text-cream sm:text-display-md">
+            Thank you, <em>{firstName}.</em>
+          </h3>
+        </div>
+        <p className="max-w-md text-sm leading-relaxed text-cream/75 sm:text-base">
+          Your enquiry has been received successfully. We read every message personally and will reply to{' '}
+          <span className="text-cream">{values.email}</span> soon.
+        </p>
+        <ul className="w-full max-w-md space-y-2 border-t border-line pt-5 text-sm text-cream/60">
+          <li>Keep an eye on your inbox (and spam, just in case).</li>
+          <li>If your project is time-sensitive, WhatsApp us from the studio panel.</li>
+        </ul>
       </motion.div>
     )
   }
 
   return (
-    <form ref={form} noValidate onSubmit={onSubmit} aria-describedby={`${uid}-required`} className="relative flex flex-col gap-10">
+    <form ref={form} noValidate onSubmit={onSubmit} aria-describedby={`${uid}-required`} className="relative flex flex-col gap-8 sm:gap-10">
       <p id={`${uid}-required`} className="text-xs text-cream/50">
         Fields marked <span className="text-gold">*</span> are required.
       </p>
@@ -166,7 +177,7 @@ export function InquiryForm() {
         )}
       </div>
 
-      <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-9">
+      <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 sm:gap-y-9">
         <FieldShell id={id('name')} label="Name" required error={errors.name}>
           <input
             id={id('name')}
@@ -227,7 +238,7 @@ export function InquiryForm() {
         </legend>
         <div className="mt-4 flex flex-wrap gap-2">
           {inquiry.projectTypes.map((type) => (
-            <label key={type} className="cursor-pointer">
+            <label key={type} className="max-w-full cursor-pointer">
               <input
                 type="radio"
                 name="projectType"
@@ -237,7 +248,7 @@ export function InquiryForm() {
                 aria-invalid={!!errors.projectType}
                 className="peer sr-only"
               />
-              <span className="inline-flex min-h-11 max-w-full items-center border border-line px-3 text-sm text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/40 sm:px-4">
+              <span className="inline-flex min-h-11 max-w-full items-center break-words border border-line px-3 py-2 text-left text-sm leading-snug text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/40 sm:px-4">
                 {type}
               </span>
             </label>

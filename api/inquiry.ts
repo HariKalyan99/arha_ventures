@@ -1,41 +1,43 @@
 /**
- * Vercel serverless enquiry endpoint.
+ * Vercel Edge enquiry endpoint.
  * Stores rows in Supabase `inquiries`. No email. No Redis.
  */
 import { createClient } from '@supabase/supabase-js'
 import {
-  applyCors,
+  applyCorsHeaders,
   enforceRateLimits,
-  getClientIp,
+  getClientIpFromHeaders,
+  isOriginAllowed,
   parseRequestBody,
   validateInquiryPayload,
 } from './lib/inquiry-security'
 
-type VercelRequest = {
-  method?: string
-  body?: unknown
-  headers: Record<string, string | string[] | undefined>
-  socket?: { remoteAddress?: string }
+export const config = {
+  runtime: 'edge',
 }
 
-type VercelResponse = {
-  status: (code: number) => VercelResponse
-  json: (body: unknown) => void
-  end: () => void
-  setHeader: (name: string, value: string) => void
+function json(status: number, body: unknown, headers?: HeadersInit) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+  })
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const corsAllowed = applyCors(req, res)
+export default async function handler(req: Request) {
+  const cors = new Headers()
+  const corsAllowed = applyCorsHeaders(req, cors)
 
   if (req.method === 'OPTIONS') {
-    return res.status(corsAllowed ? 200 : 403).end()
+    return new Response(null, { status: corsAllowed ? 200 : 403, headers: cors })
   }
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return json(405, { error: 'Method not allowed' }, cors)
   }
-  if (!corsAllowed) {
-    return res.status(403).json({ error: 'Origin not allowed' })
+  if (!corsAllowed || !isOriginAllowed(req)) {
+    return json(403, { error: 'Origin not allowed' }, cors)
   }
 
   try {
@@ -44,32 +46,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!supabaseUrl || !supabaseServiceRoleKey) {
       console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
-      return res.status(500).json({ error: 'Server configuration error' })
+      return json(500, { error: 'Server configuration error' }, cors)
     }
 
     let body: Record<string, unknown>
     try {
-      body = parseRequestBody(req.body)
+      const raw = await req.text()
+      body = parseRequestBody(raw || {})
     } catch {
-      return res.status(400).json({ error: 'Invalid JSON body' })
+      return json(400, { error: 'Invalid JSON body' }, cors)
     }
 
     const validation = validateInquiryPayload(body)
     if (!validation.ok) {
       if ('honeypot' in validation && validation.honeypot) {
-        return res.status(200).json({ success: true })
+        return json(200, { success: true }, cors)
       }
-      return res.status(400).json({ error: 'error' in validation ? validation.error : 'Invalid request' })
+      return json(400, { error: 'error' in validation ? validation.error : 'Invalid request' }, cors)
     }
 
     const data = validation.data
-    const clientIp = getClientIp(req)
-    const userAgent = String(req.headers['user-agent'] ?? '').slice(0, 300)
+    const clientIp = getClientIpFromHeaders(req.headers)
+    const userAgent = (req.headers.get('user-agent') ?? '').slice(0, 300)
 
     const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
     const rateLimit = await enforceRateLimits({ email: data.email, clientIp, supabase })
     if (!rateLimit.ok) {
-      return res.status(rateLimit.status).json({ error: rateLimit.error })
+      return json(rateLimit.status, { error: rateLimit.error }, cors)
     }
 
     const { error } = await supabase.from('inquiries').insert([
@@ -89,12 +92,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (error) {
       console.error('Supabase insert failed:', error.message)
-      return res.status(500).json({ error: 'Server error' })
+      return json(500, { error: 'Server error' }, cors)
     }
 
-    return res.status(200).json({ success: true })
+    return json(200, { success: true }, cors)
   } catch (err) {
     console.error('Server error:', err)
-    return res.status(500).json({ error: 'Server error' })
+    return json(500, { error: 'Server error' }, cors)
   }
 }

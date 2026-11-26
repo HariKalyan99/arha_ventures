@@ -1,3 +1,5 @@
+import { readApiErrorMessage } from './apiError'
+
 export const LEAD_MAGNET_GUIDE = 'Five questions before you begin a home interiors project'
 export const LEAD_MAGNET_ENDPOINT = import.meta.env.VITE_LEAD_MAGNET_ENDPOINT || '/api/lead-magnet'
 
@@ -28,8 +30,7 @@ export async function submitLeadMagnet(payload: LeadMagnetPayload): Promise<Lead
     if (response.status === 429) {
       let detail = 'Too many submissions. Please try again later.'
       try {
-        const json = (await response.json()) as { error?: string }
-        if (json.error) detail = json.error
+        detail = readApiErrorMessage(await response.json(), detail)
       } catch {
         /* keep default */
       }
@@ -39,8 +40,7 @@ export async function submitLeadMagnet(payload: LeadMagnetPayload): Promise<Lead
     if (!response.ok) {
       let detail = `The server responded with ${response.status}.`
       try {
-        const json = (await response.json()) as { error?: string }
-        if (json.error) detail = json.error
+        detail = readApiErrorMessage(await response.json(), detail)
       } catch {
         /* keep default */
       }
