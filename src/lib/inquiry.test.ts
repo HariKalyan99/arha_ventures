@@ -55,6 +55,21 @@ describe('submitInquiry', () => {
     }
   })
 
+  it('reads string messages from Vercel-style object error payloads', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({ error: { code: '500', message: 'A server error has occurred' } }),
+            { status: 500 },
+          ),
+      ),
+    )
+    const result = await submitInquiry(payload)
+    expect(result).toEqual({ status: 'error', message: 'A server error has occurred' })
+  })
+
   it('reports network failures', async () => {
     vi.stubGlobal(
       'fetch',

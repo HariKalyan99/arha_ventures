@@ -69,42 +69,82 @@ export function getAllowedOrigins(): Set<string> {
   return origins
 }
 
-export function applyCors(
-  req: { headers: HeaderBag },
-  res: { setHeader: (name: string, value: string) => void },
-): boolean {
-  const origin = headerValue(req.headers, 'origin')
+function headersToMap(headers: Headers | HeaderBag): HeaderBag {
+  if (headers instanceof Headers) {
+    const map: HeaderBag = {}
+    headers.forEach((value, key) => {
+      map[key] = value
+    })
+    return map
+  }
+  return headers
+}
+
+/** Whether the request Origin is allowlisted (or omitted for same-origin / server calls). */
+export function isOriginAllowed(req: { headers: Headers | HeaderBag } | Request): boolean {
+  const headers = req instanceof Request ? req.headers : headersToMap(req.headers)
+  const origin = headers instanceof Headers ? (headers.get('origin') ?? '') : headerValue(headers, 'origin')
+  if (!origin) return true
+  return getAllowedOrigins().has(origin)
+}
+
+/** Write CORS headers onto a Headers object; returns whether the origin is allowed. */
+export function applyCorsHeaders(req: Request | { headers: Headers | HeaderBag }, out: Headers): boolean {
+  const headers = req instanceof Request ? req.headers : headersToMap(req.headers)
+  const origin = headers instanceof Headers ? (headers.get('origin') ?? '') : headerValue(headers, 'origin')
   const allowed = getAllowedOrigins()
 
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Vary', 'Origin')
+  out.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  out.set('Access-Control-Allow-Headers', 'Content-Type')
+  out.set('Vary', 'Origin')
 
   if (origin && allowed.has(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin)
+    out.set('Access-Control-Allow-Origin', origin)
     return true
   }
 
   /* Same-origin browser posts and server-to-server calls omit Origin. */
-  if (!origin) return true
-  return false
+  return !origin
+}
+
+/** @deprecated Prefer applyCorsHeaders for Edge handlers. */
+export function applyCors(
+  req: { headers: HeaderBag },
+  res: { setHeader: (name: string, value: string) => void },
+): boolean {
+  const headers = new Headers()
+  const ok = applyCorsHeaders(req, headers)
+  /* Headers API lowercases names — restore the casing Node/tests expect. */
+  const origin = headers.get('Access-Control-Allow-Origin')
+  res.setHeader('Access-Control-Allow-Methods', headers.get('Access-Control-Allow-Methods') ?? 'POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', headers.get('Access-Control-Allow-Headers') ?? 'Content-Type')
+  res.setHeader('Vary', headers.get('Vary') ?? 'Origin')
+  if (origin) res.setHeader('Access-Control-Allow-Origin', origin)
+  return ok
 }
 
 /**
  * Resolve client IP behind a trusted edge (Vercel).
  * Prefer platform header; fall back to standard proxy headers.
- * Do not host these handlers without a proxy that overwrites forwarded headers.
  */
-export function getClientIp(req: { headers: HeaderBag; socket?: { remoteAddress?: string } }): string {
-  const vercel = headerValue(req.headers, 'x-vercel-forwarded-for')
+export function getClientIpFromHeaders(headers: Headers | HeaderBag): string {
+  const map = headersToMap(headers)
+  const vercel = headerValue(map, 'x-vercel-forwarded-for')
   if (vercel) return vercel.split(',')[0]?.trim() || 'unknown'
 
-  const realIp = headerValue(req.headers, 'x-real-ip')
+  const realIp = headerValue(map, 'x-real-ip')
   if (realIp) return realIp.split(',')[0]?.trim() || 'unknown'
 
-  const forwarded = headerValue(req.headers, 'x-forwarded-for')
+  const forwarded = headerValue(map, 'x-forwarded-for')
   if (forwarded) return forwarded.split(',')[0]?.trim() || 'unknown'
 
+  return 'unknown'
+}
+
+/** @deprecated Prefer getClientIpFromHeaders for Edge handlers. */
+export function getClientIp(req: { headers: HeaderBag; socket?: { remoteAddress?: string } }): string {
+  const fromHeaders = getClientIpFromHeaders(req.headers)
+  if (fromHeaders !== 'unknown') return fromHeaders
   return req.socket?.remoteAddress || 'unknown'
 }
 

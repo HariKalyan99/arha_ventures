@@ -1,4 +1,5 @@
 import { inquiry, studio } from '../data/site'
+import { readApiErrorMessage } from './apiError'
 
 export interface InquiryPayload {
   name: string
@@ -46,8 +47,7 @@ export async function submitInquiry(payload: InquiryPayload): Promise<SubmitResu
     if (response.status === 429) {
       let detail = 'Too many submissions. Please try again later.'
       try {
-        const json = (await response.json()) as { error?: string }
-        if (json.error) detail = json.error
+        detail = readApiErrorMessage(await response.json(), detail)
       } catch {
         /* keep default */
       }
@@ -57,8 +57,7 @@ export async function submitInquiry(payload: InquiryPayload): Promise<SubmitResu
     if (!response.ok) {
       let detail = `The server responded with ${response.status}.`
       try {
-        const json = (await response.json()) as { error?: string }
-        if (json.error) detail = json.error
+        detail = readApiErrorMessage(await response.json(), detail)
       } catch {
         /* keep default */
       }

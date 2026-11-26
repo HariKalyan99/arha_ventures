@@ -16,38 +16,6 @@ vi.mock('@supabase/supabase-js', () => ({
 
 import handler from './inquiry'
 
-type Res = {
-  statusCode: number
-  body: unknown
-  headers: Record<string, string>
-  status: (code: number) => Res
-  json: (payload: unknown) => void
-  end: () => void
-  setHeader: (name: string, value: string) => void
-}
-
-function mockRes(): Res {
-  const res: Res = {
-    statusCode: 200,
-    body: undefined,
-    headers: {},
-    status(code) {
-      this.statusCode = code
-      return this
-    },
-    json(payload) {
-      this.body = payload
-    },
-    end() {
-      this.body = this.body ?? null
-    },
-    setHeader(name, value) {
-      this.headers[name] = value
-    },
-  }
-  return res
-}
-
 function validBody(overrides: Record<string, unknown> = {}) {
   return {
     name: 'Hari Kalyan',
@@ -63,6 +31,26 @@ function validBody(overrides: Record<string, unknown> = {}) {
   }
 }
 
+function makeRequest(
+  method: string,
+  body?: Record<string, unknown>,
+  headers: Record<string, string> = {},
+) {
+  return new Request('https://arha-ventures.vercel.app/api/inquiry', {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+}
+
+async function readJson(res: Response) {
+  const text = await res.text()
+  return text ? (JSON.parse(text) as unknown) : null
+}
+
 describe('POST /api/inquiry', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -72,87 +60,60 @@ describe('POST /api/inquiry', () => {
   })
 
   it('rejects non-POST methods', async () => {
-    const res = mockRes()
-    await handler({ method: 'GET', headers: {}, body: {} }, res)
-    expect(res.statusCode).toBe(405)
+    const res = await handler(makeRequest('GET'))
+    expect(res.status).toBe(405)
   })
 
   it('answers OPTIONS for allowed origins', async () => {
-    const res = mockRes()
-    await handler({ method: 'OPTIONS', headers: { origin: 'http://localhost:5173' }, body: {} }, res)
-    expect(res.statusCode).toBe(200)
-    expect(res.headers['Access-Control-Allow-Origin']).toBe('http://localhost:5173')
+    const res = await handler(makeRequest('OPTIONS', undefined, { origin: 'http://localhost:5173' }))
+    expect(res.status).toBe(200)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('http://localhost:5173')
   })
 
   it('rejects disallowed origins', async () => {
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: { origin: 'https://evil.example' },
-        body: validBody(),
-      },
-      res,
+    const res = await handler(
+      makeRequest('POST', validBody(), { origin: 'https://evil.example' }),
     )
-    expect(res.statusCode).toBe(403)
+    expect(res.status).toBe(403)
   })
 
   it('returns 500 when Supabase env is missing', async () => {
     delete process.env.SUPABASE_URL
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: validBody() }, res)
-    expect(res.statusCode).toBe(500)
-    expect(res.body).toEqual({ error: 'Server configuration error' })
+    const res = await handler(makeRequest('POST', validBody()))
+    expect(res.status).toBe(500)
+    expect(await readJson(res)).toEqual({ error: 'Server configuration error' })
   })
 
   it('returns 400 for invalid payloads', async () => {
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: validBody({ email: 'bad' }) }, res)
-    expect(res.statusCode).toBe(400)
+    const res = await handler(makeRequest('POST', validBody({ email: 'bad' })))
+    expect(res.status).toBe(400)
   })
 
   it('returns 400 for non-allowlisted project types', async () => {
-    const res = mockRes()
-    await handler(
-      { method: 'POST', headers: {}, body: validBody({ projectType: 'NotARealType' }) },
-      res,
-    )
-    expect(res.statusCode).toBe(400)
-    expect(res.body).toEqual({ error: 'Please choose a valid project type.' })
+    const res = await handler(makeRequest('POST', validBody({ projectType: 'NotARealType' })))
+    expect(res.status).toBe(400)
+    expect(await readJson(res)).toEqual({ error: 'Please choose a valid project type.' })
     expect(insertMock).not.toHaveBeenCalled()
   })
 
   it('silently accepts honeypot submissions without inserting', async () => {
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: {},
-        body: validBody({ website: 'http://bot.example' }),
-      },
-      res,
-    )
-    expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true })
+    const res = await handler(makeRequest('POST', validBody({ website: 'http://bot.example' })))
+    expect(res.status).toBe(200)
+    expect(await readJson(res)).toEqual({ success: true })
     expect(fromMock).not.toHaveBeenCalled()
   })
 
   it('inserts a valid enquiry without returning a row id', async () => {
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: {
-          'x-forwarded-for': '203.0.113.9',
-          'user-agent': 'vitest',
-        },
-        body: validBody({ source: 'spoofed' }),
-      },
-      res,
+    const res = await handler(
+      makeRequest('POST', validBody({ source: 'spoofed' }), {
+        'x-forwarded-for': '203.0.113.9',
+        'user-agent': 'vitest',
+      }),
     )
-    expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true })
-    expect(res.body).not.toHaveProperty('id')
+    const body = await readJson(res)
+    expect(res.status).toBe(200)
+    expect(body).toEqual({ success: true })
+    expect(body).not.toHaveProperty('id')
     expect(fromMock).toHaveBeenCalledWith('inquiries')
     expect(insertMock).toHaveBeenCalledWith([
       expect.objectContaining({
@@ -174,9 +135,8 @@ describe('POST /api/inquiry', () => {
       insert: insertMock,
     }))
 
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: validBody() }, res)
-    expect(res.statusCode).toBe(429)
+    const res = await handler(makeRequest('POST', validBody()))
+    expect(res.status).toBe(429)
     expect(insertMock).not.toHaveBeenCalled()
   })
 
@@ -190,17 +150,15 @@ describe('POST /api/inquiry', () => {
       insert: insertMock,
     }))
 
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: validBody() }, res)
-    expect(res.statusCode).toBe(503)
+    const res = await handler(makeRequest('POST', validBody()))
+    expect(res.status).toBe(503)
     expect(insertMock).not.toHaveBeenCalled()
   })
 
   it('returns 500 when Supabase insert fails', async () => {
     insertMock.mockResolvedValueOnce({ data: null, error: { message: 'db down' } })
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: validBody() }, res)
-    expect(res.statusCode).toBe(500)
-    expect(res.body).toEqual({ error: 'Server error' })
+    const res = await handler(makeRequest('POST', validBody()))
+    expect(res.status).toBe(500)
+    expect(await readJson(res)).toEqual({ error: 'Server error' })
   })
 })

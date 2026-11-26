@@ -17,36 +17,24 @@ vi.mock('@supabase/supabase-js', () => ({
 
 import handler from './lead-magnet'
 
-type Res = {
-  statusCode: number
-  body: unknown
-  headers: Record<string, string>
-  status: (code: number) => Res
-  json: (payload: unknown) => void
-  end: () => void
-  setHeader: (name: string, value: string) => void
+function makeRequest(
+  method: string,
+  body?: Record<string, unknown>,
+  headers: Record<string, string> = {},
+) {
+  return new Request('https://arha-ventures.vercel.app/api/lead-magnet', {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
 }
 
-function mockRes(): Res {
-  const res: Res = {
-    statusCode: 200,
-    body: undefined,
-    headers: {},
-    status(code) {
-      this.statusCode = code
-      return this
-    },
-    json(payload) {
-      this.body = payload
-    },
-    end() {
-      this.body = this.body ?? null
-    },
-    setHeader(name, value) {
-      this.headers[name] = value
-    },
-  }
-  return res
+async function readJson(res: Response) {
+  const text = await res.text()
+  return text ? (JSON.parse(text) as unknown) : null
 }
 
 describe('POST /api/lead-magnet', () => {
@@ -58,23 +46,22 @@ describe('POST /api/lead-magnet', () => {
   })
 
   it('inserts a name + email lead with server-owned guide copy', async () => {
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: { 'x-forwarded-for': '203.0.113.9' },
-        body: {
+    const res = await handler(
+      makeRequest(
+        'POST',
+        {
           name: 'Hari',
           email: 'hari@example.com',
           guide: '../../../etc/passwd',
           website: '',
         },
-      },
-      res,
+        { 'x-forwarded-for': '203.0.113.9' },
+      ),
     )
-    expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true })
-    expect(res.body).not.toHaveProperty('id')
+    const body = await readJson(res)
+    expect(res.status).toBe(200)
+    expect(body).toEqual({ success: true })
+    expect(body).not.toHaveProperty('id')
     expect(fromMock).toHaveBeenCalledWith('inquiries')
     expect(insertMock).toHaveBeenCalledWith([
       expect.objectContaining({
@@ -88,23 +75,16 @@ describe('POST /api/lead-magnet', () => {
   })
 
   it('rejects invalid email', async () => {
-    const res = mockRes()
-    await handler({ method: 'POST', headers: {}, body: { name: 'Hari', email: 'bad' } }, res)
-    expect(res.statusCode).toBe(400)
+    const res = await handler(makeRequest('POST', { name: 'Hari', email: 'bad' }))
+    expect(res.status).toBe(400)
   })
 
   it('silently accepts honeypot fills', async () => {
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: {},
-        body: { name: 'Bot', email: 'bot@example.com', website: 'http://spam' },
-      },
-      res,
+    const res = await handler(
+      makeRequest('POST', { name: 'Bot', email: 'bot@example.com', website: 'http://spam' }),
     )
-    expect(res.statusCode).toBe(200)
-    expect(res.body).toEqual({ success: true })
+    expect(res.status).toBe(200)
+    expect(await readJson(res)).toEqual({ success: true })
     expect(fromMock).not.toHaveBeenCalled()
   })
 
@@ -118,16 +98,10 @@ describe('POST /api/lead-magnet', () => {
       insert: insertMock,
     }))
 
-    const res = mockRes()
-    await handler(
-      {
-        method: 'POST',
-        headers: {},
-        body: { name: 'Hari', email: 'hari@example.com', website: '' },
-      },
-      res,
+    const res = await handler(
+      makeRequest('POST', { name: 'Hari', email: 'hari@example.com', website: '' }),
     )
-    expect(res.statusCode).toBe(503)
+    expect(res.status).toBe(503)
     expect(insertMock).not.toHaveBeenCalled()
   })
 })
