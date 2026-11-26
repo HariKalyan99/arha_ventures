@@ -19,9 +19,25 @@ const TABLE = {
 const YAW = 0.35
 const TARGET_SPAN = 0.36
 
+function makeBlobShadow(size = 128) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.08, size / 2, size / 2, size * 0.48)
+  g.addColorStop(0, 'rgba(8,6,4,0.55)')
+  g.addColorStop(0.45, 'rgba(8,6,4,0.22)')
+  g.addColorStop(1, 'rgba(8,6,4,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, size, size)
+  const map = new THREE.CanvasTexture(canvas)
+  map.colorSpace = THREE.SRGBColorSpace
+  return map
+}
+
 /**
  * Toscano vintage telephone on the first lounge teapoy.
- * Sits on the table and rings (shake) instead of spinning. Click → /contact.
+ * Sits on the table with a soft contact blob; rings instead of spinning. Click → /contact.
  */
 export function ContactPhone() {
   const group = useRef<THREE.Group>(null)
@@ -60,6 +76,17 @@ export function ContactPhone() {
     return root
   }, [scene])
 
+  const shadowMat = useMemo(() => {
+    const map = makeBlobShadow()
+    return new THREE.MeshBasicMaterial({
+      map,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide,
+    })
+  }, [])
+
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
     play('nib')
@@ -86,19 +113,30 @@ export function ContactPhone() {
   })
 
   return (
-    <group
-      ref={group}
-      position={[TABLE.x, TABLE.y, TABLE.z]}
-      rotation={[0, YAW, 0]}
-      onClick={onClick}
-      onPointerOver={() => {
-        document.body.style.cursor = 'pointer'
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = ''
-      }}
-    >
-      <primitive object={phone} />
-    </group>
+    <>
+      {/* Soft contact blob on the teapoy — hero has shadow maps off. */}
+      <mesh
+        position={[TABLE.x, TABLE.y + 0.002, TABLE.z]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        material={shadowMat}
+        renderOrder={1}
+      >
+        <planeGeometry args={[0.42, 0.34]} />
+      </mesh>
+      <group
+        ref={group}
+        position={[TABLE.x, TABLE.y, TABLE.z]}
+        rotation={[0, YAW, 0]}
+        onClick={onClick}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = ''
+        }}
+      >
+        <primitive object={phone} />
+      </group>
+    </>
   )
 }
