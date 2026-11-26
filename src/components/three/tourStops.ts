@@ -98,8 +98,8 @@ export const houseTourStops: TourStop[] = [
   {
     id: 'overview',
     short: 'Across',
-    eyebrow: '05 — Across the loft',
-    line: 'One continuous thought — floors, light and material in a single air.',
+    eyebrow: '05 — Beyond the glass',
+    line: 'A home should borrow the skyline quietly — outlook as considered as the structure that frames it.',
     position: [1.8, 1.85, 4.8],
     target: [-2.4, 1.15, 0.2],
     fov: 50,
