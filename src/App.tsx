@@ -14,6 +14,8 @@ const JournalPage = lazy(() => import('./pages/JournalPage'))
 const ArticlePage = lazy(() => import('./pages/ArticlePage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const LegalPage = lazy(() => import('./pages/LegalPage'))
+const ModelReviewIndexPage = lazy(() => import('./pages/ModelReviewIndexPage'))
+const ModelReviewPage = lazy(() => import('./pages/ModelReviewPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 export default function App() {
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="contact" element={<ContactPage />} />
             <Route path="privacy" element={<LegalPage document="privacy" />} />
             <Route path="terms" element={<LegalPage document="terms" />} />
+            <Route path="review/models" element={<ModelReviewIndexPage />} />
+            <Route path="review/models/:slug" element={<ModelReviewPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
