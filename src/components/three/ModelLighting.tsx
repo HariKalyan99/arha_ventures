@@ -114,7 +114,7 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       loungeSpot.current.intensity = (4.5 + lamp * 6.5) * lampBoost
       loungeSpot.current.target.updateMatrixWorld()
     }
-    if (artWall.current) artWall.current.intensity = (2.2 + lamp * 3.8) * lampBoost
+    if (artWall.current) artWall.current.intensity = (ink ? 3.4 : 2.2 + lamp * 3.8) * lampBoost
     if (mezzanine.current) mezzanine.current.intensity = (2.4 + lamp * 4.0) * lampBoost
     if (stairRail.current) stairRail.current.intensity = (0.9 + lamp * 1.6) * lampBoost
     if (underMezz.current) underMezz.current.intensity = (2.0 + lamp * 3.2) * lampBoost
@@ -171,7 +171,8 @@ export function ModelLighting({ mood, blend, noir = false }: ModelLightingProps)
       />
       <object3D ref={loungeTarget} position={[-2.85, 1.1, 1.45]} />
 
-      <pointLight ref={artWall} position={[0.2, 2.2, 2.4]} color="#f0d2a8" distance={9} decay={2} />
+      {/* Soft wash on the framed print (beige end wall ≈ 5.12, 1.58, 1.05). */}
+      <pointLight ref={artWall} position={[3.9, 2.05, 1.1]} color="#f0d2a8" distance={7} decay={2} />
       <pointLight ref={mezzanine} position={[2.8, 1.9, 0.25]} color="#e8c9a0" distance={9} decay={2} />
       <pointLight ref={underMezz} position={[-1.0, 2.4, 0.5]} color="#e8c9a0" distance={8} decay={2} />
       <pointLight ref={stairRail} position={[3.5, 2.9, 0.8]} color="#e6d2b4" distance={7} decay={2.2} />

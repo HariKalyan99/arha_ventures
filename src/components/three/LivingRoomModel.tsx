@@ -5,6 +5,8 @@ import * as THREE from 'three'
 import { LIVING_ROOM_GLB, LIVING_ROOM_TARGET_SPAN, LIVING_ROOM_YAW } from './roomSource'
 import { ContactPhone } from './ContactPhone'
 import { LoftPlants } from './LoftPlants'
+import { ShelfCornerMezzJoin } from './ShelfCornerMezzJoin'
+import { WallArt } from './WallArt'
 import { WallLogo } from './WallLogo'
 
 /* night.webp = dark skyline, day.webp = morning/dusk sky — H&M framing locked */
@@ -238,6 +240,8 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
       <Suspense fallback={null}>
         <ContactPhone />
         <WallLogo />
+        <ShelfCornerMezzJoin />
+        <WallArt noir={noir} />
         <LoftPlants />
       </Suspense>
     </group>
