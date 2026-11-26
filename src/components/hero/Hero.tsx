@@ -52,8 +52,9 @@ export function Hero() {
   const webgl = useMemo(() => hasWebGL(), [])
   const tier = useMemo(() => getQualityTier(), [])
   const { scrollTo } = useSmoothScroll()
-  const stop = houseTourStops[stopIndex]
-  const isConclusion = isTour && stopIndex === houseTourStops.length - 1
+  const safeStopIndex = Math.min(stopIndex, Math.max(0, houseTourStops.length - 1))
+  const stop = houseTourStops[safeStopIndex]!
+  const isConclusion = isTour && safeStopIndex === houseTourStops.length - 1
   const plate = isDark ? 'bg-[#111111]' : 'bg-[#c8bdb0]'
 
   useEffect(() => {
@@ -92,7 +93,10 @@ export function Hero() {
           const mapped = mapTourScrollProgress(self.progress)
           const { displayIndex } = tourStopAt(mapped)
           /* Only commit React state when values change — avoids scroll-frame re-renders. */
-          setStopIndex((prev) => (prev === displayIndex ? prev : displayIndex))
+          setStopIndex((prev) => {
+            const next = Math.min(displayIndex, houseTourStops.length - 1)
+            return prev === next ? prev : next
+          })
           const nextTouring = self.progress > 0.05
           setTouring((prev) => (prev === nextTouring ? prev : nextTouring))
           const nextHolding = isTourHold(self.progress)
@@ -252,7 +256,7 @@ export function Hero() {
                   >
                     {isConclusion ? (
                       <>
-                        If a room could keep only <em>one truth</em> about you — which would you leave on the shelf?
+                        From above, the plan softens — and you see what was <em>worth keeping</em>.
                       </>
                     ) : (
                       stop.line
@@ -314,7 +318,7 @@ export function Hero() {
             <p data-hero-fade className="eyebrow hidden text-parchment/55 lg:block">
               {webgl && !sceneFailed
                 ? isTour
-                  ? 'Live 3D tour · Loft interior'
+                  ? 'Live 3D tour · Sraven interior'
                   : 'Live 3D render · A living room at dusk'
                 : 'Loft interior'}
             </p>
@@ -325,7 +329,7 @@ export function Hero() {
               </span>
             </div>
             <p data-hero-fade className="eyebrow ml-auto hidden text-parchment/55 sm:block short:!block">
-              {isTour ? `${String(stopIndex + 1).padStart(2, '0')} / ${String(houseTourStops.length).padStart(2, '0')}` : 'N° 01 — Residence study'}
+              {isTour ? `${String(safeStopIndex + 1).padStart(2, '0')} / ${String(houseTourStops.length).padStart(2, '0')}` : 'N° 01 — Residence study'}
             </p>
           </div>
         </div>

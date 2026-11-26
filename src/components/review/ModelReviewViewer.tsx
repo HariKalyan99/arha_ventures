@@ -21,6 +21,7 @@ import {
   type ModelAnnotation,
 } from '../../lib/modelAnnotations'
 import { SceneErrorBoundary } from '../three/SceneErrorBoundary'
+import { contentBox } from '../three/modelBounds'
 
 type ViewMode = 'interior' | 'exterior'
 
@@ -36,7 +37,11 @@ function frameCamera(
   controls: OrbitControlsImpl | null,
 ) {
   object.updateWorldMatrix(true, true)
-  const box = new THREE.Box3().setFromObject(object)
+  const full = new THREE.Box3().setFromObject(object)
+  if (full.isEmpty()) return
+
+  /* Interior stands inside the furnished core — not the empty inflated shell AABB. */
+  const box = view === 'interior' ? contentBox(object) : full
   if (box.isEmpty()) return
 
   const size = box.getSize(new THREE.Vector3())
@@ -47,31 +52,33 @@ function frameCamera(
 
   if (view === 'interior') {
     const eyeY = THREE.MathUtils.clamp(box.min.y + 1.55, box.min.y + 0.4, box.max.y - 0.35)
+    /* Stand in the open middle of the core — edge lerps clip into walls. */
     const pos = new THREE.Vector3(center.x, eyeY, center.z)
-    /* Stand in the first third of the long axis, look toward the far two-thirds. */
+    const target = new THREE.Vector3(center.x, eyeY - 0.1, center.z)
     if (alongZ) {
-      pos.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.28)
+      pos.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.34)
+      target.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.76)
+      /* Bias left of centre so the wood partition doesn’t fill the frame. */
+      pos.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.42)
+      target.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.46)
     } else {
-      pos.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.28)
-    }
-    const target = new THREE.Vector3(center.x, eyeY - 0.2, center.z)
-    if (alongZ) {
-      target.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.72)
-    } else {
-      target.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.72)
+      pos.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.34)
+      target.x = THREE.MathUtils.lerp(box.min.x, box.max.x, 0.76)
+      pos.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.42)
+      target.z = THREE.MathUtils.lerp(box.min.z, box.max.z, 0.46)
     }
 
-    persp.fov = 72
-    persp.near = 0.05
-    persp.far = Math.max(800, longest * 6)
+    persp.fov = 62
+    persp.near = 0.08
+    persp.far = Math.max(800, longest * 8)
     persp.position.copy(pos)
     persp.lookAt(target)
     persp.updateProjectionMatrix()
 
     if (controls) {
       controls.target.copy(target)
-      controls.minDistance = 0.15
-      controls.maxDistance = longest * 1.2
+      controls.minDistance = 0.2
+      controls.maxDistance = longest * 1.5
       controls.update()
     }
     return
@@ -116,7 +123,8 @@ function ReviewModelMesh({
   controlsRef: RefObject<OrbitControlsImpl | null>
   frameKey: number
 }) {
-  const { scene } = useGLTF(url)
+  /* Meshopt-compressed review GLBs (e.g. sraven-interior). */
+  const { scene } = useGLTF(url, false, true)
   const { camera } = useThree()
   const groupRef = useRef<THREE.Group>(null)
   const clone = useMemo(() => scene.clone(true), [scene])
@@ -127,15 +135,19 @@ function ReviewModelMesh({
       if (!mesh.isMesh) return
       mesh.castShadow = true
       mesh.receiveShadow = true
+      mesh.frustumCulled = false
       const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
       mats.forEach((mat) => {
         if (!mat) return
-        /* Interior: cull outward faces so the shell doesn’t hide the room. */
-        mat.side = interiorPass ? THREE.FrontSide : THREE.DoubleSide
+        /* DoubleSide — CAD shells face out; interior cameras need the inner faces. */
+        mat.side = THREE.DoubleSide
         mat.needsUpdate = true
       })
     })
-  }, [clone, interiorPass])
+  }, [clone])
+
+  /* interiorPass kept for call-site clarity (framing) — materials stay DoubleSide. */
+  void interiorPass
 
   useLayoutEffect(() => {
     const root = groupRef.current

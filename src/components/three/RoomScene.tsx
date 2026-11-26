@@ -7,7 +7,6 @@ import { Furniture } from './Furniture'
 import { Lighting, type MoodBlend } from './Lighting'
 import { LivingRoomModel } from './LivingRoomModel'
 import { ModelLighting } from './ModelLighting'
-import { MorningSun } from './MorningSun'
 import { getMaterialLibrary } from './materials'
 import { createRig, disposeRig } from './rig'
 import { RoomContext } from './roomContext'
@@ -31,11 +30,10 @@ export function RoomScene({ finishes, mood, blend, tier, source = HERO_ROOM_SOUR
       <>
         <ModelLighting mood={mood} blend={blend} noir={noir} />
         <LivingRoomModel noir={noir} />
-        {noir ? null : <MorningSun mood={mood} blend={blend} />}
         <ContactShadows
           position={[0, 0.01, 0]}
-          scale={14}
-          far={2.2}
+          scale={16}
+          far={2.4}
           blur={noir ? 3.2 : 2.6}
           opacity={noir ? 0.55 : 0.36}
           resolution={512}

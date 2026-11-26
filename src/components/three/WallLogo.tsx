@@ -103,7 +103,8 @@ export function WallLogo() {
   const plateW = width + 0.07
   const plateH = height + 0.07
   const depth = 0.018
-  const base = useMemo(() => ({ x: -2.84, y: 0.82, z: 2.38 }), [])
+  /* Kitchen console — beside the telephone, fitted Sraven core span 14. */
+  const base = useMemo(() => ({ x: 3.45, y: 1.1, z: -3.5 }), [])
 
   const firePulse = () => {
     pulse.current = 1

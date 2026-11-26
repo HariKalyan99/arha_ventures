@@ -1,9 +1,11 @@
 /**
- * Interior tour for free_loft_17 (fitted span 14m, floor y=0).
- * Copy advances with the camera — last stop is the shelf + curious close.
+ * Interior tour for sraven-interior.
+ * Fitted on the furnished core (span 14m, floor y=0).
  *
- * `mobile` poses reframe for phone + md tablet (below lg):
- * less ceiling, teapoy/plaque framing, FOV kept calmer.
+ * Path: kitchen → living → stair climb → upper landing.
+ * Kitchen start is the reverse of the locked sofa→island frame.
+ *
+ * `mobile` poses reframe for phone + md tablet (below lg).
  */
 export interface TourPose {
   position: [number, number, number]
@@ -22,107 +24,96 @@ export interface TourStop extends TourPose {
   mobile?: Partial<TourPose>
 }
 
-/** Eye stays inside the loft, with room to travel between zones. */
+/** Bounds cover kitchen, living aisle, and the stair climb. */
 export const TOUR_CAMERA_BOUNDS = {
-  min: [-4.8, 1.15, -5.0] as [number, number, number],
-  max: [5.2, 3.85, 6.2] as [number, number, number],
+  min: [-2.2, 1.2, -4.5] as [number, number, number],
+  max: [3.5, 3.8, 4.8] as [number, number, number],
 }
 
 /** Below Tailwind `lg` — phone and md tablet use compact tour framing. */
 export const TOUR_MOBILE_MAX_WIDTH = 1023
 
-/** Tailwind `md` floor — same teapoy targets as phone, slightly wider FOV. */
+/** Tailwind `md` floor — same look-ats as phone, slightly wider FOV. */
 export const TOUR_MD_MIN_WIDTH = 768
 
+/**
+ * Locked living→kitchen frame (sofa, island, NetTV, fire):
+ *   eye [0.58, 1.55, -0.7] → look [3.27, 1.15, -4.2]
+ * Kitchen start stands near that look-at, facing back into living.
+ */
 export const houseTourStops: TourStop[] = [
-  {
-    id: 'living',
-    short: 'Living',
-    eyebrow: '01 — The volume',
-    line: 'First, height. A room that lets the ceiling finish the sentence.',
-    position: [-0.7, 1.7, 5.0],
-    target: [-2.95, 1.42, 1.45],
-    fov: 48,
-    mobile: {
-      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 0.82, 2.38).
-      position: [0.55, 1.58, 5.55],
-      target: [-2.84, 0.92, 2.25],
-      fov: 40,
-    },
-  },
-  {
-    id: 'seating',
-    short: 'Lounge',
-    eyebrow: '02 — The gathering',
-    line: 'Then the low seat — so conversation can find its own light.',
-    position: [0.4, 1.48, 3.2],
-    target: [-2.9, 1.0, 1.5],
-    fov: 50,
-    mobile: {
-      // Stay with the teapoy a beat longer before the tour drifts right.
-      position: [0.85, 1.52, 3.9],
-      target: [-2.7, 0.9, 2.05],
-      fov: 42,
-    },
-  },
   {
     id: 'kitchen',
     short: 'Kitchen',
-    eyebrow: '03 — The daily plan',
-    line: 'Work and rest share one floor. Rituals should not feel like a corridor.',
-    position: [0.6, 1.55, 1.8],
-    target: [-3.4, 1.05, -0.9],
-    fov: 48,
+    eyebrow: '01 — The daily plan',
+    line: 'From the island, the living room opens — work and rest in one air.',
+    position: [3.05, 1.48, -3.85],
+    target: [0.45, 1.3, -0.35],
+    fov: 50,
     mobile: {
-      position: [0.75, 1.58, 2.15],
-      target: [-3.15, 0.98, -0.75],
-      fov: 45,
-    },
-  },
-  {
-    id: 'mezzanine',
-    short: 'Mezzanine',
-    eyebrow: '04 — The return look',
-    line: 'From above, the plan softens — and you see what was worth keeping.',
-    position: [2.2, 3.9, 2.8],
-    target: [-2.4, 1.5, 0.6],
-    fov: 48,
-    mobile: {
-      // Same stairs-top plan as desktop — spiral right, lounge + plaque below.
-      // Slight look bias toward the plaque so it stays in a narrow/md frame.
-      position: [2.2, 3.9, 2.8],
-      target: [-2.55, 1.25, 1.05],
+      position: [2.75, 1.45, -3.55],
+      target: [0.55, 1.25, -0.45],
       fov: 46,
     },
   },
   {
-    id: 'overview',
-    short: 'Across',
-    eyebrow: '05 — Across the loft',
-    line: 'One continuous thought — floors, light and material in a single air.',
-    position: [1.8, 1.85, 4.8],
-    target: [-2.4, 1.15, 0.2],
+    id: 'living',
+    short: 'Living',
+    eyebrow: '02 — The gathering',
+    line: 'Sofa, fire and screen — then the stair begins to pull the eye upward.',
+    // Same open volume as the locked living frame, looking toward the stair.
+    position: [0.58, 1.52, -0.55],
+    target: [-1.45, 2.05, 3.25],
     fov: 50,
     mobile: {
-      // Close 3/4 on the telephone teapoy — Call Us handset readable + tappable.
-      // Phone world ≈ (1.77, 0.45, 0.76)
-      position: [3.35, 1.55, 2.85],
-      target: [1.77, 0.55, 0.76],
-      fov: 40,
+      position: [0.5, 1.48, -0.35],
+      target: [-1.25, 1.95, 2.85],
+      fov: 46,
     },
   },
   {
-    id: 'shelf',
-    short: 'Shelf',
-    eyebrow: '06 — And then',
-    line: 'If a room could keep only one truth about you — which would you leave on the shelf?',
-    position: [0.9, 1.52, 1.9],
-    target: [3.55, 1.35, -0.55],
-    fov: 40,
+    id: 'stair-base',
+    short: 'Stair',
+    eyebrow: '03 — The ascent',
+    line: 'Dark treads, pale stringer — the climb framed like a second room.',
+    // Stay in the open living volume — look up the stair, don’t enter the well.
+    position: [-0.35, 1.55, 1.15],
+    target: [-1.65, 3.05, 4.35],
+    fov: 48,
     mobile: {
-      position: [0.7, 1.48, 2.15],
-      target: [3.35, 1.28, -0.45],
-      fov: 38,
+      position: [-0.2, 1.5, 1.35],
+      target: [-1.45, 2.85, 4.0],
+      fov: 44,
+    },
+  },
+  {
+    id: 'stair-mid',
+    short: 'Climb',
+    eyebrow: '04 — Halfway up',
+    line: 'Height rewrites the plan — the rooms below settle into one thought.',
+    // Rise in open air beside the run (avoids wall / soffit blackouts).
+    position: [-0.75, 2.55, 2.15],
+    target: [-1.55, 3.45, 4.55],
+    fov: 46,
+    mobile: {
+      position: [-0.55, 2.4, 2.0],
+      target: [-1.35, 3.25, 4.25],
+      fov: 42,
+    },
+  },
+  {
+    id: 'upper',
+    short: 'Above',
+    eyebrow: '05 — And then',
+    line: 'From above, the plan softens — and you see what was worth keeping.',
+    // High overlook back toward living + kitchen.
+    position: [-1.05, 3.45, 2.95],
+    target: [1.65, 1.35, -2.15],
+    fov: 50,
+    mobile: {
+      position: [-0.85, 3.25, 2.75],
+      target: [1.35, 1.3, -1.85],
+      fov: 46,
     },
   },
 ]
@@ -134,7 +125,7 @@ export function tourPoseFor(stop: TourStop, compact: boolean, width = 0): TourPo
   }
   const baseFov = stop.mobile.fov ?? stop.fov
   /* md tablets share phone look-ats; open FOV a touch so the frame isn’t pinched. */
-  const fov = width >= TOUR_MD_MIN_WIDTH ? Math.min(baseFov + 4, 48) : baseFov
+  const fov = width >= TOUR_MD_MIN_WIDTH ? Math.min(baseFov + 4, 52) : baseFov
   return {
     position: stop.mobile.position ?? stop.position,
     target: stop.mobile.target ?? stop.target,
@@ -142,12 +133,7 @@ export function tourPoseFor(stop: TourStop, compact: boolean, width = 0): TourPo
   }
 }
 
-/**
- * Raw sticky scroll → camera progress.
- * Tour travels through stops for most of the scroll, then holds on the final
- * shelf / question so the ending can breathe before the page continues down.
- */
-/** Tour travels through stops for most of the scroll, then holds briefly on the final shelf. */
+/** Tour travels through stops for most of the scroll, then holds briefly on the final stop. */
 export const TOUR_TRAVEL_END = 0.82
 
 export function mapTourScrollProgress(raw: number) {
@@ -163,7 +149,7 @@ export function isTourHold(raw: number) {
 
 /**
  * 0–1 reveal for the “Hold — then continue” cue.
- * Eases in as the shelf hold begins, then stays visible through the end.
+ * Eases in as the final hold begins, then stays visible through the end.
  */
 export function tourHoldReveal(raw: number) {
   const p = Math.min(1, Math.max(0, raw))

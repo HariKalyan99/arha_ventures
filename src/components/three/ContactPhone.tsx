@@ -7,20 +7,20 @@ import { play } from '../bencho/sounds/sounds'
 
 const PHONE_GLB = '/models/vintage_telephone_toscano_pm1920.glb'
 
-/** Second teapoy — Cylinder.001 in fitted loft. */
+/** Console near the kitchen end — fitted Sraven core span 14. */
 const TABLE = {
-  x: 1.77,
-  y: 0.31,
-  z: 0.76,
+  x: 3.1,
+  y: 0.85,
+  z: -3.8,
 }
 
 const SPIN = 0.42
 const TARGET_SPAN = 0.38
-const HOVER_BASE = 0.14
-const HOVER_AMP = 0.055
+const HOVER_BASE = 0.12
+const HOVER_AMP = 0.04
 
 /**
- * Toscano vintage telephone on the lounge teapoy — floats and spins like the logo plaque.
+ * Toscano vintage telephone on the kitchen console — floats and spins like the logo plaque.
  * Click → /contact.
  */
 export function ContactPhone() {

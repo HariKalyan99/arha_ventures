@@ -127,11 +127,12 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     else forward.normalize()
     right.crossVectors(forward, worldUp).normalize()
 
-    const lookYaw = mobile ? 0.45 : 1.0
-    const lookPitch = mobile ? 0.18 : 0.4
-    const walkSide = mobile ? 0.14 : 0.32
-    const walkFwd = mobile ? 0.08 : 0.18
-    const walkUp = mobile ? 0.05 : 0.1
+    /* Keep parallax mild — large offsets push the eye into door leaves mid-tour. */
+    const lookYaw = mobile ? 0.28 : 0.7
+    const lookPitch = mobile ? 0.12 : 0.28
+    const walkSide = mobile ? 0.06 : 0.16
+    const walkFwd = mobile ? 0.04 : 0.1
+    const walkUp = mobile ? 0.03 : 0.06
 
     offset
       .set(0, 0, 0)

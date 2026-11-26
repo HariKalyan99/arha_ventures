@@ -1,6 +1,6 @@
 /**
  * Room sources — hero tour and atelier are independent.
- * - Hero uses the imported loft GLB (scroll tour).
+ * - Hero uses the imported interior GLB (scroll tour).
  * - Atelier always uses the hand-built procedural room so finishes / moods apply.
  */
 export type RoomSource = 'glb' | 'procedural'
@@ -15,12 +15,15 @@ export const ATELIER_ROOM_SOURCE: RoomSource = 'procedural'
 export const ROOM_SOURCE: RoomSource = HERO_ROOM_SOURCE
 
 /**
- * Active hero model — free loft 17 (city through the panes, as on Sketchfab).
- * Alternatives: '/models/loft_interior_6_for_free.glb' | '/models/living_room_interior_free_v2.glb'
+ * Active hero model — Sraven interior (meshopt + webp).
+ * Alternatives: '/models/free_loft_17.glb' | '/models/loft_interior_6_for_free.glb'
  */
-export const LIVING_ROOM_GLB = '/models/free_loft_17.glb'
+export const LIVING_ROOM_GLB = '/models/sraven-interior.glb'
 
-/** Target horizontal span (metres) after normalising the interior (city excluded). */
+/**
+ * Target horizontal span (metres) of the furnished core after fit.
+ * Core is ~11.7 × 14m with multi-storey height (~8m).
+ */
 export const LIVING_ROOM_TARGET_SPAN = 14
 
 /** Yaw applied before fit. */
