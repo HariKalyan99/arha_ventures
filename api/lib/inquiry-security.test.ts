@@ -4,8 +4,10 @@ import {
   IP_LIMIT,
   LEAD_MAGNET_GUIDE,
   applyCors,
+  applyCorsHeaders,
   enforceRateLimits,
   getClientIp,
+  isOriginAllowed,
   parseRequestBody,
   validateInquiryPayload,
   validateLeadMagnetPayload,
@@ -174,12 +176,16 @@ describe('applyCors / getClientIp', () => {
     delete process.env.ALLOWED_ORIGINS
     delete process.env.PUBLIC_BASE_URL
     delete process.env.VERCEL_URL
+    delete process.env.VERCEL_BRANCH_URL
+    delete process.env.VERCEL_PROJECT_PRODUCTION_URL
   })
 
   afterEach(() => {
     delete process.env.ALLOWED_ORIGINS
     delete process.env.PUBLIC_BASE_URL
     delete process.env.VERCEL_URL
+    delete process.env.VERCEL_BRANCH_URL
+    delete process.env.VERCEL_PROJECT_PRODUCTION_URL
   })
 
   it('allows localhost origins', () => {
@@ -199,6 +205,29 @@ describe('applyCors / getClientIp', () => {
   it('allows configured PUBLIC_BASE_URL', () => {
     process.env.PUBLIC_BASE_URL = 'https://arha.example.com/'
     const ok = applyCors({ headers: { origin: 'https://arha.example.com' } }, res)
+    expect(ok).toBe(true)
+  })
+
+  it('allows Vercel production alias via VERCEL_PROJECT_PRODUCTION_URL', () => {
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = 'arha-ventures.vercel.app'
+    const ok = applyCors({ headers: { origin: 'https://arha-ventures.vercel.app' } }, res)
+    expect(ok).toBe(true)
+    expect(headers['Access-Control-Allow-Origin']).toBe('https://arha-ventures.vercel.app')
+  })
+
+  it('allows same-origin Request hosts even when alias is not in env allowlist', () => {
+    const req = new Request('https://arha.com/api/inquiry', {
+      method: 'POST',
+      headers: { origin: 'https://arha.com' },
+    })
+    const out = new Headers()
+    expect(applyCorsHeaders(req, out)).toBe(true)
+    expect(isOriginAllowed(req)).toBe(true)
+    expect(out.get('Access-Control-Allow-Origin')).toBe('https://arha.com')
+  })
+
+  it('allows current production alias from DEFAULT_ORIGINS', () => {
+    const ok = applyCors({ headers: { origin: 'https://arha-ventures.vercel.app' } }, res)
     expect(ok).toBe(true)
   })
 
