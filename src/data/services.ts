@@ -8,7 +8,7 @@ export const services: Service[] = [
     summary:
       'New homes, additions and structural upgrades built with clear methodology, site discipline and finishes ready for the interior team to follow.',
     scope: ['New build', 'Renovation', 'Structure'],
-    image: media.construction,
+    image: media['house-dusk'],
   },
   {
     id: 'commercial-construction',

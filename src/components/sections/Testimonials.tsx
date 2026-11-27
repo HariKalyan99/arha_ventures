@@ -106,10 +106,27 @@ export function Testimonials({ index }: { index: string }) {
                 aria-label={`${current + 1} of ${testimonials.length}`}
               >
                 <blockquote className="display text-display-md text-balance text-cream">{item.quote}</blockquote>
-                <figcaption className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                  <span aria-hidden className="h-px w-10 shrink-0 bg-gold" />
-                  <span className="text-cream">{item.attribution}</span>
-                  <span className="text-cream/50">— {item.reference}</span>
+                <figcaption className="mt-10 flex items-center gap-3 text-sm">
+                  {item.avatar ? (
+                    <span className="reviewer-avatar size-9 shrink-0">
+                      <img
+                        src={item.avatar.src}
+                        alt=""
+                        width={36}
+                        height={36}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </span>
+                  ) : (
+                    <span aria-hidden className="reviewer-avatar reviewer-avatar--initial size-9 shrink-0">
+                      {item.attribution.charAt(0)}
+                    </span>
+                  )}
+                  <div className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-3">
+                    <span className="text-cream">{item.attribution}</span>
+                    <span className="text-cream/50">— {item.reference}</span>
+                  </div>
                 </figcaption>
               </motion.figure>
             </AnimatePresence>

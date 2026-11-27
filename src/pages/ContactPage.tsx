@@ -28,7 +28,7 @@ export default function ContactPage() {
         title={['Begin with', <>a <em>conversation.</em></>]}
         intro={
           <div className="flex flex-col items-start gap-6">
-            <div className="w-full max-w-[min(100%,20rem)] self-start" aria-hidden>
+            <div className="w-full max-w-[min(100%,24rem)] self-start" aria-hidden>
               <Particles shape="Circle" grain="Fine" reach={80} force={60} />
             </div>
             <p>
