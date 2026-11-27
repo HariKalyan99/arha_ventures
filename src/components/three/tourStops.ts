@@ -44,9 +44,9 @@ export const houseTourStops: TourStop[] = [
     target: [-2.95, 1.42, 1.45],
     fov: 48,
     mobile: {
-      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 0.82, 2.38).
+      // Opening: bias left toward the lounge teapoy / plaque (≈ -2.84, 1.18, 2.38).
       position: [0.55, 1.58, 5.55],
-      target: [-2.84, 0.92, 2.25],
+      target: [-2.84, 1.05, 2.25],
       fov: 40,
     },
   },
@@ -70,12 +70,13 @@ export const houseTourStops: TourStop[] = [
     short: 'Kitchen',
     eyebrow: '03 — The daily plan',
     line: 'Work and rest share one floor. Rituals should not feel like a corridor.',
-    position: [0.6, 1.55, 1.8],
-    target: [-3.4, 1.05, -0.9],
+    // Pulled back toward the lounge / window — clear of the stair well.
+    position: [-0.25, 1.52, 3.05],
+    target: [-2.85, 1.08, 1.35],
     fov: 48,
     mobile: {
-      position: [0.75, 1.58, 2.15],
-      target: [-3.15, 0.98, -0.75],
+      position: [0.05, 1.55, 3.15],
+      target: [-2.65, 1.02, 1.5],
       fov: 45,
     },
   },
@@ -84,13 +85,12 @@ export const houseTourStops: TourStop[] = [
     short: 'Mezzanine',
     eyebrow: '04 — The return look',
     line: 'From above, the plan softens — and you see what was worth keeping.',
-    position: [2.2, 3.9, 2.8],
+    /* Same look as before; eye stepped back off the spiral (not inside treads). */
+    position: [1.05, 3.85, 3.95],
     target: [-2.4, 1.5, 0.6],
     fov: 48,
     mobile: {
-      // Same stairs-top plan as desktop — spiral right, lounge + plaque below.
-      // Slight look bias toward the plaque so it stays in a narrow/md frame.
-      position: [2.2, 3.9, 2.8],
+      position: [1.05, 3.85, 3.95],
       target: [-2.55, 1.25, 1.05],
       fov: 46,
     },
@@ -98,16 +98,15 @@ export const houseTourStops: TourStop[] = [
   {
     id: 'overview',
     short: 'Across',
-    eyebrow: '05 — Across the loft',
-    line: 'One continuous thought — floors, light and material in a single air.',
+    eyebrow: '05 — Beyond the glass',
+    line: 'A home should borrow the skyline quietly — outlook as considered as the structure that frames it.',
     position: [1.8, 1.85, 4.8],
     target: [-2.4, 1.15, 0.2],
     fov: 50,
     mobile: {
-      // Close 3/4 on the telephone teapoy — Call Us handset readable + tappable.
-      // Phone world ≈ (1.77, 0.45, 0.76)
-      position: [3.35, 1.55, 2.85],
-      target: [1.77, 0.55, 0.76],
+      // Close 3/4 on the lounge teapoy — Call Us handset + plaque readable.
+      position: [-0.35, 1.45, 4.15],
+      target: [-2.84, 0.7, 2.38],
       fov: 40,
     },
   },
@@ -120,9 +119,10 @@ export const houseTourStops: TourStop[] = [
     target: [3.55, 1.35, -0.55],
     fov: 40,
     mobile: {
-      position: [0.7, 1.48, 2.15],
-      target: [3.35, 1.28, -0.45],
-      fov: 38,
+      // LoftPlants right vase ≈ (4.5, 1.02, -0.42) — center foliage, shelf slips left.
+      position: [1.2, 1.47, 1.55],
+      target: [4.48, 1.04, -0.41],
+      fov: 34,
     },
   },
 ]

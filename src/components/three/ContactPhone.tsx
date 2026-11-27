@@ -7,26 +7,41 @@ import { play } from '../bencho/sounds/sounds'
 
 const PHONE_GLB = '/models/vintage_telephone_toscano_pm1920.glb'
 
-/** Second teapoy — Cylinder.001 in fitted loft. */
+/** First lounge teapoy — same plan as the brand plaque (WallLogo). */
 const TABLE = {
-  x: 1.77,
-  y: 0.31,
-  z: 0.76,
+  x: -2.84,
+  /** Authored table top at this xz (ray hit ≈ 0.367). */
+  y: 0.39,
+  z: 2.38,
 }
 
-const SPIN = 0.42
-const TARGET_SPAN = 0.38
-const HOVER_BASE = 0.14
-const HOVER_AMP = 0.055
+/** Facing the room — no continuous spin. */
+const YAW = 0.35
+const TARGET_SPAN = 0.36
+
+function makeBlobShadow(size = 128) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.08, size / 2, size / 2, size * 0.48)
+  g.addColorStop(0, 'rgba(8,6,4,0.55)')
+  g.addColorStop(0.45, 'rgba(8,6,4,0.22)')
+  g.addColorStop(1, 'rgba(8,6,4,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, size, size)
+  const map = new THREE.CanvasTexture(canvas)
+  map.colorSpace = THREE.SRGBColorSpace
+  return map
+}
 
 /**
- * Toscano vintage telephone on the lounge teapoy — floats and spins like the logo plaque.
- * Click → /contact.
+ * Toscano vintage telephone on the first lounge teapoy.
+ * Sits on the table with a soft contact blob; rings instead of spinning. Click → /contact.
  */
 export function ContactPhone() {
   const group = useRef<THREE.Group>(null)
   const navigate = useNavigate()
-  /* Loaded only when the loft Suspense mounts — no eager preload (~0.8 MB meshopt). */
   const { scene } = useGLTF(PHONE_GLB, false, true)
 
   const phone = useMemo(() => {
@@ -61,10 +76,16 @@ export function ContactPhone() {
     return root
   }, [scene])
 
-  const base = useMemo(
-    () => ({ x: TABLE.x, y: TABLE.y + HOVER_BASE, z: TABLE.z }),
-    [],
-  )
+  const shadowMat = useMemo(() => {
+    const map = makeBlobShadow()
+    return new THREE.MeshBasicMaterial({
+      map,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.DoubleSide,
+    })
+  }, [])
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
@@ -72,32 +93,50 @@ export function ContactPhone() {
     navigate('/contact')
   }
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const g = group.current
     if (!g) return
-    const dt = Math.min(delta, 0.05)
     const t = state.clock.elapsedTime
 
-    g.rotation.y += SPIN * dt
-    g.position.x = base.x
-    g.position.y = base.y + Math.sin(t * 1.05) * HOVER_AMP
-    g.position.z = base.z
+    /* Classic double-burst ring, then a pause. */
+    const cycle = t % 2.6
+    const ringing =
+      (cycle > 0.05 && cycle < 0.22) || (cycle > 0.32 && cycle < 0.49)
+    const amp = ringing ? Math.sin(t * 58) * 0.007 : 0
+
+    g.position.x = TABLE.x + amp
+    g.position.y = TABLE.y
+    g.position.z = TABLE.z + amp * 0.55
+    g.rotation.y = YAW
+    g.rotation.z = amp * 3.2
+    g.rotation.x = amp * 0.8
   })
 
   return (
-    <group
-      ref={group}
-      position={[base.x, base.y, base.z]}
-      onClick={onClick}
-      onPointerOver={() => {
-        document.body.style.cursor = 'pointer'
-      }}
-      onPointerOut={() => {
-        document.body.style.cursor = ''
-      }}
-    >
-      <primitive object={phone} />
-    </group>
+    <>
+      {/* Soft contact blob on the teapoy — hero has shadow maps off. */}
+      <mesh
+        position={[TABLE.x, TABLE.y + 0.002, TABLE.z]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        material={shadowMat}
+        renderOrder={1}
+      >
+        <planeGeometry args={[0.42, 0.34]} />
+      </mesh>
+      <group
+        ref={group}
+        position={[TABLE.x, TABLE.y, TABLE.z]}
+        rotation={[0, YAW, 0]}
+        onClick={onClick}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer'
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = ''
+        }}
+      >
+        <primitive object={phone} />
+      </group>
+    </>
   )
 }
-

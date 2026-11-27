@@ -314,9 +314,9 @@ export function Hero() {
             <p data-hero-fade className="eyebrow hidden text-parchment/55 lg:block">
               {webgl && !sceneFailed
                 ? isTour
-                  ? 'Live 3D tour · Loft interior'
-                  : 'Live 3D render · A living room at dusk'
-                : 'Loft interior'}
+                  ? 'Live 3D tour'
+                  : 'Live 3D render'
+                : 'Residence study'}
             </p>
             <div data-hero-cue className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-parchment/60 sm:bottom-6 short:hidden">
               <span className="eyebrow">{holding ? 'Continue' : touring ? 'Continue' : 'Scroll'}</span>
