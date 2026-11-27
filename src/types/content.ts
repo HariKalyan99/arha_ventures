@@ -122,6 +122,8 @@ export interface Testimonial {
   attribution: string
   reference: string
   sample: boolean
+  /** Reviewer photo — cached from their public Google profile when available. */
+  avatar?: Pick<MediaAsset, 'src' | 'alt' | 'width' | 'height'>
 }
 
 export interface InquiryConfig {

@@ -33,5 +33,5 @@
 
 /* Slightly tighter for inline headline overlays */
 .ptc--inline {
-  width: min(100%, clamp(11rem, 26vw, 15rem));
+  width: min(100%, clamp(13rem, 30vw, 17.5rem));
 }

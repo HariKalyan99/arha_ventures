@@ -37,7 +37,7 @@ export function Footer() {
               </h2>
             </div>
             <div data-reveal="fade" className="relative z-10 flex flex-col items-start gap-5 overflow-visible lg:col-span-4 lg:col-start-9">
-              <div className="w-full max-w-[13rem] self-start" aria-hidden>
+              <div className="w-full max-w-[16.5rem] self-start" aria-hidden>
                 <Particles className="ptc--inline" shape="Circle" grain="Fine" reach={80} force={60} />
               </div>
               <p className="max-w-sm text-cream/60">
