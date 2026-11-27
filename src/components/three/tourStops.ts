@@ -119,9 +119,10 @@ export const houseTourStops: TourStop[] = [
     target: [3.55, 1.35, -0.55],
     fov: 40,
     mobile: {
-      position: [0.7, 1.48, 2.15],
-      target: [3.35, 1.28, -0.45],
-      fov: 38,
+      // LoftPlants right vase ≈ (4.5, 1.02, -0.42) — center foliage, shelf slips left.
+      position: [1.2, 1.47, 1.55],
+      target: [4.48, 1.04, -0.41],
+      fov: 34,
     },
   },
 ]
