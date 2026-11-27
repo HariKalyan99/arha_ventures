@@ -110,8 +110,22 @@ export function HeroTourCamera({ progress, reducedMotion }: HeroTourCameraProps)
     toPos.copy(stations[i + 1].pos)
     fromLook.copy(stations[i].look)
     toLook.copy(stations[i + 1].look)
-    pos.lerpVectors(fromPos, toPos, e)
-    look.lerpVectors(fromLook, toLook, e)
+
+    const stairClimb = i === 2
+    /* Kitchen → mezz: stay at floor height in plan, rise only at end — avoids stair overlap. */
+    const climbT = stairClimb ? THREE.MathUtils.smoothstep(e, 0.58, 1) : e
+
+    pos.x = THREE.MathUtils.lerp(fromPos.x, toPos.x, e)
+    pos.z = THREE.MathUtils.lerp(fromPos.z, toPos.z, e)
+    pos.y = THREE.MathUtils.lerp(fromPos.y, toPos.y, climbT)
+
+    look.x = THREE.MathUtils.lerp(fromLook.x, toLook.x, e)
+    look.z = THREE.MathUtils.lerp(fromLook.z, toLook.z, e)
+    look.y = THREE.MathUtils.lerp(
+      fromLook.y,
+      toLook.y,
+      stairClimb ? THREE.MathUtils.smoothstep(e, 0.52, 1) : e,
+    )
 
     const portraitBoost = portrait ? (mobile ? 2 : 8) : 0
     const desiredFov = THREE.MathUtils.lerp(stations[i].fov, stations[i + 1].fov, e) + portraitBoost

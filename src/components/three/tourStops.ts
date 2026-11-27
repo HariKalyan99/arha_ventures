@@ -70,12 +70,13 @@ export const houseTourStops: TourStop[] = [
     short: 'Kitchen',
     eyebrow: '03 — The daily plan',
     line: 'Work and rest share one floor. Rituals should not feel like a corridor.',
-    position: [0.6, 1.55, 1.8],
-    target: [-3.4, 1.05, -0.9],
+    // Pulled back toward the lounge / window — clear of the stair well.
+    position: [-0.25, 1.52, 3.05],
+    target: [-2.85, 1.08, 1.35],
     fov: 48,
     mobile: {
-      position: [0.75, 1.58, 2.15],
-      target: [-3.15, 0.98, -0.75],
+      position: [0.05, 1.55, 3.15],
+      target: [-2.65, 1.02, 1.5],
       fov: 45,
     },
   },
@@ -84,13 +85,12 @@ export const houseTourStops: TourStop[] = [
     short: 'Mezzanine',
     eyebrow: '04 — The return look',
     line: 'From above, the plan softens — and you see what was worth keeping.',
-    position: [2.2, 3.9, 2.8],
+    /* Same look as before; eye stepped back off the spiral (not inside treads). */
+    position: [1.05, 3.85, 3.95],
     target: [-2.4, 1.5, 0.6],
     fov: 48,
     mobile: {
-      // Same stairs-top plan as desktop — spiral right, lounge + plaque below.
-      // Slight look bias toward the plaque so it stays in a narrow/md frame.
-      position: [2.2, 3.9, 2.8],
+      position: [1.05, 3.85, 3.95],
       target: [-2.55, 1.25, 1.05],
       fov: 46,
     },
