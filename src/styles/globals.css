@@ -158,6 +158,45 @@
     background: var(--color-ink);
   }
 
+  /* Global scrollbars — brand terracotta (Firefox + WebKit). `.no-scrollbar` opts out. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-terracotta) 88%, transparent)
+      color-mix(in srgb, var(--color-line) 55%, transparent);
+  }
+  *:not(.no-scrollbar, .no-scrollbar *) {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-terracotta) 82%, transparent)
+      color-mix(in srgb, var(--color-line) 45%, transparent);
+  }
+  html::-webkit-scrollbar,
+  *:not(.no-scrollbar)::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  html::-webkit-scrollbar-track,
+  *:not(.no-scrollbar)::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--color-line) 35%, transparent);
+    border-radius: 999px;
+  }
+  html::-webkit-scrollbar-thumb,
+  *:not(.no-scrollbar)::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-terracotta) 72%, var(--color-terracotta-soft));
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+    transition: background 0.35s var(--ease-luxe);
+  }
+  html::-webkit-scrollbar-thumb:hover,
+  *:not(.no-scrollbar)::-webkit-scrollbar-thumb:hover {
+    background: var(--color-terracotta);
+    background-clip: padding-box;
+  }
+  html::-webkit-scrollbar-corner,
+  *:not(.no-scrollbar)::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   /*
     Hero sticky tour — runway + stage share --app-height and the same plate colour
     so any sub-pixel shortfall while scrolling never flashes a different background.

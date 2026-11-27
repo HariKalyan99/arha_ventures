@@ -10,7 +10,7 @@ export const studio: StudioConfig = {
   legalName: 'Arha Ventures',
   tagline: 'Construction & Interiors',
   descriptor: 'Spaces that inspire, connect, and stand the test of time.',
-  email: 'studio@example.com', // PLACEHOLDER — not listed on Google Business Profile
+  email: 'arhaventures.dm@gmail.com',
   phone: '+91 91136 16705',
   location:
     '19, S S Arcade, Guniagrahara, near Lakshmipura Layout cross, Shivakote, Bengaluru, Karnataka 560097',
@@ -21,8 +21,7 @@ export const studio: StudioConfig = {
     { label: 'Pinterest', href: 'https://www.pinterest.com/' }, // PLACEHOLDER
     { label: 'LinkedIn', href: 'https://www.linkedin.com/' }, // PLACEHOLDER
   ],
-  /** Email is still a placeholder; address and phone are live from Google. */
-  contactIsPlaceholder: true,
+  contactIsPlaceholder: false,
 }
 
 /** Digits only — for tel: / WhatsApp links. */
@@ -116,13 +115,14 @@ export const inquiry: InquiryConfig = {
     'Commercial / workplace',
     'Consultation only',
   ],
+  /* Indicative — full homes rarely sit under ₹10L; consultation / single-room can. */
   budgets: [
     'To be discussed',
-    'Under 100k',
-    '100k – 250k',
-    '250k – 500k',
-    '500k – 1M',
-    'Above 1M',
+    'Under 10 lakhs',
+    '10 – 25 lakhs',
+    '25 – 50 lakhs',
+    '50 lakhs – 1 crore',
+    'Above 1 crore',
   ],
   endpoint: import.meta.env.VITE_INQUIRY_ENDPOINT || '/api/inquiry',
 }

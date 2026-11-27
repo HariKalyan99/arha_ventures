@@ -85,9 +85,9 @@ describe('validateInquiryPayload', () => {
     expect(result).toEqual({ ok: false, error: 'Please use digits, spaces and + only.' })
   })
 
-  it('allows empty phone', () => {
+  it('rejects empty phone', () => {
     const result = validateInquiryPayload(validBody({ phone: '' }))
-    expect(result.ok).toBe(true)
+    expect(result).toEqual({ ok: false, error: 'Please add a phone number so we can reach you.' })
   })
 
   it('rejects missing project type', () => {

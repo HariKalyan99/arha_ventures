@@ -7,6 +7,8 @@ import { buildMailto, submitInquiry, type InquiryPayload } from '../../lib/inqui
 import { EASE_LUXE } from '../../lib/motion'
 import { useSmoothScroll } from '../../lib/scroll-context'
 import { ArrowButton } from '../ui/ArrowButton'
+import { FieldSelect } from '../ui/FieldSelect'
+import { RollText } from '../ui/RollText'
 
 type Field = keyof InquiryPayload | 'consent'
 type Errors = Partial<Record<Field, string>>
@@ -18,7 +20,9 @@ function validate(values: InquiryPayload, consent: boolean): Errors {
   const errors: Errors = {}
   if (values.name.trim().length < 2) errors.name = 'Please tell us your name.'
   if (!EMAIL.test(values.email.trim())) errors.email = 'Please enter a valid email address.'
-  if (values.phone && !/^[+()\d\s.-]{6,}$/.test(values.phone.trim())) errors.phone = 'Please use digits, spaces and + only.'
+  const phone = values.phone.trim()
+  if (phone.length < 6) errors.phone = 'Please add a phone number so we can reach you.'
+  else if (!/^[+()\d\s.-]{6,}$/.test(phone)) errors.phone = 'Please use digits, spaces and + only.'
   if (!values.projectType) errors.projectType = 'Please choose the type of project.'
   if (values.message.trim().length < 20) errors.message = 'A few sentences about the project help us prepare (20 characters minimum).'
   if (!consent) errors.consent = 'Please confirm we may use these details to reply.'
@@ -250,7 +254,7 @@ export function InquiryForm() {
             className="field-input"
           />
         </FieldShell>
-        <FieldShell id={id('phone')} label="Phone" error={errors.phone}>
+        <FieldShell id={id('phone')} label="Phone" required error={errors.phone}>
           <input
             id={id('phone')}
             name="phone"
@@ -260,6 +264,7 @@ export function InquiryForm() {
             onChange={(e) => update('phone', e.target.value)}
             aria-invalid={!!errors.phone}
             aria-describedby={describedBy('phone')}
+            aria-required
             className="field-input"
           />
         </FieldShell>
@@ -282,7 +287,7 @@ export function InquiryForm() {
         </legend>
         <div className="mt-4 flex flex-wrap gap-2">
           {inquiry.projectTypes.map((type) => (
-            <label key={type} className="relative max-w-full cursor-pointer">
+            <label key={type} className="group relative max-w-full cursor-pointer">
               <input
                 type="radio"
                 name="projectType"
@@ -290,11 +295,10 @@ export function InquiryForm() {
                 checked={values.projectType === type}
                 onChange={() => update('projectType', type)}
                 aria-invalid={!!errors.projectType}
-                /* Keep the control on the chip — sr-only radios make the browser scroll-jump on focus. */
                 className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0"
               />
-              <span className="inline-flex min-h-11 max-w-full items-center break-words border border-line px-3 py-2 text-left text-sm leading-snug text-cream/75 transition-colors duration-500 peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold hover:border-cream/40 sm:px-4">
-                {type}
+              <span className="inline-flex h-11 max-w-full items-stretch overflow-hidden border border-line px-3 text-left text-cream/75 transition-[border-color,background-color,color] duration-500 ease-[var(--ease-luxe)] peer-checked:border-gold peer-checked:bg-gold peer-checked:text-obsidian peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold group-hover:border-cream/40 sm:px-4">
+                <RollText>{type}</RollText>
               </span>
             </label>
           ))}
@@ -306,14 +310,14 @@ export function InquiryForm() {
         )}
       </fieldset>
 
-      <FieldShell id={id('budget')} label="Indicative budget" className="sm:max-w-sm">
-        <select id={id('budget')} name="budget" value={values.budget} onChange={(e) => update('budget', e.target.value)} className="field-input">
-          {inquiry.budgets.map((b) => (
-            <option key={b} value={b} className="bg-obsidian">
-              {b}
-            </option>
-          ))}
-        </select>
+      <FieldShell id={id('budget')} label="Indicative budget" className="sm:max-w-md">
+        <FieldSelect
+          id={id('budget')}
+          name="budget"
+          value={values.budget}
+          options={inquiry.budgets}
+          onChange={(b) => update('budget', b)}
+        />
       </FieldShell>
 
       <FieldShell id={id('message')} label="About the project" required error={errors.message} hint="Scope, timing, what matters most to you.">
