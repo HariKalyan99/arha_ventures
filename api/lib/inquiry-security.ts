@@ -219,7 +219,8 @@ export function validateInquiryPayload(body: Record<string, unknown>): Validatio
 
   if (name.length < 2) return { ok: false, error: 'Please tell us your name.' }
   if (!EMAIL_RE.test(email)) return { ok: false, error: 'Please enter a valid email address.' }
-  if (phone && !PHONE_RE.test(phone)) return { ok: false, error: 'Please use digits, spaces and + only.' }
+  if (phone.length < 6) return { ok: false, error: 'Please add a phone number so we can reach you.' }
+  if (!PHONE_RE.test(phone)) return { ok: false, error: 'Please use digits, spaces and + only.' }
   if (!projectType) return { ok: false, error: 'Please choose the type of project.' }
   if (!(ALLOWED_PROJECT_TYPES as readonly string[]).includes(projectType)) {
     return { ok: false, error: 'Please choose a valid project type.' }

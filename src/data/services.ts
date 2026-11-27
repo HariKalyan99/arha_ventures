@@ -3,59 +3,75 @@ import { media } from './media'
 
 export const services: Service[] = [
   {
-    id: 'residential',
-    title: 'Residential Interior Design',
-    summary: 'Complete interiors for private homes — from the first plan to the last cushion — composed around how you actually live.',
-    scope: ['Concept', 'Detailing', 'Furniture', 'Art'],
+    id: 'residential-construction',
+    title: 'Residential Construction Works',
+    summary:
+      'New homes, additions and structural upgrades built with clear methodology, site discipline and finishes ready for the interior team to follow.',
+    scope: ['New build', 'Renovation', 'Structure'],
+    image: media.construction,
+  },
+  {
+    id: 'commercial-construction',
+    title: 'Commercial Construction Works',
+    summary:
+      'Retail, office and hospitality shells delivered on programme — compliant, durable and coordinated for MEP, signage and the fit-out to come.',
+    scope: ['Shell & core', 'Retail', 'Offices'],
+    image: media['office-open'],
+  },
+  {
+    id: 'residential-interior',
+    title: 'Residential Interior Works',
+    summary:
+      'Homes planned around daily rituals — joinery, finishes, lighting and furniture composed so every room feels intentional and lived-in.',
+    scope: ['Joinery', 'Finishes', 'FF&E'],
     image: media['living-fireplace'],
   },
   {
-    id: 'villas',
-    title: 'Luxury Villa Design',
-    summary: 'Architecture and interiors conceived together, so landscape, structure and rooms speak a single language.',
-    scope: ['Architecture', 'Interiors', 'Landscape'],
-    image: media['villa-dusk'],
-  },
-  {
-    id: 'apartments',
-    title: 'Apartment Interiors',
-    summary: 'Re-planning and refining city apartments and penthouses to feel generous, calm and entirely personal.',
-    scope: ['Re-planning', 'Joinery', 'Styling'],
-    image: media['living-cream'],
-  },
-  {
-    id: 'commercial',
-    title: 'Commercial Interiors',
-    summary: 'Workplaces, hospitality and retail spaces with the material quality and comfort of a private residence.',
+    id: 'commercial-interior',
+    title: 'Commercial Interior Works',
+    summary:
+      'Workplaces and guest-facing spaces with the comfort of a residence — zoning, acoustics and brand presence without sacrificing warmth.',
     scope: ['Workplace', 'Hospitality', 'Retail'],
-    image: media['restaurant'],
+    image: media.restaurant,
   },
   {
-    id: 'planning',
-    title: 'Space Planning',
-    summary: 'Measured layouts that resolve circulation, light and storage before a single finish is chosen.',
-    scope: ['Surveys', 'Layouts', 'Zoning'],
-    image: media['drawing'],
-  },
-  {
-    id: 'styling',
-    title: 'Furniture & Styling',
-    summary: 'Bespoke and sourced pieces, art and objects — curated so each room feels collected over time.',
-    scope: ['Bespoke', 'Sourcing', 'Art curation'],
-    image: media['lounge-chairs'],
-  },
-  {
-    id: 'materials',
-    title: 'Material Consultation',
-    summary: 'Stone, timber, metal and textile palettes selected in person and tested against light, use and age.',
-    scope: ['Stone', 'Timber', 'Finishes'],
-    image: media['marble-black'],
+    id: 'architectural',
+    title: 'Architectural Works',
+    summary:
+      'Plans, sections and details that reconcile structure, light and circulation before ground breaks — approvals and documentation included.',
+    scope: ['Concept', 'Working drawings', 'Approvals'],
+    image: media.drawing,
   },
   {
     id: 'turnkey',
-    title: 'Turnkey Interior Solutions',
-    summary: 'One accountable team from concept through procurement, installation and handover — keys in hand.',
-    scope: ['Procurement', 'Site', 'Handover'],
-    image: media['living-wood-stone'],
+    title: 'Turnkey Projects',
+    summary:
+      'One team from briefing through construction, interiors and handover — single point of accountability, predictable timelines, keys in hand.',
+    scope: ['Design-build', 'Procurement', 'Handover'],
+    image: media['living-bright'],
+  },
+  {
+    id: 'consultation',
+    title: 'Construction & Interior Consultation',
+    summary:
+      'Expert review of your brief, budget and drawings — feasibility, scope definition and material direction before you commit to full execution.',
+    scope: ['Feasibility', 'Costing', 'Material advice'],
+    image: media.meeting,
+  },
+  {
+    id: 'villa',
+    title: 'Villa Construction & Interior',
+    summary:
+      'Large-format living inside and out — architecture, landscaping interfaces and interiors developed together for villas and independent homes.',
+    scope: ['Villa build', 'Landscape tie-in', 'Full interior'],
+    image: media['villa-dusk'],
+  },
+  {
+    id: 'apartment',
+    title: 'Apartment Construction & Interior',
+    summary:
+      'Compact city homes made generous — reworked layouts, bespoke storage and refined finishes across apartments and penthouses.',
+    scope: ['Re-planning', 'Built-ins', 'Styling'],
+    image: media['living-cream'],
   },
 ]
