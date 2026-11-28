@@ -4,7 +4,7 @@ import { buildMailto, submitInquiry, type InquiryPayload } from './inquiry'
 const payload: InquiryPayload = {
   name: 'Hari Kalyan',
   email: 'hari@example.com',
-  phone: '+91 91136 16705',
+  phone: '+91 79756 53113',
   projectType: 'Villa',
   location: 'Bengaluru',
   budget: 'To be discussed',

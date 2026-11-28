@@ -11,7 +11,7 @@ export const studio: StudioConfig = {
   tagline: 'Construction & Interiors',
   descriptor: 'Spaces that inspire, connect, and stand the test of time.',
   email: 'arhaventures.dm@gmail.com',
-  phone: '+91 91136 16705',
+  phone: '+91 79756 53113',
   location:
     '19, S S Arcade, Guniagrahara, near Lakshmipura Layout cross, Shivakote, Bengaluru, Karnataka 560097',
   coordinates: { lat: 13.092945, lng: 77.529367 },
