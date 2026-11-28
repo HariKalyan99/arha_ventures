@@ -240,7 +240,7 @@ export function LivingRoomModel({ noir = false }: LivingRoomModelProps) {
       <Suspense fallback={null}>
         <ContactPhone />
         <WallLogo />
-        <ShelfCornerMezzJoin />
+        <ShelfCornerMezzJoin noir={noir} />
         <WallArt noir={noir} />
         <LoftPlants />
       </Suspense>

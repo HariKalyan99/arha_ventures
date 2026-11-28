@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 
 /**
- * Shelf-corner join: wood fascia meets the beige end-wall return.
- * The beige plane is authored short — extend it to the right (+Z).
+ * Shelf-corner join: wood fascia meets the end-wall return.
+ * The GLB plane is authored short — extend it to the right (+Z) in the same plaster tone.
  */
 const BEAM = {
   faceZ: -0.816,
@@ -13,39 +13,48 @@ const BEAM = {
   xEnd: 5.186,
 } as const
 
-/** Beige end wall — −X face at the shelf corner, run further +Z (screen-right). */
+/** End wall — −X face at the shelf corner, run further +Z (screen-right). */
 const WALL_X = 5.22
 const WALL_Z0 = -0.93
 const WALL_Z1 = 3.35
 const WALL_Y0 = 0.05
 const WALL_Y1 = 3.55
 
-const WOOD = '#e6ddd0'
-const PLASTER = '#d6cec2'
+/** Match free_loft plaster — warm brown in day, charcoal brown in night (see LivingRoomModel noir). */
+const TONES = {
+  day: { wood: '#c8bdb0', plaster: '#b8aca0' },
+  night: { wood: '#2a241e', plaster: '#1a1614' },
+} as const
 
-export function ShelfCornerMezzJoin() {
+interface ShelfCornerMezzJoinProps {
+  noir?: boolean
+}
+
+export function ShelfCornerMezzJoin({ noir = false }: ShelfCornerMezzJoinProps) {
+  const tone = noir ? TONES.night : TONES.day
+
   const woodMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: WOOD,
+        color: tone.wood,
         roughness: 0.7,
         metalness: 0,
         envMapIntensity: 0.35,
         side: THREE.FrontSide,
       }),
-    [],
+    [tone.wood],
   )
 
   const plasterMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: PLASTER,
+        color: tone.plaster,
         roughness: 0.95,
         metalness: 0,
-        envMapIntensity: 0.2,
+        envMapIntensity: noir ? 0.28 : 0.2,
         side: THREE.FrontSide,
       }),
-    [],
+    [noir, tone.plaster],
   )
 
   const beamH = BEAM.y1 - BEAM.y0
@@ -80,7 +89,7 @@ export function ShelfCornerMezzJoin() {
         <boxGeometry args={[extend + 0.08, 0.03, 0.1]} />
       </mesh>
 
-      {/* Beige end wall — extended to the right */}
+      {/* End wall — extended to the right */}
       <mesh
         position={[WALL_X - 0.04, (WALL_Y0 + WALL_Y1) / 2, (WALL_Z0 + WALL_Z1) / 2]}
         material={plasterMat}
