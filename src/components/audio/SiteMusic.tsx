@@ -66,9 +66,18 @@ export function SiteMusic({ children }: { children?: ReactNode }) {
     if (audio) audio.muted = next
   }, [])
 
+  const ensureThemeSource = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio || audio.dataset.srcReady === '1') return
+    audio.src = SITE_MUSIC_SRC
+    audio.dataset.srcReady = '1'
+    audio.load()
+  }, [])
+
   const playTheme = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return Promise.reject(new Error('no audio'))
+    ensureThemeSource()
     audio.muted = false
     const p = audio.play()
     if (p && typeof p.then === 'function') {
@@ -79,7 +88,7 @@ export function SiteMusic({ children }: { children?: ReactNode }) {
     }
     setPlaying(true)
     return Promise.resolve()
-  }, [])
+  }, [ensureThemeSource])
 
   const pauseTheme = useCallback(() => {
     const audio = audioRef.current
@@ -155,15 +164,7 @@ export function SiteMusic({ children }: { children?: ReactNode }) {
 
   return (
     <MusicContext.Provider value={controls}>
-      <audio
-        ref={audioRef}
-        src={SITE_MUSIC_SRC}
-        loop
-        preload="metadata"
-        playsInline
-        className="sr-only"
-        aria-hidden
-      />
+      <audio ref={audioRef} loop preload="none" playsInline className="sr-only" aria-hidden />
       {children}
     </MusicContext.Provider>
   )
