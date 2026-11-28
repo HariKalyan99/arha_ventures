@@ -20,9 +20,9 @@ const WALL_Z1 = 3.35
 const WALL_Y0 = 0.05
 const WALL_Y1 = 3.55
 
-/** Match free_loft plaster — warm brown in day, charcoal brown in night (see LivingRoomModel noir). */
 const TONES = {
-  day: { wood: '#c8bdb0', plaster: '#b8aca0' },
+  /** Daylight — black end wall behind the framed print. */
+  day: { wood: '#101010', plaster: '#060606' },
   night: { wood: '#2a241e', plaster: '#1a1614' },
 } as const
 
@@ -30,7 +30,7 @@ interface ShelfCornerMezzJoinProps {
   noir?: boolean
 }
 
-export function ShelfCornerMezzJoin({ noir = false }: ShelfCornerMezzJoinProps) {
+export function ShelfCornerMezzJoin({ noir = false }: ShelfCornerMezzJoinProps = {}) {
   const tone = noir ? TONES.night : TONES.day
 
   const woodMat = useMemo(
@@ -39,19 +39,19 @@ export function ShelfCornerMezzJoin({ noir = false }: ShelfCornerMezzJoinProps) 
         color: tone.wood,
         roughness: 0.7,
         metalness: 0,
-        envMapIntensity: 0.35,
+        envMapIntensity: noir ? 0.35 : 0.18,
         side: THREE.FrontSide,
       }),
-    [tone.wood],
+    [noir, tone.wood],
   )
 
   const plasterMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: tone.plaster,
-        roughness: 0.95,
+        roughness: 0.98,
         metalness: 0,
-        envMapIntensity: noir ? 0.28 : 0.2,
+        envMapIntensity: noir ? 0.28 : 0.12,
         side: THREE.FrontSide,
       }),
     [noir, tone.plaster],
