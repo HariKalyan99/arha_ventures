@@ -72,7 +72,7 @@ export function Philosophy() {
               </div>
             </div>
             <figcaption className="eyebrow mt-4 flex justify-between text-cream/40">
-              <span>Timber, stone & glass</span>
+              <span>Wood, stone & glass</span>
               <span>Sample imagery</span>
             </figcaption>
           </figure>
